@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<title>Product Catalog</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#e9f6f5;
+margin:0;
+}
+
+header{
+background:#0aa3a3;
+color:white;
+padding:15px;
+font-size:22px;
+}
+
+#search{
+width:300px;
+padding:10px;
+margin:10px;
+}
+
+.container{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.product{
+background:white;
+width:220px;
+margin:10px;
+padding:10px;
+border-radius:8px;
+box-shadow:0 0 5px #aaa;
+}
+
+.product img{
+width:100%;
+height:160px;
+object-fit:contain;
+}
+
+button{
+background:#0aa3a3;
+color:white;
+border:none;
+padding:8px;
+cursor:pointer;
+}
+
+.cart{
+position:fixed;
+right:0;
+top:0;
+width:250px;
+background:white;
+height:100%;
+border-left:2px solid #ccc;
+padding:10px;
+overflow:auto;
+}
+
+footer{
+text-align:center;
+padding:20px;
+color:#555;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+Product Catalog
+
+<input id="search" placeholder="Search product">
+
+</header>
+
+<div class="container" id="products"></div>
+
+<div class="cart">
+
+<h3>Cart</h3>
+
+<div id="cartItems"></div>
+
+<p>Total: $<span id="total">0</span></p>
+
+<button onclick="checkout()">Checkout</button>
+
+</div>
+
+<footer>
+
+by HJY.co
+
+</footer>
+
+<script>
+
+let cart=[]
+let products=[]
+
+fetch("products.csv")
+.then(r=>r.text())
+.then(data=>{
+
+let rows=data.split("\n")
+
+rows.forEach((row,i)=>{
+
+if(i==0)return
+
+let c=row.split(",")
+
+let about=c[2].toLowerCase()
+
+if(about.includes("ملغى")||about.includes("ملغي")) return
+
+let price=parseFloat(c[3])*1.10
+
+let product={
+code1:c[0],
+code2:c[1],
+about:c[2],
+price:price,
+photo:c[4]
+}
+
+products.push(product)
+
+})
+
+render(products)
+
+})
+
+function render(list){
+
+let html=""
+
+list.forEach((p,i)=>{
+
+html+=`
+
+<div class="product">
+
+<img src="${p.photo}">
+
+<h4>${p.code2}</h4>
+
+<p>${p.about}</p>
+
+<p>Price: $${p.price.toFixed(2)}</p>
+
+<button onclick="add(${i})">Add</button>
+
+</div>
+
+`
+
+})
+
+document.getElementById("products").innerHTML=html
+
+}
+
+function add(i){
+
+cart.push(products[i])
+
+updateCart()
+
+}
+
+function updateCart(){
+
+let html=""
+let total=0
+
+cart.forEach(p=>{
+
+html+=`<p>${p.code2} $${p.price}</p>`
+total+=p.price
+
+})
+
+document.getElementById("cartItems").innerHTML=html
+document.getElementById("total").innerText=total.toFixed(2)
+
+}
+
+function checkout(){
+
+let name=prompt("Name")
+let phone=prompt("Phone")
+let city=prompt("City")
+
+alert("Order sent\n"+name)
+
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+
+let q=e.target.value.toLowerCase()
+
+let filtered=products.filter(p=>
+
+p.about.toLowerCase().includes(q) ||
+p.code2.toLowerCase().includes(q)
+
+)
+
+render(filtered)
+
+})
+
+</script>
+
+</body>
+</html>
