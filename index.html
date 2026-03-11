@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 
 <head>
+
 <meta charset="UTF-8">
 <title>كتالوج المنتجات</title>
 
@@ -9,12 +10,12 @@
 
 body{
 font-family:Arial;
-background:#f3f7f8;
+background:#f2f6f7;
 margin:0;
 }
 
 header{
-background:#0a7c86;
+background:#0f7f88;
 color:white;
 padding:20px;
 text-align:center;
@@ -22,14 +23,14 @@ font-size:24px;
 }
 
 .controls{
-padding:20px;
+padding:15px;
 text-align:center;
 }
 
 input,select{
 padding:10px;
-margin:5px;
 font-size:16px;
+margin:5px;
 }
 
 .products{
@@ -41,43 +42,37 @@ padding:20px;
 
 .card{
 background:white;
-border-radius:10px;
 padding:15px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
+border-radius:10px;
+box-shadow:0 0 8px rgba(0,0,0,0.15);
 text-align:center;
 }
 
 .card img{
 width:100%;
-height:180px;
+height:170px;
 object-fit:contain;
 }
 
 .price{
 font-size:18px;
-color:#0a7c86;
+color:#0f7f88;
 font-weight:bold;
 }
 
 .old{
 text-decoration:line-through;
-color:#888;
+color:#777;
 font-size:14px;
 }
 
 button{
-background:#0a7c86;
+background:#0f7f88;
 color:white;
 border:none;
-padding:8px 15px;
+padding:8px 14px;
+margin-top:6px;
 cursor:pointer;
-margin-top:5px;
-}
-
-footer{
-text-align:center;
-padding:20px;
-color:#666;
 }
 
 .cart{
@@ -90,8 +85,16 @@ border-radius:10px;
 box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
+footer{
+text-align:center;
+padding:20px;
+color:#666;
+}
+
 </style>
+
 </head>
+
 
 
 <body>
@@ -106,11 +109,13 @@ box-shadow:0 0 10px rgba(0,0,0,0.2);
 <input id="search" placeholder="بحث عن منتج">
 
 <select id="filter">
+
 <option value="all">كل المنتجات</option>
-<option value="total">TOTAL</option>
-<option value="wadfow">WADFOW</option>
+<option value="total">منتجات TOTAL</option>
+<option value="wadfow">منتجات WADFOW</option>
 <option value="expensive">الأعلى سعر</option>
 <option value="cheap">الأقل سعر</option>
+
 </select>
 
 </div>
@@ -121,6 +126,8 @@ box-shadow:0 0 10px rgba(0,0,0,0.2);
 
 <div class="cart">
 🛒 سلة: <span id="cartCount">0</span>
+<br><br>
+<button onclick="order()">طلب عبر واتساب</button>
 </div>
 
 
@@ -129,28 +136,33 @@ by HJY.co
 </footer>
 
 
+
 <script>
 
 let products=[]
-let cart=0
+let cart=[]
 let discount=0
 let increase=0.10
 
 
-function csvToArray(text){
+function parseCSV(text){
 
-let rows=text.split("\n").map(r=>r.split(","))
+let lines=text.trim().split("\n")
 
-let headers=rows[0]
+let delimiter = lines[0].includes(";") ? ";" : ","
+
+let headers=lines[0].split(delimiter).map(h=>h.trim().toUpperCase())
 
 let data=[]
 
-for(let i=1;i<rows.length;i++){
+for(let i=1;i<lines.length;i++){
+
+let row=lines[i].split(delimiter)
 
 let obj={}
 
 headers.forEach((h,index)=>{
-obj[h.trim().toUpperCase()]=rows[i][index]
+obj[h]=row[index]
 })
 
 data.push(obj)
@@ -161,13 +173,14 @@ return data
 }
 
 
+
 fetch("products.csv")
 
 .then(r=>r.text())
 
 .then(text=>{
 
-let data=csvToArray(text)
+let data=parseCSV(text)
 
 data.forEach(p=>{
 
@@ -176,7 +189,6 @@ if(!p.ABOUT)return
 let about=p.ABOUT.toLowerCase()
 
 if(about.includes("ملغي") || about.includes("ملغى")) return
-
 
 let price=parseFloat(p.PRICE)
 
@@ -191,7 +203,7 @@ code2:p.CODE2,
 about:p.ABOUT,
 photo:p.PHOTO,
 price:price,
-brand:about.includes("wadfow")?"wadfow":"total"
+brand:about.includes("wadfow") ? "wadfow" : "total"
 
 })
 
@@ -213,9 +225,7 @@ let search=document.getElementById("search").value.toLowerCase()
 
 let filter=document.getElementById("filter").value
 
-
 let list=[...products]
-
 
 if(filter=="total")
 list=list.filter(p=>p.brand=="total")
@@ -233,8 +243,7 @@ list=list.sort((a,b)=>a.price-b.price)
 
 list=list.filter(p=>p.about.toLowerCase().includes(search))
 
-
-list.forEach(p=>{
+list.forEach((p,i)=>{
 
 let final=p.price*(1-discount)
 
@@ -249,10 +258,9 @@ let card=`
 <p>${p.about}</p>
 
 <div class="old">$${p.price.toFixed(2)}</div>
-
 <div class="price">$${final.toFixed(2)}</div>
 
-<button onclick="addCart()">اضافة للسلة</button>
+<button onclick="addCart(${i})">اضافة للسلة</button>
 
 </div>
 
@@ -266,13 +274,40 @@ container.innerHTML+=card
 
 
 
-function addCart(){
+function addCart(i){
 
-cart++
+cart.push(products[i])
 
-document.getElementById("cartCount").innerText=cart
+document.getElementById("cartCount").innerText=cart.length
 
 }
+
+
+
+function order(){
+
+if(cart.length==0){
+
+alert("السلة فارغة")
+
+return
+
+}
+
+let msg="طلب جديد:%0A"
+
+cart.forEach(p=>{
+
+msg+=p.code2+" - "+p.price+"$%0A"
+
+})
+
+let phone="963000000000"
+
+window.open("https://wa.me/"+phone+"?text="+msg)
+
+}
+
 
 
 document.getElementById("search").onkeyup=render
