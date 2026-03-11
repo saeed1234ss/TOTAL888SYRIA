@@ -1,45 +1,49 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
+
 <head>
 
 <meta charset="UTF-8">
-
-<title>Product Catalog</title>
+<title>كتالوج المنتجات</title>
 
 <style>
 
 body{
-font-family:Arial;
-background:#e9f6f5;
+font-family:Tahoma;
 margin:0;
+background:#eef5f5;
 }
 
 header{
-background:#0aa3a3;
+background:#159a9c;
 color:white;
 padding:15px;
-font-size:22px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
 #search{
-width:300px;
 padding:10px;
-margin:10px;
+width:250px;
+border:none;
+border-radius:5px;
 }
 
 .container{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:20px;
+padding:20px;
 }
 
 .product{
 background:white;
-width:220px;
-margin:10px;
+border-radius:10px;
 padding:10px;
-border-radius:8px;
-box-shadow:0 0 5px #aaa;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+text-align:center;
 }
 
 .product img{
@@ -48,30 +52,59 @@ height:160px;
 object-fit:contain;
 }
 
+.price{
+font-size:18px;
+color:#159a9c;
+font-weight:bold;
+}
+
 button{
-background:#0aa3a3;
+background:#159a9c;
 color:white;
 border:none;
-padding:8px;
+padding:8px 12px;
+border-radius:5px;
 cursor:pointer;
+}
+
+button:hover{
+opacity:.8;
 }
 
 .cart{
 position:fixed;
-right:0;
+left:0;
 top:0;
-width:250px;
-background:white;
+width:260px;
 height:100%;
-border-left:2px solid #ccc;
+background:white;
+border-right:2px solid #ddd;
 padding:10px;
 overflow:auto;
 }
 
-footer{
+.cart h3{
+margin-top:0;
+}
+
+.pagination{
 text-align:center;
 padding:20px;
+}
+
+footer{
+text-align:center;
+padding:15px;
 color:#555;
+}
+
+.filters{
+padding:10px;
+text-align:center;
+}
+
+.filters button{
+margin:5px;
 }
 
 </style>
@@ -82,23 +115,41 @@ color:#555;
 
 <header>
 
-Product Catalog
+<h2>كتالوج المنتجات</h2>
 
-<input id="search" placeholder="Search product">
+<input id="search" placeholder="ابحث عن منتج">
 
 </header>
 
+<div class="filters">
+
+<button onclick="showAll()">الكل</button>
+<button onclick="filterBrand('total')">TOTAL</button>
+<button onclick="filterBrand('wadfow')">WADFOW</button>
+<button onclick="sortPrice(true)">الأرخص</button>
+<button onclick="sortPrice(false)">الأغلى</button>
+
+</div>
+
 <div class="container" id="products"></div>
+
+<div class="pagination">
+
+<button onclick="prevPage()">السابق</button>
+<span id="page"></span>
+<button onclick="nextPage()">التالي</button>
+
+</div>
 
 <div class="cart">
 
-<h3>Cart</h3>
+<h3>السلة</h3>
 
 <div id="cartItems"></div>
 
-<p>Total: $<span id="total">0</span></p>
+<p>المجموع: $<span id="total">0</span></p>
 
-<button onclick="checkout()">Checkout</button>
+<button onclick="checkout()">إتمام الطلب</button>
 
 </div>
 
@@ -110,8 +161,11 @@ by HJY.co
 
 <script>
 
-let cart=[]
 let products=[]
+let filtered=[]
+let cart=[]
+let page=1
+let perPage=20
 
 fetch("products.csv")
 .then(r=>r.text())
@@ -125,29 +179,43 @@ if(i==0)return
 
 let c=row.split(",")
 
+if(!c[3]) return
+
 let about=c[2].toLowerCase()
 
-if(about.includes("ملغى")||about.includes("ملغي")) return
+if(about.includes("ملغي") || about.includes("ملغى")) return
 
 let price=parseFloat(c[3])*1.10
 
-let product={
+let photo=c[4]
+
+if(photo.includes("https://"))
+photo=photo.substring(photo.lastIndexOf("https://"))
+
+products.push({
+
 code1:c[0],
 code2:c[1],
 about:c[2],
 price:price,
-photo:c[4]
-}
-
-products.push(product)
+photo:photo
 
 })
 
-render(products)
+})
+
+filtered=[...products]
+
+render()
 
 })
 
-function render(list){
+function render(){
+
+let start=(page-1)*perPage
+let end=start+perPage
+
+let list=filtered.slice(start,end)
 
 let html=""
 
@@ -163,9 +231,9 @@ html+=`
 
 <p>${p.about}</p>
 
-<p>Price: $${p.price.toFixed(2)}</p>
+<p class="price">$${p.price.toFixed(2)}</p>
 
-<button onclick="add(${i})">Add</button>
+<button onclick="add(${products.indexOf(p)})">إضافة للسلة</button>
 
 </div>
 
@@ -175,12 +243,74 @@ html+=`
 
 document.getElementById("products").innerHTML=html
 
+document.getElementById("page").innerText=
+"صفحة "+page+" / "+Math.ceil(filtered.length/perPage)
+
 }
+
+function nextPage(){
+
+if(page<Math.ceil(filtered.length/perPage)){
+page++
+render()
+}
+
+}
+
+function prevPage(){
+
+if(page>1){
+page--
+render()
+}
+
+}
+
+function showAll(){
+
+filtered=[...products]
+page=1
+render()
+
+}
+
+function filterBrand(name){
+
+filtered=products.filter(p=>
+p.about.toLowerCase().includes(name)
+)
+
+page=1
+render()
+
+}
+
+function sortPrice(low){
+
+filtered.sort((a,b)=> low ? a.price-b.price : b.price-a.price)
+
+page=1
+render()
+
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+
+let q=e.target.value.toLowerCase()
+
+filtered=products.filter(p=>
+p.about.toLowerCase().includes(q) ||
+p.code2.toLowerCase().includes(q)
+)
+
+page=1
+render()
+
+})
 
 function add(i){
 
 cart.push(products[i])
-
 updateCart()
 
 }
@@ -192,7 +322,7 @@ let total=0
 
 cart.forEach(p=>{
 
-html+=`<p>${p.code2} $${p.price}</p>`
+html+=`<p>${p.code2} - $${p.price}</p>`
 total+=p.price
 
 })
@@ -204,30 +334,17 @@ document.getElementById("total").innerText=total.toFixed(2)
 
 function checkout(){
 
-let name=prompt("Name")
-let phone=prompt("Phone")
-let city=prompt("City")
+let name=prompt("الاسم")
+let phone=prompt("رقم الهاتف")
+let city=prompt("المحافظة")
 
-alert("Order sent\n"+name)
+alert("تم تسجيل الطلب")
 
 }
-
-document.getElementById("search").addEventListener("input",e=>{
-
-let q=e.target.value.toLowerCase()
-
-let filtered=products.filter(p=>
-
-p.about.toLowerCase().includes(q) ||
-p.code2.toLowerCase().includes(q)
-
-)
-
-render(filtered)
-
-})
 
 </script>
 
 </body>
+
 </html>
+```
