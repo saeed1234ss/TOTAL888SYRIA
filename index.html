@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -9,205 +8,239 @@
 <style>
 
 body{
-font-family:Tahoma;
+font-family:Arial;
+background:#f3f7f8;
 margin:0;
-background:#eef5f5;
 }
 
 header{
-background:#169a9a;
+background:#0a7c86;
 color:white;
-padding:15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+padding:20px;
+text-align:center;
+font-size:24px;
 }
 
-#search{
+.controls{
+padding:20px;
+text-align:center;
+}
+
+input,select{
 padding:10px;
-width:260px;
-border:none;
-border-radius:6px;
+margin:5px;
+font-size:16px;
 }
 
-.container{
+.products{
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
 gap:20px;
 padding:20px;
 }
 
-.product{
+.card{
 background:white;
 border-radius:10px;
-padding:10px;
-box-shadow:0 2px 10px rgba(0,0,0,0.1);
+padding:15px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
 text-align:center;
 }
 
-.product img{
+.card img{
 width:100%;
-height:170px;
+height:180px;
 object-fit:contain;
 }
 
 .price{
 font-size:18px;
-color:#169a9a;
+color:#0a7c86;
 font-weight:bold;
 }
 
-button{
-background:#169a9a;
-color:white;
-border:none;
-padding:8px 12px;
-border-radius:6px;
-cursor:pointer;
+.old{
+text-decoration:line-through;
+color:#888;
+font-size:14px;
 }
 
-button:hover{
-opacity:.8;
+button{
+background:#0a7c86;
+color:white;
+border:none;
+padding:8px 15px;
+cursor:pointer;
+margin-top:5px;
+}
+
+footer{
+text-align:center;
+padding:20px;
+color:#666;
 }
 
 .cart{
 position:fixed;
-left:0;
-top:0;
-width:260px;
-height:100%;
+top:20px;
+left:20px;
 background:white;
-border-right:2px solid #ddd;
-padding:10px;
-overflow:auto;
-}
-
-.pagination{
-text-align:center;
-padding:20px;
-}
-
-.filters{
-text-align:center;
-padding:10px;
-}
-
-.filters button{
-margin:5px;
+padding:15px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
 </style>
 </head>
 
+
 <body>
 
 <header>
-
-<h2>كتالوج المنتجات</h2>
-
-<input id="search" placeholder="ابحث عن منتج">
-
+كتالوج المنتجات
 </header>
 
-<div class="filters">
 
-<button onclick="showAll()">الكل</button>
-<button onclick="filterBrand('total')">TOTAL</button>
-<button onclick="filterBrand('wadfow')">WADFOW</button>
+<div class="controls">
 
-</div>
+<input id="search" placeholder="بحث عن منتج">
 
-<div class="container" id="products"></div>
-
-<div class="pagination">
-
-<button onclick="prevPage()">السابق</button>
-<span id="page"></span>
-<button onclick="nextPage()">التالي</button>
+<select id="filter">
+<option value="all">كل المنتجات</option>
+<option value="total">TOTAL</option>
+<option value="wadfow">WADFOW</option>
+<option value="expensive">الأعلى سعر</option>
+<option value="cheap">الأقل سعر</option>
+</select>
 
 </div>
+
+
+<div class="products" id="products"></div>
+
 
 <div class="cart">
-
-<h3>السلة</h3>
-
-<div id="cartItems"></div>
-
-<p>المجموع: $<span id="total">0</span></p>
-
-<button onclick="checkout()">إتمام الطلب</button>
-
+🛒 سلة: <span id="cartCount">0</span>
 </div>
+
+
+<footer>
+by HJY.co
+</footer>
+
 
 <script>
 
 let products=[]
-let filtered=[]
-let cart=[]
+let cart=0
+let discount=0
+let increase=0.10
 
-let page=1
-let perPage=20
+
+function csvToArray(text){
+
+let rows=text.split("\n").map(r=>r.split(","))
+
+let headers=rows[0]
+
+let data=[]
+
+for(let i=1;i<rows.length;i++){
+
+let obj={}
+
+headers.forEach((h,index)=>{
+obj[h.trim().toUpperCase()]=rows[i][index]
+})
+
+data.push(obj)
+
+}
+
+return data
+}
+
 
 fetch("products.csv")
+
 .then(r=>r.text())
-.then(data=>{
 
-let rows=data.split("\n")
+.then(text=>{
 
-rows.forEach((row,i)=>{
+let data=csvToArray(text)
 
-if(i==0) return
-if(!row) return
+data.forEach(p=>{
 
-let c=row.split(",")
+if(!p.ABOUT)return
 
-let code1=c[0]
-let code2=c[1]
-let about=c[2]
+let about=p.ABOUT.toLowerCase()
 
-let price=parseFloat(c[3])
+if(about.includes("ملغي") || about.includes("ملغى")) return
+
+
+let price=parseFloat(p.PRICE)
 
 if(isNaN(price)) return
 
-price=price*1.10
-
-let photo=c.slice(4).join(",")
-
-if(photo.includes("https://"))
-photo=photo.substring(photo.lastIndexOf("https://"))
+price=price+(price*increase)
 
 products.push({
 
-code1:code1,
-code2:code2,
-about:about,
+code1:p.CODE1,
+code2:p.CODE2,
+about:p.ABOUT,
+photo:p.PHOTO,
 price:price,
-photo:photo
+brand:about.includes("wadfow")?"wadfow":"total"
 
 })
 
 })
-
-filtered=[...products]
 
 render()
 
 })
 
+
+
 function render(){
 
-let start=(page-1)*perPage
-let end=start+perPage
+let container=document.getElementById("products")
 
-let list=filtered.slice(start,end)
+container.innerHTML=""
 
-let html=""
+let search=document.getElementById("search").value.toLowerCase()
 
-list.forEach((p,i)=>{
+let filter=document.getElementById("filter").value
 
-html+=`
 
-<div class="product">
+let list=[...products]
+
+
+if(filter=="total")
+list=list.filter(p=>p.brand=="total")
+
+if(filter=="wadfow")
+list=list.filter(p=>p.brand=="wadfow")
+
+if(filter=="expensive")
+list=list.sort((a,b)=>b.price-a.price)
+
+if(filter=="cheap")
+list=list.sort((a,b)=>a.price-b.price)
+
+
+
+list=list.filter(p=>p.about.toLowerCase().includes(search))
+
+
+list.forEach(p=>{
+
+let final=p.price*(1-discount)
+
+let card=`
+
+<div class="card">
 
 <img src="${p.photo}">
 
@@ -215,110 +248,37 @@ html+=`
 
 <p>${p.about}</p>
 
-<p class="price">$${p.price.toFixed(2)}</p>
+<div class="old">$${p.price.toFixed(2)}</div>
 
-<button onclick="add(${products.indexOf(p)})">إضافة للسلة</button>
+<div class="price">$${final.toFixed(2)}</div>
+
+<button onclick="addCart()">اضافة للسلة</button>
 
 </div>
 
 `
 
-})
-
-document.getElementById("products").innerHTML=html
-
-document.getElementById("page").innerText=
-"صفحة "+page+" / "+Math.ceil(filtered.length/perPage)
-
-}
-
-function nextPage(){
-
-if(page<Math.ceil(filtered.length/perPage)){
-page++
-render()
-}
-
-}
-
-function prevPage(){
-
-if(page>1){
-page--
-render()
-}
-
-}
-
-function showAll(){
-
-filtered=[...products]
-page=1
-render()
-
-}
-
-function filterBrand(name){
-
-filtered=products.filter(p=>
-p.about.toLowerCase().includes(name)
-)
-
-page=1
-render()
-
-}
-
-document.getElementById("search").addEventListener("input",e=>{
-
-let q=e.target.value.toLowerCase()
-
-filtered=products.filter(p=>
-p.about.toLowerCase().includes(q) ||
-p.code2.toLowerCase().includes(q)
-)
-
-page=1
-render()
+container.innerHTML+=card
 
 })
 
-function add(i){
+}
 
-cart.push(products[i])
-updateCart()
+
+
+function addCart(){
+
+cart++
+
+document.getElementById("cartCount").innerText=cart
 
 }
 
-function updateCart(){
 
-let html=""
-let total=0
-
-cart.forEach(p=>{
-
-html+=`<p>${p.code2} - $${p.price}</p>`
-total+=p.price
-
-})
-
-document.getElementById("cartItems").innerHTML=html
-document.getElementById("total").innerText=total.toFixed(2)
-
-}
-
-function checkout(){
-
-let name=prompt("الاسم")
-let phone=prompt("رقم الهاتف")
-let city=prompt("المحافظة")
-
-alert("تم تسجيل الطلب")
-
-}
+document.getElementById("search").onkeyup=render
+document.getElementById("filter").onchange=render
 
 </script>
 
 </body>
 </html>
-```
