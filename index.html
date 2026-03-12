@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-شwidth, initial-scale=1" />
-    <title>HJY Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TOTAL SYRIA TOOLS</title>
     <style>
       :root {
         --bg: #e9f6f5;
@@ -19,6 +19,7 @@
         --success: #0f8a3a;
         --ring: 0 0 0 4px rgba(10, 163, 163, 0.22);
         --radius: 14px;
+        --promo: #c62828;
       }
 
       * {
@@ -44,9 +45,31 @@
         grid-template-columns: 1fr;
       }
 
-      .topbar {
+      .promo-bar {
         position: sticky;
         top: 0;
+        z-index: 70;
+        background: var(--promo);
+        color: #fff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .promo-bar-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 42px;
         z-index: 50;
         border-bottom: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.85);
@@ -128,6 +151,8 @@
         gap: 8px;
         align-items: center;
         flex-wrap: wrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .pill {
@@ -191,9 +216,7 @@
         max-width: 1200px;
         margin: 0 auto;
         padding: 18px 16px 90px;
-        display: grid;
-        grid-template-columns: 1fr 360px;
-        gap: 18px;
+        display: block;
         align-items: start;
       }
 
@@ -240,6 +263,7 @@
         display: flex;
         flex-direction: column;
         min-height: 330px;
+        position: relative;
       }
 
       .thumb {
@@ -275,11 +299,32 @@
         align-items: center;
       }
 
-      .code strong {
-        color: var(--text);
-        font-weight: 700;
+      .code-left {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        min-width: 0;
+      }
+
+      .code1 {
+        color: var(--primary-3);
+        font-weight: 900;
         direction: ltr;
         unicode-bidi: plaintext;
+        white-space: nowrap;
+      }
+
+      .code2 {
+        color: var(--muted);
+        font-weight: 700;
+        font-size: 11px;
+        direction: ltr;
+        unicode-bidi: plaintext;
+        opacity: 0.9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
       }
 
       .tag {
@@ -313,6 +358,22 @@
         overflow: hidden;
       }
 
+      .desc.is-expanded {
+        display: block;
+        overflow: visible;
+      }
+
+      .readmore {
+        border: 0;
+        background: transparent;
+        color: var(--primary-2);
+        cursor: pointer;
+        font-weight: 800;
+        font-size: 12px;
+        padding: 0;
+        align-self: flex-start;
+      }
+
       .prices {
         display: flex;
         align-items: baseline;
@@ -334,6 +395,19 @@
         text-decoration: line-through;
         direction: ltr;
         unicode-bidi: plaintext;
+      }
+
+      .discount-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(10, 116, 116, 0.95);
+        color: #fff;
+        font-weight: 900;
+        font-size: 12px;
+        padding: 6px 9px;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(11, 43, 42, 0.14);
       }
 
       .actions {
@@ -366,6 +440,14 @@
         background: rgba(11, 43, 42, 0.06);
         color: var(--text);
         border: 1px solid var(--border);
+      }
+
+      .btn-disabled {
+        background: rgba(11, 43, 42, 0.06);
+        color: var(--muted);
+        border: 1px solid var(--border);
+        cursor: not-allowed;
+        flex: 1;
       }
 
       .footerbar {
@@ -422,20 +504,80 @@
         cursor: not-allowed;
       }
 
-      .cart {
-        position: sticky;
-        top: 78px;
-        padding-bottom: 12px;
+      .cart-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(11, 43, 42, 0.18);
+        backdrop-filter: blur(4px);
+        z-index: 80;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 200ms ease;
       }
 
-      .cart-body {
+      .cart-drawer {
+        position: fixed;
+        top: 96px;
+        inset-inline-end: 16px;
+        width: min(440px, calc(100vw - 32px));
+        max-height: calc(100vh - 132px);
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 18px 50px rgba(11, 43, 42, 0.22);
+        transform: translateY(-8px) scale(0.98);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 200ms ease, opacity 200ms ease;
+        z-index: 90;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .cart-drawer[data-open="true"] {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .cart-backdrop[data-open="true"] {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .cart-header {
+        padding: 14px 14px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .cart-header h2 {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .cart-close {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 8px 10px;
+        cursor: pointer;
+        font-weight: 900;
+      }
+
+      .cart-scroll {
+        overflow: auto;
         padding: 12px 14px;
         display: grid;
         gap: 10px;
+        flex: 1;
       }
 
       .cart-empty {
-        padding: 16px 14px;
+        padding: 6px 2px;
         color: var(--muted);
         font-size: 13px;
       }
@@ -446,30 +588,98 @@
         border-radius: 14px;
         padding: 10px 10px;
         display: grid;
-        gap: 6px;
+        gap: 10px;
       }
 
-      .cart-item-top {
+      .cart-row {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 10px;
+        align-items: start;
+      }
+
+      .cart-thumb {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .cart-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+
+      .cart-info {
+        display: grid;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .cart-info-top {
         display: flex;
-        align-items: center;
+        align-items: baseline;
         justify-content: space-between;
         gap: 10px;
       }
 
-      .cart-item-top strong {
-        font-size: 13px;
+      .cart-code1 {
+        font-weight: 900;
+        color: var(--primary-3);
         direction: ltr;
         unicode-bidi: plaintext;
+        white-space: nowrap;
       }
 
-      .cart-item-top button {
+      .cart-code2 {
+        font-weight: 800;
+        color: var(--muted);
+        font-size: 11px;
+        opacity: 0.9;
+        direction: ltr;
+        unicode-bidi: plaintext;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+      }
+
+      .cart-remove {
         border: 1px solid rgba(198, 40, 40, 0.28);
         background: rgba(198, 40, 40, 0.08);
         color: var(--danger);
         padding: 6px 10px;
         border-radius: 12px;
         cursor: pointer;
-        font-weight: 700;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .cart-about {
+        margin: 0;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .cart-about.is-expanded {
+        display: block;
+        overflow: visible;
+      }
+
+      .cart-table {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
       }
 
       .qty {
@@ -505,7 +715,7 @@
 
       .cart-summary {
         border-top: 1px solid var(--border);
-        padding: 12px 14px 0;
+        padding: 12px 14px;
         display: grid;
         gap: 8px;
       }
@@ -529,7 +739,7 @@
       .cart-actions {
         display: flex;
         gap: 10px;
-        padding: 12px 14px 0;
+        padding: 0 14px 14px;
       }
 
       .cart-actions .btn {
@@ -562,18 +772,14 @@
 
       @media (max-width: 900px) {
         .layout {
-          grid-template-columns: 1fr;
+          display: block;
         }
-        .cart {
-          position: fixed;
-          inset: auto 10px 70px 10px;
-          max-height: min(75vh, 720px);
-          transform: translateY(120%);
-          transition: transform 200ms ease;
-          z-index: 60;
+        .promo-bar-inner {
+          font-size: 12px;
+          padding: 9px 12px;
         }
-        .cart[data-open="true"] {
-          transform: translateY(0);
+        .topbar {
+          top: 40px;
         }
       }
 
@@ -587,8 +793,32 @@
         .brand p {
           display: none;
         }
-        .pillbar {
-          display: none;
+        .footerbar-inner {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+        }
+        .meta {
+          justify-content: center;
+          font-size: 12px;
+        }
+        .pager {
+          justify-content: center;
+        }
+
+        .cart-drawer {
+          top: auto;
+          inset-inline: 0;
+          inset-block-end: 0;
+          width: 100%;
+          max-height: 82vh;
+          border-radius: 18px 18px 0 0;
+          transform: translateY(110%);
+          opacity: 1;
+        }
+
+        .cart-drawer[data-open="true"] {
+          transform: translateY(0);
         }
       }
 
@@ -597,16 +827,37 @@
           grid-template-columns: 1fr;
         }
       }
+
+      @media (max-width: 420px) {
+        .footerbar-inner {
+          padding: 10px 12px;
+        }
+        .meta {
+          gap: 8px;
+          justify-content: center;
+          text-align: center;
+        }
+        .pager {
+          width: 100%;
+          justify-content: center;
+        }
+        .pager button {
+          flex: 1;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="app">
+      <div class="promo-bar">
+        <div class="promo-bar-inner">خصومات حصرية: خصم 3% لـ TOTAL و خصم 5% لـ WADFOW</div>
+      </div>
       <header class="topbar">
         <div class="topbar-inner">
           <div class="brand">
             <div class="logo" aria-hidden="true"></div>
             <div>
-              <h1>متجر HJY</h1>
+              <h1>TOTAL SYRIA TOOLS</h1>
               <p>بحث سريع + تصنيفات + سلة مشتريات</p>
             </div>
           </div>
@@ -633,16 +884,17 @@
         <div class="topbar-inner" style="padding-top: 0; padding-bottom: 12px">
           <div class="pillbar" role="group" aria-label="التصنيفات">
             <button class="pill" type="button" data-category="ALL" aria-pressed="true">الكل</button>
-            <button class="pill" type="button" data-category="WADOW" aria-pressed="false">WADOW</button>
+            <button class="pill" type="button" data-category="WADFOW" aria-pressed="false">WADFOW</button>
             <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
-            <button class="pill" type="button" data-category="OTHER" aria-pressed="false">أخرى</button>
+            <button class="pill" type="button" data-category="UNAVAILABLE" aria-pressed="false">الغير متوفر</button>
+            <button class="pill" type="button" data-category="UNCATEGORIZED" aria-pressed="false">غير مصنف</button>
           </div>
           <p class="panel-sub" id="hint" style="margin-inline-start: auto">تحميل البيانات...</p>
         </div>
       </header>
 
       <main class="layout">
-        <section class="panel">
+        <section class="panel" id="shopView">
           <div class="panel-header">
             <div>
               <h2>المنتجات</h2>
@@ -657,51 +909,93 @@
           <div class="grid" id="productsGrid" aria-live="polite"></div>
         </section>
 
-        <aside class="panel cart" id="cartPanel" data-open="false">
+        <section class="panel" id="checkoutView" style="display:none">
           <div class="panel-header">
             <div>
-              <h2>سلة المشتريات</h2>
-              <p class="panel-sub" id="cartMeta">—</p>
+              <h2>إتمام الطلب</h2>
+              <p class="panel-sub" id="checkoutMeta">—</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button class="btn btn-ghost" id="backToShopBtn" type="button">رجوع للتسوق</button>
             </div>
           </div>
-          <div id="cartContent"></div>
-        </aside>
+          <div style="padding:14px;display:grid;gap:14px">
+            <div class="status" id="checkoutStatus" aria-hidden="true"></div>
+            <form id="checkoutForm" style="display:grid;gap:10px;max-width:520px">
+              <label style="display:grid;gap:6px">
+                <span style="font-weight:800">اسم ثلاثي</span>
+                <input id="fullNameInput" type="text" autocomplete="name" required style="padding:12px;border:1px solid var(--border);border-radius:12px" />
+              </label>
+              <label style="display:grid;gap:6px">
+                <span style="font-weight:800">المحافظة</span>
+                <input id="govInput" type="text" autocomplete="address-level1" required style="padding:12px;border:1px solid var(--border);border-radius:12px" />
+              </label>
+              <label style="display:grid;gap:6px">
+                <span style="font-weight:800">رقم الهاتف</span>
+                <input id="phoneInput" type="tel" inputmode="tel" autocomplete="tel" required style="padding:12px;border:1px solid var(--border);border-radius:12px;direction:ltr;unicode-bidi:plaintext" />
+              </label>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" id="confirmOrderBtn" type="submit" style="flex:1">إتمام الطلب</button>
+                <button class="btn btn-ghost" id="copyInvoiceBtn" type="button" style="flex:1;display:none">نسخ الفاتورة</button>
+              </div>
+              <div id="invoiceNote" class="panel-sub" style="display:none">
+                يمكنك نسخ الفاتورة وإرسالها إلينا على الواتساب. الفاتورة المنسوخة تحتوي كل التفاصيل بشكل مرتب وسطر تحت سطر.
+              </div>
+            </form>
+            <div id="orderSummary" style="display:grid;gap:10px"></div>
+          </div>
+        </section>
       </main>
 
       <footer class="footerbar">
         <div class="footerbar-inner">
           <div class="meta">
-            <span>عرض</span>
-            <strong id="rangeText">—</strong>
-            <span>من</span>
-            <strong id="totalText">—</strong>
-            <span>منتج</span>
+            <span>
+              عرض <bdi id="rangeText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> من
+              <bdi id="totalText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> منتج
+            </span>
           </div>
           <div class="pager">
             <button id="prevPage" type="button">السابق</button>
             <button id="nextPage" type="button">التالي</button>
           </div>
           <div class="meta">
-            <span>by HJY.co</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:700">BY HJY.co</span>
           </div>
         </div>
       </footer>
     </div>
+
+    <div class="cart-backdrop" id="cartBackdrop" data-open="false"></div>
+    <aside class="cart-drawer" id="cartPanel" data-open="false" aria-label="سلة المشتريات">
+      <div class="cart-header">
+        <div>
+          <h2>سلة المشتريات</h2>
+          <p class="panel-sub" id="cartMeta">—</p>
+        </div>
+        <button class="cart-close" id="cartCloseBtn" type="button">إغلاق</button>
+      </div>
+      <div class="cart-scroll" id="cartContent"></div>
+      <div class="cart-summary" id="cartSummary"></div>
+      <div class="cart-actions" id="cartActions"></div>
+    </aside>
 
     <script>
       const CONFIG = {
         CSV_URL: "products.csv",
         ITEMS_PER_PAGE: 20,
         MARKUP_RATE: 0.1,
-        DISCOUNT_ENABLED: false,
-        DISCOUNT_PERCENT: 0.15,
+        DISCOUNT_TOTAL: 0.03,
+        DISCOUNT_WADFOW: 0.05,
+        SEARCH_MIN_CHARS: 3,
+        TELEGRAM_BOT_TOKEN: "8539011678:AAEcx0KoMJPO_biAaKyPA8SgsQZAe0gC3S4",
+        TELEGRAM_CHAT_ID: "2067991553",
       };
-      // لتفعيل الخصم: غيّر DISCOUNT_ENABLED إلى true وحدد DISCOUNT_PERCENT
 
       const PLACEHOLDER_IMG =
         "data:image/svg+xml;charset=utf-8," +
         encodeURIComponent(
-          `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9f6f5"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><g fill="#0aa3a3" opacity="0.7"><circle cx="130" cy="110" r="18"/><circle cx="190" cy="110" r="10"/><circle cx="170" cy="150" r="12"/></g><text x="50%" y="52%" font-size="26" text-anchor="middle" fill="#4b6b69" font-family="Arial">HJY</text><text x="50%" y="58%" font-size="14" text-anchor="middle" fill="#4b6b69" font-family="Arial">Image</text></svg>`
+          `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9f6f5"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><g fill="#0aa3a3" opacity="0.7"><circle cx="130" cy="110" r="18"/><circle cx="190" cy="110" r="10"/><circle cx="170" cy="150" r="12"/></g><text x="50%" y="52%" font-size="26" text-anchor="middle" fill="#4b6b69" font-family="Arial">TOTAL</text><text x="50%" y="58%" font-size="14" text-anchor="middle" fill="#4b6b69" font-family="Arial">TOOLS</text></svg>`
         );
 
       const els = {
@@ -719,9 +1013,26 @@
         hint: document.getElementById("hint"),
         cartToggle: document.getElementById("cartToggle"),
         cartPanel: document.getElementById("cartPanel"),
+        cartBackdrop: document.getElementById("cartBackdrop"),
+        cartCloseBtn: document.getElementById("cartCloseBtn"),
         cartCount: document.getElementById("cartCount"),
         cartContent: document.getElementById("cartContent"),
         cartMeta: document.getElementById("cartMeta"),
+        cartSummary: document.getElementById("cartSummary"),
+        cartActions: document.getElementById("cartActions"),
+        shopView: document.getElementById("shopView"),
+        checkoutView: document.getElementById("checkoutView"),
+        checkoutMeta: document.getElementById("checkoutMeta"),
+        checkoutStatus: document.getElementById("checkoutStatus"),
+        checkoutForm: document.getElementById("checkoutForm"),
+        fullNameInput: document.getElementById("fullNameInput"),
+        govInput: document.getElementById("govInput"),
+        phoneInput: document.getElementById("phoneInput"),
+        confirmOrderBtn: document.getElementById("confirmOrderBtn"),
+        copyInvoiceBtn: document.getElementById("copyInvoiceBtn"),
+        invoiceNote: document.getElementById("invoiceNote"),
+        orderSummary: document.getElementById("orderSummary"),
+        backToShopBtn: document.getElementById("backToShopBtn"),
       };
 
       const state = {
@@ -733,6 +1044,7 @@
         page: 1,
         cart: new Map(),
         lastQueryTokens: [],
+        lastInvoiceText: "",
       };
 
       function safeLower(v) {
@@ -800,9 +1112,10 @@
 
       function getCategoryFromAbout(about) {
         const a = safeLower(about);
-        if (a.includes("wadow")) return "WADOW";
+        if (a.includes("ملغى") || a.includes("ملغي")) return "UNAVAILABLE";
+        if (a.includes("wadfow") || a.includes("wadow")) return "WADFOW";
         if (a.includes("total")) return "TOTAL";
-        return "OTHER";
+        return "UNCATEGORIZED";
       }
 
       function calcPriceBefore(rawPrice) {
@@ -810,10 +1123,15 @@
         return rawPrice * (1 + CONFIG.MARKUP_RATE);
       }
 
-      function calcPriceAfter(priceBefore) {
+      function discountForCategory(category) {
+        if (category === "TOTAL") return CONFIG.DISCOUNT_TOTAL;
+        if (category === "WADFOW") return CONFIG.DISCOUNT_WADFOW;
+        return 0;
+      }
+
+      function calcPriceAfter(priceBefore, category) {
         if (!Number.isFinite(priceBefore)) return 0;
-        if (!CONFIG.DISCOUNT_ENABLED) return priceBefore;
-        const d = Math.max(0, Math.min(0.95, CONFIG.DISCOUNT_PERCENT));
+        const d = Math.max(0, Math.min(0.95, discountForCategory(category)));
         return priceBefore * (1 - d);
       }
 
@@ -839,8 +1157,9 @@
       }
 
       function buildSearchTokens(q) {
-        return safeLower(q)
-          .trim()
+        const cleaned = safeLower(q).trim();
+        if (cleaned.length < CONFIG.SEARCH_MIN_CHARS) return [];
+        return cleaned
           .split(/\s+/)
           .map((t) => t.trim())
           .filter(Boolean)
@@ -887,7 +1206,14 @@
         } else if (state.sort === "priceDesc") {
           list = [...list].sort((a, b) => b.priceAfter - a.priceAfter);
         } else if (state.sort === "code") {
-          list = [...list].sort((a, b) => (a.codeCombo < b.codeCombo ? -1 : a.codeCombo > b.codeCombo ? 1 : 0));
+          list = [...list].sort((a, b) => {
+            const a1 = safeLower(a.code1);
+            const b1 = safeLower(b.code1);
+            if (a1 !== b1) return a1 < b1 ? -1 : 1;
+            const a2 = safeLower(a.code2);
+            const b2 = safeLower(b.code2);
+            return a2 < b2 ? -1 : a2 > b2 ? 1 : 0;
+          });
         }
 
         state.filteredProducts = list;
@@ -914,8 +1240,17 @@
         els.totalText.textContent = String(state.filteredProducts.length);
 
         const catLabel =
-          state.category === "ALL" ? "الكل" : state.category === "WADOW" ? "WADOW" : state.category === "TOTAL" ? "TOTAL" : "أخرى";
-        const qLabel = state.query.trim() ? ` / بحث: ${state.query.trim()}` : "";
+          state.category === "ALL"
+            ? "الكل"
+            : state.category === "WADFOW"
+            ? "WADFOW"
+            : state.category === "TOTAL"
+            ? "TOTAL"
+            : state.category === "UNAVAILABLE"
+            ? "الغير متوفر"
+            : "غير مصنف";
+        const qTrimmed = state.query.trim();
+        const qLabel = qTrimmed.length >= CONFIG.SEARCH_MIN_CHARS ? ` / بحث: ${qTrimmed}` : "";
         els.activeFilters.textContent = `${catLabel}${qLabel}`;
         els.resultsMeta.textContent = `صفحة ${state.page} من ${pageCount} — عرض ${CONFIG.ITEMS_PER_PAGE} لكل صفحة`;
 
@@ -933,13 +1268,16 @@
 
         let html = "";
         for (const p of items) {
-          const showOld = CONFIG.DISCOUNT_ENABLED && p.priceAfter < p.priceBefore;
+          const showOld = p.discountPercent > 0 && p.priceAfter < p.priceBefore;
+          const aboutLong = String(p.about ?? "").length > 120;
+          const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           html += `
-            <article class="card">
+            <article class="card" data-key="${escapeHtmlAttr(p.key)}">
+              ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
               <div class="thumb">
                 <img
                   src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
-                  alt="${escapeHtmlAttr(p.code2)}"
+                  alt="${escapeHtmlAttr(p.code1)}"
                   loading="lazy"
                   decoding="async"
                   referrerpolicy="no-referrer"
@@ -948,18 +1286,24 @@
               </div>
               <div class="card-body">
                 <div class="code">
-                  <strong>${escapeHtml(p.codeCombo)}</strong>
-                  <span class="tag">${p.category}</span>
+                  <div class="code-left">
+                    <span class="code1">${escapeHtml(p.code1)}</span>
+                    <span class="code2">${escapeHtml(p.code2)}</span>
+                  </div>
                 </div>
-                <p class="title">${escapeHtml(p.code2)}</p>
-                <p class="desc">${escapeHtml(p.about)}</p>
+                <p class="desc" data-desc="${escapeHtmlAttr(p.key)}">${escapeHtml(p.about)}</p>
+                ${aboutLong ? `<button class="readmore" type="button" data-more="${escapeHtmlAttr(p.key)}">قراءة المزيد...</button>` : ""}
                 <div class="prices">
                   <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                   ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
                 </div>
                 <div class="actions">
-                  <button class="btn btn-primary" type="button" data-add="${escapeHtmlAttr(p.key)}">إضافة للسلة</button>
-                  <button class="btn btn-ghost" type="button" data-copy="${escapeHtmlAttr(p.key)}">نسخ الكود</button>
+                  ${
+                    p.category === "UNAVAILABLE"
+                      ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
+                      : `<button class="btn btn-primary" type="button" data-add="${escapeHtmlAttr(p.key)}">إضافة للسلة</button>`
+                  }
+                  <button class="btn btn-ghost" type="button" data-copy="${escapeHtmlAttr(p.key)}">نسخ CODE1</button>
                 </div>
               </div>
             </article>
@@ -1027,6 +1371,7 @@
       function addToCartByKey(key) {
         const p = state.allProducts.find((x) => x.key === key);
         if (!p) return;
+        if (p.category === "UNAVAILABLE") return;
         const existing = state.cart.get(key);
         state.cart.set(key, { product: p, qty: Math.min(999, (existing?.qty ?? 0) + 1) });
         saveCart();
@@ -1061,50 +1406,77 @@
 
         if (count === 0) {
           els.cartContent.innerHTML = `<div class="cart-empty">السلة فارغة. أضف منتجات لعرضها هنا.</div>`;
+          els.cartSummary.innerHTML = "";
+          els.cartActions.innerHTML = "";
           return;
         }
 
-        let itemsHtml = `<div class="cart-body">`;
+        let itemsHtml = ``;
         for (const [key, it] of state.cart.entries()) {
+          const aboutLong = String(it.product.about ?? "").length > 110;
           itemsHtml += `
             <div class="cart-item">
-              <div class="cart-item-top">
-                <strong>${escapeHtml(it.product.codeCombo)}</strong>
-                <button type="button" data-remove="${escapeHtmlAttr(key)}">حذف</button>
-              </div>
-              <div class="qty">
-                <div class="qty-controls">
-                  <button type="button" data-dec="${escapeHtmlAttr(key)}">-</button>
-                  <input inputmode="numeric" pattern="[0-9]*" value="${it.qty}" data-qty="${escapeHtmlAttr(key)}" />
-                  <button type="button" data-inc="${escapeHtmlAttr(key)}">+</button>
+              <div class="cart-row">
+                <div class="cart-thumb">
+                  <img
+                    src="${escapeHtmlAttr(it.product.photo || PLACEHOLDER_IMG)}"
+                    alt="${escapeHtmlAttr(it.product.code1)}"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                    onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                  />
                 </div>
-                <div style="direction:ltr;unicode-bidi:plaintext;font-weight:800;color:var(--primary-3)">$${formatMoney(
-                  it.qty * it.product.priceAfter
-                )}</div>
+                <div class="cart-info">
+                  <div class="cart-info-top">
+                    <div style="display:flex;gap:8px;align-items:baseline;min-width:0">
+                      <span class="cart-code1">${escapeHtml(it.product.code1)}</span>
+                      <span class="cart-code2">${escapeHtml(it.product.code2)}</span>
+                    </div>
+                    <button class="cart-remove" type="button" data-remove="${escapeHtmlAttr(key)}">حذف</button>
+                  </div>
+                  <p class="cart-about" data-cart-about="${escapeHtmlAttr(key)}">${escapeHtml(it.product.about)}</p>
+                  ${
+                    aboutLong
+                      ? `<button class="readmore" type="button" data-cart-more="${escapeHtmlAttr(key)}">قراءة المزيد...</button>`
+                      : ""
+                  }
+                  <div class="cart-table">
+                    <div class="qty">
+                      <div class="qty-controls">
+                        <button type="button" data-dec="${escapeHtmlAttr(key)}">-</button>
+                        <input inputmode="numeric" pattern="[0-9]*" value="${it.qty}" data-qty="${escapeHtmlAttr(
+                          key
+                        )}" />
+                        <button type="button" data-inc="${escapeHtmlAttr(key)}">+</button>
+                      </div>
+                    </div>
+                    <div style="direction:ltr;unicode-bidi:plaintext;font-weight:900;color:var(--primary-3)">$${formatMoney(
+                      it.qty * it.product.priceAfter
+                    )}</div>
+                  </div>
+                </div>
               </div>
             </div>
           `;
         }
-        itemsHtml += `</div>`;
         const total = cartTotals();
-        itemsHtml += `
-          <div class="cart-summary">
-            <div class="sum-row">
-              <span>الإجمالي</span>
-              <strong>$${formatMoney(total)}</strong>
-            </div>
-          </div>
-          <div class="cart-actions">
-            <button class="btn btn-danger" type="button" id="clearCartBtn">تفريغ</button>
-            <button class="btn btn-primary" type="button" id="checkoutBtn">إتمام الطلب</button>
+        els.cartContent.innerHTML = itemsHtml;
+        els.cartSummary.innerHTML = `
+          <div class="sum-row">
+            <span>الإجمالي</span>
+            <strong>$${formatMoney(total)}</strong>
           </div>
         `;
-        els.cartContent.innerHTML = itemsHtml;
+        els.cartActions.innerHTML = `
+          <button class="btn btn-danger" type="button" id="clearCartBtn">تفريغ</button>
+          <button class="btn btn-primary" type="button" id="checkoutBtn">إتمام الطلب</button>
+        `;
       }
 
-      async function copyCode(codeCombo) {
+      async function copyText(text) {
         try {
-          await navigator.clipboard.writeText(codeCombo);
+          await navigator.clipboard.writeText(text);
           els.hint.textContent = "تم النسخ";
           setTimeout(() => {
             els.hint.textContent = "جاهز";
@@ -1117,23 +1489,157 @@
         }
       }
 
-      function checkout() {
-        if (state.cart.size === 0) return;
+      function setCheckoutStatus(text, isError = false) {
+        if (!text) {
+          els.checkoutStatus.setAttribute("aria-hidden", "true");
+          els.checkoutStatus.textContent = "";
+          return;
+        }
+        els.checkoutStatus.setAttribute("aria-hidden", "false");
+        els.checkoutStatus.style.color = isError ? "#c62828" : "";
+        els.checkoutStatus.textContent = text;
+      }
 
-        const name = prompt("الاسم");
-        if (name === null) return;
-        const phone = prompt("رقم الهاتف");
-        if (phone === null) return;
-        const city = prompt("المدينة");
-        if (city === null) return;
+      function openCart(open) {
+        const next =
+          typeof open === "boolean" ? (open ? "true" : "false") : els.cartPanel.getAttribute("data-open") === "true" ? "false" : "true";
+        els.cartPanel.setAttribute("data-open", next);
+        els.cartBackdrop.setAttribute("data-open", next);
+      }
 
-        let lines = [];
+      function showShopView() {
+        els.shopView.style.display = "";
+        els.checkoutView.style.display = "none";
+        setCheckoutStatus("");
+      }
+
+      function buildInvoiceText(details) {
+        const name = String(details.name ?? "").trim();
+        const gov = String(details.gov ?? "").trim();
+        const phone = String(details.phone ?? "").trim();
+        const lines = [];
+        lines.push("طلب جديد");
+        lines.push(`الاسم الثلاثي: ${name}`);
+        lines.push(`المحافظة: ${gov}`);
+        lines.push(`رقم الهاتف: ${phone}`);
+        lines.push("");
+        lines.push("تفاصيل الطلب:");
         for (const it of state.cart.values()) {
-          lines.push(`${it.product.codeCombo} x${it.qty} = $${formatMoney(it.qty * it.product.priceAfter)}`);
+          lines.push(`- CODE1: ${it.product.code1}`);
+          lines.push(`  CODE2: ${it.product.code2}`);
+          lines.push(`  ${it.product.about}`);
+          lines.push(`  الكمية: ${it.qty}`);
+          lines.push(`  السعر: $${formatMoney(it.product.priceAfter)}`);
+          lines.push(`  المجموع: $${formatMoney(it.qty * it.product.priceAfter)}`);
+          lines.push("");
+        }
+        lines.push(`الإجمالي: $${formatMoney(cartTotals())}`);
+        return lines.join("\n").trim();
+      }
+
+      function splitText(text, maxLen) {
+        const t = String(text ?? "");
+        if (t.length <= maxLen) return [t];
+        const out = [];
+        let cur = "";
+        for (const line of t.split("\n")) {
+          const candidate = cur ? `${cur}\n${line}` : line;
+          if (candidate.length <= maxLen) {
+            cur = candidate;
+            continue;
+          }
+          if (cur) out.push(cur);
+          if (line.length <= maxLen) {
+            cur = line;
+            continue;
+          }
+          for (let i = 0; i < line.length; i += maxLen) out.push(line.slice(i, i + maxLen));
+          cur = "";
+        }
+        if (cur) out.push(cur);
+        return out;
+      }
+
+      async function sendToTelegram(text) {
+        const token = String(CONFIG.TELEGRAM_BOT_TOKEN ?? "").trim();
+        const chatId = String(CONFIG.TELEGRAM_CHAT_ID ?? "").trim();
+        if (!token || !chatId) return;
+        const chunks = splitText(text, 3500);
+        for (let i = 0; i < chunks.length; i++) {
+          const part = chunks[i];
+          const prefix = chunks.length > 1 ? `(${i + 1}/${chunks.length})\n` : "";
+          const url =
+            `https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage` +
+            `?chat_id=${encodeURIComponent(chatId)}` +
+            `&text=${encodeURIComponent(prefix + part)}` +
+            `&disable_web_page_preview=true`;
+          const img = new Image();
+          img.referrerPolicy = "no-referrer";
+          img.src = url;
+          await new Promise((r) => setTimeout(r, 180));
+        }
+      }
+
+      function renderCheckoutSummary() {
+        if (state.cart.size === 0) {
+          els.orderSummary.innerHTML = "";
+          els.checkoutMeta.textContent = "السلة فارغة";
+          return;
         }
         const total = formatMoney(cartTotals());
-        const message = `طلب جديد\nالاسم: ${name}\nالهاتف: ${phone}\nالمدينة: ${city}\n\n${lines.join("\n")}\n\nالإجمالي: $${total}`;
-        alert(message);
+        els.checkoutMeta.textContent = `${cartCountTotal()} قطعة — الإجمالي $${total}`;
+        let html = `<div style="display:grid;gap:10px">`;
+        for (const it of state.cart.values()) {
+          html += `
+            <div class="cart-item">
+              <div class="cart-row">
+                <div class="cart-thumb">
+                  <img
+                    src="${escapeHtmlAttr(it.product.photo || PLACEHOLDER_IMG)}"
+                    alt="${escapeHtmlAttr(it.product.code1)}"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                    onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                  />
+                </div>
+                <div class="cart-info">
+                  <div class="cart-info-top">
+                    <div style="display:flex;gap:8px;align-items:baseline;min-width:0">
+                      <span class="cart-code1">${escapeHtml(it.product.code1)}</span>
+                      <span class="cart-code2">${escapeHtml(it.product.code2)}</span>
+                    </div>
+                    <span style="direction:ltr;unicode-bidi:plaintext;font-weight:900;color:var(--primary-3)">$${formatMoney(
+                      it.qty * it.product.priceAfter
+                    )}</span>
+                  </div>
+                  <p class="cart-about is-expanded">${escapeHtml(it.product.about)}</p>
+                  <div class="cart-table">
+                    <div style="font-weight:800;color:var(--muted)">الكمية: ${it.qty}</div>
+                    <div style="direction:ltr;unicode-bidi:plaintext;color:var(--muted);font-weight:800">$${formatMoney(
+                      it.product.priceAfter
+                    )} / قطعة</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        html += `</div>`;
+        els.orderSummary.innerHTML = html;
+      }
+
+      function checkout() {
+        if (state.cart.size === 0) return;
+        openCart(false);
+        els.shopView.style.display = "none";
+        els.checkoutView.style.display = "";
+        els.copyInvoiceBtn.style.display = "none";
+        els.invoiceNote.style.display = "none";
+        els.confirmOrderBtn.disabled = false;
+        els.confirmOrderBtn.textContent = "إتمام الطلب";
+        setCheckoutStatus("");
+        renderCheckoutSummary();
       }
 
       function debounce(fn, wait) {
@@ -1181,22 +1687,36 @@
           const addKey = t.getAttribute("data-add");
           if (addKey) {
             addToCartByKey(addKey);
-            if (window.matchMedia("(max-width: 900px)").matches) {
-              els.cartPanel.setAttribute("data-open", "true");
-            }
+            els.hint.textContent = "تمت الإضافة للسلة";
+            setTimeout(() => {
+              if (els.hint.textContent === "تمت الإضافة للسلة") els.hint.textContent = "جاهز";
+            }, 900);
             return;
           }
           const copyKey = t.getAttribute("data-copy");
           if (copyKey) {
             const p = state.allProducts.find((x) => x.key === copyKey);
             if (!p) return;
-            await copyCode(p.codeCombo);
+            await copyText(p.code1);
+            return;
+          }
+          const moreKey = t.getAttribute("data-more");
+          if (moreKey) {
+            const desc = els.grid.querySelector(`[data-desc="${CSS.escape(moreKey)}"]`);
+            if (!(desc instanceof HTMLElement)) return;
+            const isExpanded = desc.classList.toggle("is-expanded");
+            t.textContent = isExpanded ? "إخفاء" : "قراءة المزيد...";
           }
         });
 
         els.cartToggle.addEventListener("click", () => {
-          const isOpen = els.cartPanel.getAttribute("data-open") === "true";
-          els.cartPanel.setAttribute("data-open", isOpen ? "false" : "true");
+          openCart();
+        });
+
+        els.cartCloseBtn.addEventListener("click", () => openCart(false));
+        els.cartBackdrop.addEventListener("click", () => openCart(false));
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") openCart(false);
         });
 
         els.cartContent.addEventListener("click", (e) => {
@@ -1216,6 +1736,18 @@
             if (!it) return;
             return setCartQty(decKey, it.qty - 1);
           }
+          const moreKey = t.getAttribute("data-cart-more");
+          if (moreKey) {
+            const p = els.cartContent.querySelector(`[data-cart-about="${CSS.escape(moreKey)}"]`);
+            if (!(p instanceof HTMLElement)) return;
+            const isExpanded = p.classList.toggle("is-expanded");
+            t.textContent = isExpanded ? "إخفاء" : "قراءة المزيد...";
+          }
+        });
+
+        els.cartActions.addEventListener("click", (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLElement)) return;
           if (t.id === "clearCartBtn") return clearCart();
           if (t.id === "checkoutBtn") return checkout();
         });
@@ -1228,6 +1760,41 @@
           const qty = Number(t.value);
           if (!Number.isFinite(qty)) return renderCart();
           setCartQty(key, qty);
+        });
+
+        els.backToShopBtn.addEventListener("click", () => showShopView());
+
+        els.checkoutForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (state.cart.size === 0) return;
+          const name = String(els.fullNameInput.value ?? "").trim();
+          const gov = String(els.govInput.value ?? "").trim();
+          const phone = String(els.phoneInput.value ?? "").trim();
+          if (name.length < 6) return setCheckoutStatus("يرجى إدخال الاسم الثلاثي بشكل صحيح.", true);
+          if (gov.length < 2) return setCheckoutStatus("يرجى إدخال المحافظة.", true);
+          if (phone.replace(/[^0-9]/g, "").length < 9) return setCheckoutStatus("يرجى إدخال رقم هاتف صحيح.", true);
+
+          const invoice = buildInvoiceText({ name, gov, phone });
+          state.lastInvoiceText = invoice;
+          els.copyInvoiceBtn.style.display = "";
+          els.invoiceNote.style.display = "";
+          els.confirmOrderBtn.disabled = true;
+          els.confirmOrderBtn.textContent = "جارٍ الإرسال...";
+          setCheckoutStatus("جارٍ إرسال الطلب...", false);
+          try {
+            await sendToTelegram(invoice);
+            els.confirmOrderBtn.textContent = "تم إرسال الطلب";
+            setCheckoutStatus("طلبك وصل إلينا. سوف يتم التواصل معك على واتساب قريباً.", false);
+          } catch {
+            els.confirmOrderBtn.textContent = "تم تجهيز الفاتورة";
+            setCheckoutStatus("تم تجهيز الفاتورة. يمكنك نسخها وإرسالها إلينا على الواتساب.", false);
+          }
+          await copyText(invoice);
+        });
+
+        els.copyInvoiceBtn.addEventListener("click", async () => {
+          if (!state.lastInvoiceText) return;
+          await copyText(state.lastInvoiceText);
         });
       }
 
@@ -1253,26 +1820,24 @@
             const rawPrice = Number(String(cols[3] ?? "").replace(/[^0-9.]/g, ""));
             const photo = cols[4] ?? "";
 
-            const aboutLower = safeLower(about);
-            if (aboutLower.includes("ملغى") || aboutLower.includes("ملغي")) continue;
             if (!code1 && !code2) continue;
 
-            const priceBefore = calcPriceBefore(rawPrice);
-            const priceAfter = calcPriceAfter(priceBefore);
             const category = getCategoryFromAbout(about);
-            const codeCombo = `${String(code1).trim()} + ${String(code2).trim()}`.trim();
+            const priceBefore = calcPriceBefore(rawPrice);
+            const priceAfter = calcPriceAfter(priceBefore, category);
+            const discountPercent = discountForCategory(category);
             const key = `${String(code1).trim()}::${String(code2).trim()}`;
-            const search = safeLower(`${code1} ${code2} ${about} ${category}`);
+            const search = safeLower(`${code1} ${code2} ${about}`);
 
             products.push({
               key,
               code1: String(code1).trim(),
               code2: String(code2).trim(),
-              codeCombo,
               about: String(about).trim(),
               rawPrice: Number.isFinite(rawPrice) ? rawPrice : 0,
               priceBefore,
               priceAfter,
+              discountPercent,
               photo: String(photo).trim(),
               category,
               search,
@@ -1287,6 +1852,7 @@
           renderCart();
           render();
           els.totalText.textContent = String(products.length);
+          showShopView();
         } catch (e) {
           els.hint.textContent = "فشل التحميل";
           setStatus("فشل تحميل products.csv. تأكد أن الملف موجود بنفس المجلد على GitHub Pages وبنفس الاسم.", true);
