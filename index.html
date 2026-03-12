@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-شwidth, initial-scale=1" />
     <title>HJY Store</title>
     <style>
       :root {
@@ -739,7 +739,7 @@
         return String(v ?? "").toLowerCase();
       }
 
-      function parseCsvLine(line) {
+      function parseCsvLine(line, delimiter = ",") {
         const out = [];
         let cur = "";
         let inQuotes = false;
@@ -754,7 +754,7 @@
             inQuotes = !inQuotes;
             continue;
           }
-          if (ch === "," && !inQuotes) {
+          if (ch === delimiter && !inQuotes) {
             out.push(cur);
             cur = "";
             continue;
@@ -763,6 +763,39 @@
         }
         out.push(cur);
         return out.map((v) => v.trim());
+      }
+
+      function detectCsvDelimiter(headerLine) {
+        const h = String(headerLine ?? "").replace(/^\uFEFF/, "");
+        const candidates = [",", ";", "\t"];
+        let best = ",";
+        let bestScore = -1;
+        for (const d of candidates) {
+          const cols = parseCsvLine(h, d);
+          let score = cols.length;
+          const c0 = safeLower(cols[0] ?? "");
+          if (c0.includes("code1")) score += 10;
+          if (score > bestScore) {
+            bestScore = score;
+            best = d;
+          }
+        }
+        return best;
+      }
+
+      function normalizeCsvRow(cols, delimiter, expected = 5) {
+        const c = Array.isArray(cols) ? cols.slice() : [];
+        if (c.length > expected) {
+          return [...c.slice(0, expected - 1), c.slice(expected - 1).join(delimiter)];
+        }
+        while (c.length < expected) c.push("");
+        return c;
+      }
+
+      function cleanCell(v) {
+        const s = String(v ?? "").trim();
+        if (s.startsWith("`") && s.endsWith("`") && s.length >= 2) return s.slice(1, -1).trim();
+        return s;
       }
 
       function getCategoryFromAbout(about) {
@@ -1208,9 +1241,12 @@
           const lines = data.split(/\r?\n/).filter((l) => l.trim().length > 0);
           if (lines.length <= 1) throw new Error("Empty CSV");
 
+          const headerLine = String(lines[0] ?? "").replace(/^\uFEFF/, "");
+          const delimiter = detectCsvDelimiter(headerLine);
           const products = [];
           for (let i = 1; i < lines.length; i++) {
-            const cols = parseCsvLine(lines[i]);
+            const colsRaw = parseCsvLine(lines[i], delimiter);
+            const cols = normalizeCsvRow(colsRaw, delimiter, 5).map(cleanCell);
             const code1 = cols[0] ?? "";
             const code2 = cols[1] ?? "";
             const about = cols[2] ?? "";
