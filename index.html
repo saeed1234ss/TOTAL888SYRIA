@@ -1,177 +1,1266 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HJY Store</title>
+    <style>
+      :root {
+        --bg: #e9f6f5;
+        --surface: #ffffff;
+        --text: #0b2b2a;
+        --muted: #4b6b69;
+        --border: rgba(11, 43, 42, 0.14);
+        --shadow: 0 10px 30px rgba(11, 43, 42, 0.12);
+        --primary: #0aa3a3;
+        --primary-2: #0b8e8e;
+        --primary-3: #0a7474;
+        --danger: #c62828;
+        --success: #0f8a3a;
+        --ring: 0 0 0 4px rgba(10, 163, 163, 0.22);
+        --radius: 14px;
+      }
 
-<meta charset="UTF-8">
-<title>كتالوج المنتجات</title>
+      * {
+        box-sizing: border-box;
+      }
 
-<style>
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: radial-gradient(1100px 600px at 30% -10%, rgba(10, 163, 163, 0.18), transparent 60%),
+          radial-gradient(900px 500px at 90% 10%, rgba(11, 116, 116, 0.18), transparent 60%),
+          var(--bg);
+        color: var(--text);
+      }
 
-body{
-font-family:Arial;
-background:#f4f6f7;
-margin:0;
-}
+      a {
+        color: inherit;
+      }
 
-header{
-background:#0a7c86;
-color:white;
-text-align:center;
-padding:20px;
-font-size:24px;
-}
+      .app {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
 
-.products{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-gap:20px;
-padding:20px;
-}
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+      }
 
-.card{
-background:white;
-padding:10px;
-border-radius:10px;
-box-shadow:0 0 8px rgba(0,0,0,0.15);
-text-align:center;
-}
+      .topbar-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-.card img{
-width:100%;
-height:170px;
-object-fit:contain;
-}
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 170px;
+      }
 
-.price{
-color:#0a7c86;
-font-weight:bold;
-font-size:18px;
-}
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-3));
+        box-shadow: 0 12px 30px rgba(10, 163, 163, 0.28);
+      }
 
-.pagination{
-text-align:center;
-padding:20px;
-}
+      .brand h1 {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.15;
+      }
 
-.pagination button{
-padding:8px 14px;
-margin:4px;
-border:none;
-background:#0a7c86;
-color:white;
-cursor:pointer;
-}
+      .brand p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
 
-</style>
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 0;
+      }
 
-</head>
+      .search {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        box-shadow: 0 8px 22px rgba(11, 43, 42, 0.06);
+      }
 
-<body>
+      .search input {
+        width: 100%;
+        border: 0;
+        outline: none;
+        font-size: 14px;
+        background: transparent;
+        color: var(--text);
+      }
 
-<header>
-كتالوج المنتجات
-</header>
+      .search input:focus-visible {
+        outline: none;
+      }
 
-<div id="products" class="products"></div>
+      .pillbar {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
 
-<div id="pagination" class="pagination"></div>
+      .pill {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        cursor: pointer;
+        user-select: none;
+      }
 
+      .pill[aria-pressed="true"] {
+        border-color: rgba(10, 163, 163, 0.45);
+        background: rgba(10, 163, 163, 0.12);
+        box-shadow: var(--ring);
+      }
 
-<script>
+      .select {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        padding: 10px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        color: var(--text);
+        outline: none;
+      }
 
-let products=[]
-let perPage=20
-let currentPage=1
+      .select:focus {
+        box-shadow: var(--ring);
+      }
 
+      .cart-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(10, 163, 163, 0.38);
+        background: linear-gradient(135deg, rgba(10, 163, 163, 0.18), rgba(10, 163, 163, 0.05));
+        padding: 10px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+      }
 
-fetch("products.csv")
-.then(r=>r.text())
-.then(text=>{
+      .badge {
+        min-width: 22px;
+        height: 22px;
+        padding: 0 7px;
+        border-radius: 999px;
+        background: var(--primary);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+      }
 
-let rows=text.trim().split("\n")
+      .layout {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 18px 16px 90px;
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 18px;
+        align-items: start;
+      }
 
-for(let i=1;i<rows.length;i++){
+      .panel {
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
 
-let cols=rows[i].split(";")
+      .panel-header {
+        padding: 14px 14px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid var(--border);
+      }
 
-if(cols.length<5) continue
+      .panel-header h2 {
+        margin: 0;
+        font-size: 15px;
+      }
 
-let code2=cols[1]
-let about=cols[2]
-let price=parseFloat(cols[3])
-let photo=cols[4]
+      .panel-sub {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
 
-if(isNaN(price)) continue
+      .grid {
+        padding: 14px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
 
-products.push({
-code2,
-about,
-price,
-photo
-})
+      .card {
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 24px rgba(11, 43, 42, 0.06);
+        display: flex;
+        flex-direction: column;
+        min-height: 330px;
+      }
 
-}
+      .thumb {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        background: linear-gradient(135deg, rgba(10, 163, 163, 0.12), rgba(10, 163, 163, 0));
+        display: grid;
+        place-items: center;
+      }
 
-renderPage(1)
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        background: #fff;
+      }
 
-})
+      .card-body {
+        padding: 12px 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+      }
 
+      .code {
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+      }
 
-function renderPage(page){
+      .code strong {
+        color: var(--text);
+        font-weight: 700;
+        direction: ltr;
+        unicode-bidi: plaintext;
+      }
 
-currentPage=page
+      .tag {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--muted);
+      }
 
-let start=(page-1)*perPage
-let end=start+perPage
+      .title {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
 
-let list=products.slice(start,end)
+      .desc {
+        margin: 0;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
 
-let html=""
+      .prices {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
 
-list.forEach(p=>{
+      .price-now {
+        font-weight: 800;
+        font-size: 16px;
+        color: var(--primary-3);
+        direction: ltr;
+        unicode-bidi: plaintext;
+      }
 
-html+=`
+      .price-old {
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: line-through;
+        direction: ltr;
+        unicode-bidi: plaintext;
+      }
 
-<div class="card">
+      .actions {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+      }
 
-<img loading="lazy" src="${p.photo}">
+      .btn {
+        border: 0;
+        cursor: pointer;
+        border-radius: 12px;
+        padding: 10px 10px;
+        font-weight: 700;
+        font-size: 13px;
+        user-select: none;
+      }
 
-<h4>${p.code2}</h4>
+      .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-3));
+        color: #fff;
+        flex: 1;
+      }
 
-<p>${p.about}</p>
+      .btn-primary:active {
+        transform: translateY(1px);
+      }
 
-<div class="price">$${p.price}</div>
+      .btn-ghost {
+        background: rgba(11, 43, 42, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
 
-</div>
+      .footerbar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 40;
+        background: rgba(255, 255, 255, 0.9);
+        border-top: 1px solid var(--border);
+        backdrop-filter: blur(10px);
+      }
 
-`
+      .footerbar-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
 
-})
+      .meta {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
 
-document.getElementById("products").innerHTML=html
+      .meta strong {
+        direction: ltr;
+        unicode-bidi: plaintext;
+      }
 
-renderPagination()
+      .pager {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
 
-}
+      .pager button {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        padding: 9px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 700;
+      }
 
+      .pager button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
 
-function renderPagination(){
+      .cart {
+        position: sticky;
+        top: 78px;
+        padding-bottom: 12px;
+      }
 
-let pages=Math.ceil(products.length/perPage)
+      .cart-body {
+        padding: 12px 14px;
+        display: grid;
+        gap: 10px;
+      }
 
-let html=""
+      .cart-empty {
+        padding: 16px 14px;
+        color: var(--muted);
+        font-size: 13px;
+      }
 
-for(let i=1;i<=pages;i++){
+      .cart-item {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 14px;
+        padding: 10px 10px;
+        display: grid;
+        gap: 6px;
+      }
 
-html+=`<button onclick="renderPage(${i})">${i}</button>`
+      .cart-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
 
-}
+      .cart-item-top strong {
+        font-size: 13px;
+        direction: ltr;
+        unicode-bidi: plaintext;
+      }
 
-document.getElementById("pagination").innerHTML=html
+      .cart-item-top button {
+        border: 1px solid rgba(198, 40, 40, 0.28);
+        background: rgba(198, 40, 40, 0.08);
+        color: var(--danger);
+        padding: 6px 10px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 700;
+      }
 
-}
+      .qty {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
 
-</script>
+      .qty-controls {
+        display: inline-flex;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+      }
 
-</body>
+      .qty-controls button {
+        border: 0;
+        background: rgba(11, 43, 42, 0.06);
+        padding: 8px 10px;
+        cursor: pointer;
+        font-weight: 900;
+      }
+
+      .qty-controls input {
+        width: 50px;
+        border: 0;
+        text-align: center;
+        font-weight: 800;
+        outline: none;
+        background: #fff;
+      }
+
+      .cart-summary {
+        border-top: 1px solid var(--border);
+        padding: 12px 14px 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .sum-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .sum-row strong {
+        color: var(--text);
+        font-size: 16px;
+        direction: ltr;
+        unicode-bidi: plaintext;
+      }
+
+      .cart-actions {
+        display: flex;
+        gap: 10px;
+        padding: 12px 14px 0;
+      }
+
+      .cart-actions .btn {
+        flex: 1;
+        padding: 12px 10px;
+      }
+
+      .btn-danger {
+        background: rgba(198, 40, 40, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(198, 40, 40, 0.22);
+      }
+
+      .status {
+        padding: 14px;
+        color: var(--muted);
+        font-size: 13px;
+        display: none;
+      }
+
+      .status[aria-hidden="false"] {
+        display: block;
+      }
+
+      @media (max-width: 1100px) {
+        .grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .cart {
+          position: fixed;
+          inset: auto 10px 70px 10px;
+          max-height: min(75vh, 720px);
+          transform: translateY(120%);
+          transition: transform 200ms ease;
+          z-index: 60;
+        }
+        .cart[data-open="true"] {
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 720px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .brand {
+          min-width: auto;
+        }
+        .brand p {
+          display: none;
+        }
+        .pillbar {
+          display: none;
+        }
+      }
+
+      @media (max-width: 460px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <div class="brand">
+            <div class="logo" aria-hidden="true"></div>
+            <div>
+              <h1>متجر HJY</h1>
+              <p>بحث سريع + تصنيفات + سلة مشتريات</p>
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="search" role="search">
+              <input id="searchInput" type="search" placeholder="ابحث بالاسم أو CODE1 / CODE2 أو كلمات من الوصف..." autocomplete="off" />
+            </div>
+
+            <select id="sortSelect" class="select" aria-label="الترتيب">
+              <option value="relevance">أفضل تطابق</option>
+              <option value="priceAsc">الأرخص</option>
+              <option value="priceDesc">الأغلى</option>
+              <option value="code">حسب الكود</option>
+            </select>
+          </div>
+
+          <button class="cart-button" id="cartToggle" type="button">
+            <span>السلة</span>
+            <span class="badge" id="cartCount">0</span>
+          </button>
+        </div>
+
+        <div class="topbar-inner" style="padding-top: 0; padding-bottom: 12px">
+          <div class="pillbar" role="group" aria-label="التصنيفات">
+            <button class="pill" type="button" data-category="ALL" aria-pressed="true">الكل</button>
+            <button class="pill" type="button" data-category="WADOW" aria-pressed="false">WADOW</button>
+            <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
+            <button class="pill" type="button" data-category="OTHER" aria-pressed="false">أخرى</button>
+          </div>
+          <p class="panel-sub" id="hint" style="margin-inline-start: auto">تحميل البيانات...</p>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>المنتجات</h2>
+              <p class="panel-sub" id="resultsMeta">—</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center">
+              <span class="tag" id="activeFilters">الكل</span>
+            </div>
+          </div>
+
+          <div class="status" id="status" aria-hidden="true"></div>
+          <div class="grid" id="productsGrid" aria-live="polite"></div>
+        </section>
+
+        <aside class="panel cart" id="cartPanel" data-open="false">
+          <div class="panel-header">
+            <div>
+              <h2>سلة المشتريات</h2>
+              <p class="panel-sub" id="cartMeta">—</p>
+            </div>
+          </div>
+          <div id="cartContent"></div>
+        </aside>
+      </main>
+
+      <footer class="footerbar">
+        <div class="footerbar-inner">
+          <div class="meta">
+            <span>عرض</span>
+            <strong id="rangeText">—</strong>
+            <span>من</span>
+            <strong id="totalText">—</strong>
+            <span>منتج</span>
+          </div>
+          <div class="pager">
+            <button id="prevPage" type="button">السابق</button>
+            <button id="nextPage" type="button">التالي</button>
+          </div>
+          <div class="meta">
+            <span>by HJY.co</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      const CONFIG = {
+        CSV_URL: "products.csv",
+        ITEMS_PER_PAGE: 20,
+        MARKUP_RATE: 0.1,
+        DISCOUNT_ENABLED: false,
+        DISCOUNT_PERCENT: 0.15,
+      };
+      // لتفعيل الخصم: غيّر DISCOUNT_ENABLED إلى true وحدد DISCOUNT_PERCENT
+
+      const PLACEHOLDER_IMG =
+        "data:image/svg+xml;charset=utf-8," +
+        encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9f6f5"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><g fill="#0aa3a3" opacity="0.7"><circle cx="130" cy="110" r="18"/><circle cx="190" cy="110" r="10"/><circle cx="170" cy="150" r="12"/></g><text x="50%" y="52%" font-size="26" text-anchor="middle" fill="#4b6b69" font-family="Arial">HJY</text><text x="50%" y="58%" font-size="14" text-anchor="middle" fill="#4b6b69" font-family="Arial">Image</text></svg>`
+        );
+
+      const els = {
+        grid: document.getElementById("productsGrid"),
+        search: document.getElementById("searchInput"),
+        sort: document.getElementById("sortSelect"),
+        pills: Array.from(document.querySelectorAll(".pill[data-category]")),
+        resultsMeta: document.getElementById("resultsMeta"),
+        activeFilters: document.getElementById("activeFilters"),
+        rangeText: document.getElementById("rangeText"),
+        totalText: document.getElementById("totalText"),
+        prevPage: document.getElementById("prevPage"),
+        nextPage: document.getElementById("nextPage"),
+        status: document.getElementById("status"),
+        hint: document.getElementById("hint"),
+        cartToggle: document.getElementById("cartToggle"),
+        cartPanel: document.getElementById("cartPanel"),
+        cartCount: document.getElementById("cartCount"),
+        cartContent: document.getElementById("cartContent"),
+        cartMeta: document.getElementById("cartMeta"),
+      };
+
+      const state = {
+        allProducts: [],
+        filteredProducts: [],
+        category: "ALL",
+        query: "",
+        sort: "relevance",
+        page: 1,
+        cart: new Map(),
+        lastQueryTokens: [],
+      };
+
+      function safeLower(v) {
+        return String(v ?? "").toLowerCase();
+      }
+
+      function parseCsvLine(line) {
+        const out = [];
+        let cur = "";
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"' && line[i + 1] === '"') {
+            cur += '"';
+            i++;
+            continue;
+          }
+          if (ch === '"') {
+            inQuotes = !inQuotes;
+            continue;
+          }
+          if (ch === "," && !inQuotes) {
+            out.push(cur);
+            cur = "";
+            continue;
+          }
+          cur += ch;
+        }
+        out.push(cur);
+        return out.map((v) => v.trim());
+      }
+
+      function getCategoryFromAbout(about) {
+        const a = safeLower(about);
+        if (a.includes("wadow")) return "WADOW";
+        if (a.includes("total")) return "TOTAL";
+        return "OTHER";
+      }
+
+      function calcPriceBefore(rawPrice) {
+        if (!Number.isFinite(rawPrice)) return 0;
+        return rawPrice * (1 + CONFIG.MARKUP_RATE);
+      }
+
+      function calcPriceAfter(priceBefore) {
+        if (!Number.isFinite(priceBefore)) return 0;
+        if (!CONFIG.DISCOUNT_ENABLED) return priceBefore;
+        const d = Math.max(0, Math.min(0.95, CONFIG.DISCOUNT_PERCENT));
+        return priceBefore * (1 - d);
+      }
+
+      function formatMoney(v) {
+        const n = Number(v);
+        if (!Number.isFinite(n)) return "0.00";
+        return n.toFixed(2);
+      }
+
+      function productKey(p) {
+        return `${p.code1}::${p.code2}`;
+      }
+
+      function setStatus(text, isError = false) {
+        if (!text) {
+          els.status.setAttribute("aria-hidden", "true");
+          els.status.textContent = "";
+          return;
+        }
+        els.status.setAttribute("aria-hidden", "false");
+        els.status.style.color = isError ? "#c62828" : "";
+        els.status.textContent = text;
+      }
+
+      function buildSearchTokens(q) {
+        return safeLower(q)
+          .trim()
+          .split(/\s+/)
+          .map((t) => t.trim())
+          .filter(Boolean)
+          .slice(0, 8);
+      }
+
+      function relevanceScore(p, tokens) {
+        if (!tokens || tokens.length === 0) return 0;
+        const code1 = safeLower(p.code1);
+        const code2 = safeLower(p.code2);
+        const about = safeLower(p.about);
+        let score = 0;
+        for (const t of tokens) {
+          if (!t) continue;
+          if (code1 === t) score += 16;
+          if (code2 === t) score += 16;
+          if (code1.startsWith(t)) score += 10;
+          if (code2.startsWith(t)) score += 10;
+          if (code1.includes(t)) score += 8;
+          if (code2.includes(t)) score += 8;
+          if (about.includes(t)) score += 2;
+        }
+        return score;
+      }
+
+      function applyFilters() {
+        const tokens = buildSearchTokens(state.query);
+        state.lastQueryTokens = tokens;
+
+        let list = state.allProducts;
+
+        if (state.category !== "ALL") {
+          list = list.filter((p) => p.category === state.category);
+        }
+
+        if (tokens.length > 0) {
+          list = list.filter((p) => tokens.every((t) => p.search.includes(t)));
+        }
+
+        if (state.sort === "relevance" && tokens.length > 0) {
+          list = [...list].sort((a, b) => relevanceScore(b, tokens) - relevanceScore(a, tokens));
+        } else if (state.sort === "priceAsc") {
+          list = [...list].sort((a, b) => a.priceAfter - b.priceAfter);
+        } else if (state.sort === "priceDesc") {
+          list = [...list].sort((a, b) => b.priceAfter - a.priceAfter);
+        } else if (state.sort === "code") {
+          list = [...list].sort((a, b) => (a.codeCombo < b.codeCombo ? -1 : a.codeCombo > b.codeCombo ? 1 : 0));
+        }
+
+        state.filteredProducts = list;
+        state.page = 1;
+        render();
+      }
+
+      function paginate(list) {
+        const per = CONFIG.ITEMS_PER_PAGE;
+        const pageCount = Math.max(1, Math.ceil(list.length / per));
+        state.page = Math.min(state.page, pageCount);
+        const startIndex = (state.page - 1) * per;
+        const endIndex = Math.min(list.length, startIndex + per);
+        return { pageCount, startIndex, endIndex, items: list.slice(startIndex, endIndex) };
+      }
+
+      function render() {
+        const { pageCount, startIndex, endIndex, items } = paginate(state.filteredProducts);
+
+        els.prevPage.disabled = state.page <= 1;
+        els.nextPage.disabled = state.page >= pageCount;
+
+        els.rangeText.textContent = state.filteredProducts.length === 0 ? "0-0" : `${startIndex + 1}-${endIndex}`;
+        els.totalText.textContent = String(state.filteredProducts.length);
+
+        const catLabel =
+          state.category === "ALL" ? "الكل" : state.category === "WADOW" ? "WADOW" : state.category === "TOTAL" ? "TOTAL" : "أخرى";
+        const qLabel = state.query.trim() ? ` / بحث: ${state.query.trim()}` : "";
+        els.activeFilters.textContent = `${catLabel}${qLabel}`;
+        els.resultsMeta.textContent = `صفحة ${state.page} من ${pageCount} — عرض ${CONFIG.ITEMS_PER_PAGE} لكل صفحة`;
+
+        if (state.allProducts.length === 0) {
+          els.grid.innerHTML = "";
+          return;
+        }
+
+        if (state.filteredProducts.length === 0) {
+          els.grid.innerHTML = "";
+          setStatus("لا توجد نتائج مطابقة. جرّب كلمات مختلفة أو غيّر التصنيف.");
+          return;
+        }
+        setStatus("");
+
+        let html = "";
+        for (const p of items) {
+          const showOld = CONFIG.DISCOUNT_ENABLED && p.priceAfter < p.priceBefore;
+          html += `
+            <article class="card">
+              <div class="thumb">
+                <img
+                  src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
+                  alt="${escapeHtmlAttr(p.code2)}"
+                  loading="lazy"
+                  decoding="async"
+                  referrerpolicy="no-referrer"
+                  onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                />
+              </div>
+              <div class="card-body">
+                <div class="code">
+                  <strong>${escapeHtml(p.codeCombo)}</strong>
+                  <span class="tag">${p.category}</span>
+                </div>
+                <p class="title">${escapeHtml(p.code2)}</p>
+                <p class="desc">${escapeHtml(p.about)}</p>
+                <div class="prices">
+                  <span class="price-now">$${formatMoney(p.priceAfter)}</span>
+                  ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
+                </div>
+                <div class="actions">
+                  <button class="btn btn-primary" type="button" data-add="${escapeHtmlAttr(p.key)}">إضافة للسلة</button>
+                  <button class="btn btn-ghost" type="button" data-copy="${escapeHtmlAttr(p.key)}">نسخ الكود</button>
+                </div>
+              </div>
+            </article>
+          `;
+        }
+        els.grid.innerHTML = html;
+      }
+
+      function escapeHtml(s) {
+        return String(s ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function escapeHtmlAttr(s) {
+        return escapeHtml(s).replaceAll("\n", " ").replaceAll("\r", " ");
+      }
+
+      function togglePill(nextCategory) {
+        state.category = nextCategory;
+        for (const pill of els.pills) {
+          const isOn = pill.getAttribute("data-category") === nextCategory;
+          pill.setAttribute("aria-pressed", isOn ? "true" : "false");
+        }
+        applyFilters();
+      }
+
+      function cartCountTotal() {
+        let c = 0;
+        for (const it of state.cart.values()) c += it.qty;
+        return c;
+      }
+
+      function cartTotals() {
+        let total = 0;
+        for (const it of state.cart.values()) total += it.qty * it.product.priceAfter;
+        return total;
+      }
+
+      function saveCart() {
+        const payload = [];
+        for (const [key, it] of state.cart.entries()) payload.push({ key, qty: it.qty });
+        localStorage.setItem("hjy_cart_v1", JSON.stringify(payload));
+      }
+
+      function loadCart() {
+        try {
+          const raw = localStorage.getItem("hjy_cart_v1");
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return;
+          for (const row of parsed) {
+            if (!row || typeof row.key !== "string") continue;
+            const p = state.allProducts.find((x) => x.key === row.key);
+            if (!p) continue;
+            const qty = Math.max(1, Math.min(999, Number(row.qty) || 1));
+            state.cart.set(row.key, { product: p, qty });
+          }
+        } catch {}
+      }
+
+      function addToCartByKey(key) {
+        const p = state.allProducts.find((x) => x.key === key);
+        if (!p) return;
+        const existing = state.cart.get(key);
+        state.cart.set(key, { product: p, qty: Math.min(999, (existing?.qty ?? 0) + 1) });
+        saveCart();
+        renderCart();
+      }
+
+      function setCartQty(key, qty) {
+        const it = state.cart.get(key);
+        if (!it) return;
+        const q = Math.max(1, Math.min(999, qty));
+        state.cart.set(key, { product: it.product, qty: q });
+        saveCart();
+        renderCart();
+      }
+
+      function removeFromCart(key) {
+        state.cart.delete(key);
+        saveCart();
+        renderCart();
+      }
+
+      function clearCart() {
+        state.cart.clear();
+        saveCart();
+        renderCart();
+      }
+
+      function renderCart() {
+        const count = cartCountTotal();
+        els.cartCount.textContent = String(count);
+        els.cartMeta.textContent = count === 0 ? "فارغة" : `${count} قطعة`;
+
+        if (count === 0) {
+          els.cartContent.innerHTML = `<div class="cart-empty">السلة فارغة. أضف منتجات لعرضها هنا.</div>`;
+          return;
+        }
+
+        let itemsHtml = `<div class="cart-body">`;
+        for (const [key, it] of state.cart.entries()) {
+          itemsHtml += `
+            <div class="cart-item">
+              <div class="cart-item-top">
+                <strong>${escapeHtml(it.product.codeCombo)}</strong>
+                <button type="button" data-remove="${escapeHtmlAttr(key)}">حذف</button>
+              </div>
+              <div class="qty">
+                <div class="qty-controls">
+                  <button type="button" data-dec="${escapeHtmlAttr(key)}">-</button>
+                  <input inputmode="numeric" pattern="[0-9]*" value="${it.qty}" data-qty="${escapeHtmlAttr(key)}" />
+                  <button type="button" data-inc="${escapeHtmlAttr(key)}">+</button>
+                </div>
+                <div style="direction:ltr;unicode-bidi:plaintext;font-weight:800;color:var(--primary-3)">$${formatMoney(
+                  it.qty * it.product.priceAfter
+                )}</div>
+              </div>
+            </div>
+          `;
+        }
+        itemsHtml += `</div>`;
+        const total = cartTotals();
+        itemsHtml += `
+          <div class="cart-summary">
+            <div class="sum-row">
+              <span>الإجمالي</span>
+              <strong>$${formatMoney(total)}</strong>
+            </div>
+          </div>
+          <div class="cart-actions">
+            <button class="btn btn-danger" type="button" id="clearCartBtn">تفريغ</button>
+            <button class="btn btn-primary" type="button" id="checkoutBtn">إتمام الطلب</button>
+          </div>
+        `;
+        els.cartContent.innerHTML = itemsHtml;
+      }
+
+      async function copyCode(codeCombo) {
+        try {
+          await navigator.clipboard.writeText(codeCombo);
+          els.hint.textContent = "تم النسخ";
+          setTimeout(() => {
+            els.hint.textContent = "جاهز";
+          }, 1200);
+        } catch {
+          els.hint.textContent = "لم يتم النسخ";
+          setTimeout(() => {
+            els.hint.textContent = "جاهز";
+          }, 1200);
+        }
+      }
+
+      function checkout() {
+        if (state.cart.size === 0) return;
+
+        const name = prompt("الاسم");
+        if (name === null) return;
+        const phone = prompt("رقم الهاتف");
+        if (phone === null) return;
+        const city = prompt("المدينة");
+        if (city === null) return;
+
+        let lines = [];
+        for (const it of state.cart.values()) {
+          lines.push(`${it.product.codeCombo} x${it.qty} = $${formatMoney(it.qty * it.product.priceAfter)}`);
+        }
+        const total = formatMoney(cartTotals());
+        const message = `طلب جديد\nالاسم: ${name}\nالهاتف: ${phone}\nالمدينة: ${city}\n\n${lines.join("\n")}\n\nالإجمالي: $${total}`;
+        alert(message);
+      }
+
+      function debounce(fn, wait) {
+        let t = null;
+        return (...args) => {
+          if (t) clearTimeout(t);
+          t = setTimeout(() => fn(...args), wait);
+        };
+      }
+
+      function wireEvents() {
+        els.pills.forEach((p) =>
+          p.addEventListener("click", () => {
+            const cat = p.getAttribute("data-category");
+            if (!cat) return;
+            togglePill(cat);
+          })
+        );
+
+        els.sort.addEventListener("change", () => {
+          state.sort = els.sort.value;
+          applyFilters();
+        });
+
+        els.search.addEventListener(
+          "input",
+          debounce(() => {
+            state.query = els.search.value;
+            applyFilters();
+          }, 180)
+        );
+
+        els.prevPage.addEventListener("click", () => {
+          state.page = Math.max(1, state.page - 1);
+          render();
+        });
+        els.nextPage.addEventListener("click", () => {
+          state.page += 1;
+          render();
+        });
+
+        els.grid.addEventListener("click", async (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLElement)) return;
+          const addKey = t.getAttribute("data-add");
+          if (addKey) {
+            addToCartByKey(addKey);
+            if (window.matchMedia("(max-width: 900px)").matches) {
+              els.cartPanel.setAttribute("data-open", "true");
+            }
+            return;
+          }
+          const copyKey = t.getAttribute("data-copy");
+          if (copyKey) {
+            const p = state.allProducts.find((x) => x.key === copyKey);
+            if (!p) return;
+            await copyCode(p.codeCombo);
+          }
+        });
+
+        els.cartToggle.addEventListener("click", () => {
+          const isOpen = els.cartPanel.getAttribute("data-open") === "true";
+          els.cartPanel.setAttribute("data-open", isOpen ? "false" : "true");
+        });
+
+        els.cartContent.addEventListener("click", (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLElement)) return;
+          const removeKey = t.getAttribute("data-remove");
+          if (removeKey) return removeFromCart(removeKey);
+          const incKey = t.getAttribute("data-inc");
+          if (incKey) {
+            const it = state.cart.get(incKey);
+            if (!it) return;
+            return setCartQty(incKey, it.qty + 1);
+          }
+          const decKey = t.getAttribute("data-dec");
+          if (decKey) {
+            const it = state.cart.get(decKey);
+            if (!it) return;
+            return setCartQty(decKey, it.qty - 1);
+          }
+          if (t.id === "clearCartBtn") return clearCart();
+          if (t.id === "checkoutBtn") return checkout();
+        });
+
+        els.cartContent.addEventListener("change", (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLInputElement)) return;
+          const key = t.getAttribute("data-qty");
+          if (!key) return;
+          const qty = Number(t.value);
+          if (!Number.isFinite(qty)) return renderCart();
+          setCartQty(key, qty);
+        });
+      }
+
+      async function loadProducts() {
+        els.hint.textContent = "تحميل...";
+        setStatus("تحميل المنتجات من CSV...");
+        try {
+          const res = await fetch(CONFIG.CSV_URL, { cache: "no-store" });
+          if (!res.ok) throw new Error("Fetch failed");
+          const data = await res.text();
+          const lines = data.split(/\r?\n/).filter((l) => l.trim().length > 0);
+          if (lines.length <= 1) throw new Error("Empty CSV");
+
+          const products = [];
+          for (let i = 1; i < lines.length; i++) {
+            const cols = parseCsvLine(lines[i]);
+            const code1 = cols[0] ?? "";
+            const code2 = cols[1] ?? "";
+            const about = cols[2] ?? "";
+            const rawPrice = Number(String(cols[3] ?? "").replace(/[^0-9.]/g, ""));
+            const photo = cols[4] ?? "";
+
+            const aboutLower = safeLower(about);
+            if (aboutLower.includes("ملغى") || aboutLower.includes("ملغي")) continue;
+            if (!code1 && !code2) continue;
+
+            const priceBefore = calcPriceBefore(rawPrice);
+            const priceAfter = calcPriceAfter(priceBefore);
+            const category = getCategoryFromAbout(about);
+            const codeCombo = `${String(code1).trim()} + ${String(code2).trim()}`.trim();
+            const key = `${String(code1).trim()}::${String(code2).trim()}`;
+            const search = safeLower(`${code1} ${code2} ${about} ${category}`);
+
+            products.push({
+              key,
+              code1: String(code1).trim(),
+              code2: String(code2).trim(),
+              codeCombo,
+              about: String(about).trim(),
+              rawPrice: Number.isFinite(rawPrice) ? rawPrice : 0,
+              priceBefore,
+              priceAfter,
+              photo: String(photo).trim(),
+              category,
+              search,
+            });
+          }
+
+          state.allProducts = products;
+          state.filteredProducts = products;
+          els.hint.textContent = "جاهز";
+          setStatus("");
+          loadCart();
+          renderCart();
+          render();
+          els.totalText.textContent = String(products.length);
+        } catch (e) {
+          els.hint.textContent = "فشل التحميل";
+          setStatus("فشل تحميل products.csv. تأكد أن الملف موجود بنفس المجلد على GitHub Pages وبنفس الاسم.", true);
+          els.grid.innerHTML = "";
+        }
+      }
+
+      wireEvents();
+      loadProducts();
+      renderCart();
+    </script>
+  </body>
 </html>
