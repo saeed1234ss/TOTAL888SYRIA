@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
+
 <meta charset="UTF-8">
 <title>كتالوج المنتجات</title>
 
@@ -9,25 +9,16 @@
 
 body{
 font-family:Arial;
-background:#f5f7f8;
+background:#f4f6f7;
 margin:0;
 }
 
 header{
-background:#0c7f86;
+background:#0a7c86;
 color:white;
-padding:15px;
 text-align:center;
-}
-
-.search{
-text-align:center;
-padding:15px;
-}
-
-.search input{
-padding:10px;
-width:250px;
+padding:20px;
+font-size:24px;
 }
 
 .products{
@@ -52,12 +43,27 @@ object-fit:contain;
 }
 
 .price{
-color:#0c7f86;
+color:#0a7c86;
 font-weight:bold;
 font-size:18px;
 }
 
+.pagination{
+text-align:center;
+padding:20px;
+}
+
+.pagination button{
+padding:8px 14px;
+margin:4px;
+border:none;
+background:#0a7c86;
+color:white;
+cursor:pointer;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -66,16 +72,17 @@ font-size:18px;
 كتالوج المنتجات
 </header>
 
-<div class="search">
-<input id="search" placeholder="بحث">
-</div>
-
 <div id="products" class="products"></div>
+
+<div id="pagination" class="pagination"></div>
 
 
 <script>
 
 let products=[]
+let perPage=20
+let currentPage=1
+
 
 fetch("products.csv")
 .then(r=>r.text())
@@ -89,7 +96,6 @@ let cols=rows[i].split(";")
 
 if(cols.length<5) continue
 
-let code1=cols[0]
 let code2=cols[1]
 let about=cols[2]
 let price=parseFloat(cols[3])
@@ -97,12 +103,7 @@ let photo=cols[4]
 
 if(isNaN(price)) continue
 
-if(about.includes("ملغي") || about.includes("ملغى")) continue
-
-price=price*1.10
-
 products.push({
-code1,
 code2,
 about,
 price,
@@ -111,11 +112,19 @@ photo
 
 }
 
-render(products)
+renderPage(1)
 
 })
 
-function render(list){
+
+function renderPage(page){
+
+currentPage=page
+
+let start=(page-1)*perPage
+let end=start+perPage
+
+let list=products.slice(start,end)
 
 let html=""
 
@@ -125,13 +134,13 @@ html+=`
 
 <div class="card">
 
-<img src="${p.photo}">
+<img loading="lazy" src="${p.photo}">
 
 <h4>${p.code2}</h4>
 
 <p>${p.about}</p>
 
-<div class="price">$${p.price.toFixed(2)}</div>
+<div class="price">$${p.price}</div>
 
 </div>
 
@@ -141,21 +150,26 @@ html+=`
 
 document.getElementById("products").innerHTML=html
 
+renderPagination()
+
 }
 
 
-document.getElementById("search").addEventListener("input",e=>{
+function renderPagination(){
 
-let q=e.target.value.toLowerCase()
+let pages=Math.ceil(products.length/perPage)
 
-let filtered=products.filter(p=>
-p.about.toLowerCase().includes(q) ||
-p.code2.toLowerCase().includes(q)
-)
+let html=""
 
-render(filtered)
+for(let i=1;i<=pages;i++){
 
-})
+html+=`<button onclick="renderPage(${i})">${i}</button>`
+
+}
+
+document.getElementById("pagination").innerHTML=html
+
+}
 
 </script>
 
