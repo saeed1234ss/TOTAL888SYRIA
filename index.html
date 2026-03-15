@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TOTAL SYRIA TOOLS</title>
+    <link rel="icon" href="logo.png" />
     <style>
       :root {
         --bg: #e9f6f5;
@@ -98,6 +99,17 @@
         border-radius: 12px;
         background: linear-gradient(135deg, var(--primary), var(--primary-3));
         box-shadow: 0 12px 30px rgba(10, 163, 163, 0.28);
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+      }
+
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        background: #fff;
       }
 
       .brand h1 {
@@ -401,13 +413,18 @@
         position: absolute;
         top: 10px;
         left: 10px;
-        background: rgba(10, 116, 116, 0.95);
+        background: var(--danger);
         color: #fff;
         font-weight: 900;
         font-size: 12px;
         padding: 6px 9px;
         border-radius: 12px;
         box-shadow: 0 10px 20px rgba(11, 43, 42, 0.14);
+      }
+
+      .card.is-wadfow .code1,
+      .card.is-wadfow .price-now {
+        color: #ff8a00;
       }
 
       .actions {
@@ -432,6 +449,12 @@
         flex: 1;
       }
 
+      .btn-wadfow {
+        background: linear-gradient(135deg, #ff9a1f, #e86e00);
+        color: #fff;
+        flex: 1;
+      }
+
       .btn-primary:active {
         transform: translateY(1px);
       }
@@ -448,6 +471,94 @@
         border: 1px solid var(--border);
         cursor: not-allowed;
         flex: 1;
+      }
+
+      .btn-muted {
+        background: rgba(11, 43, 42, 0.12);
+        color: var(--muted);
+        border: 1px solid var(--border);
+        cursor: not-allowed;
+        flex: 1;
+      }
+
+      .viewmodes {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .viewbtn {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .viewbtn[aria-pressed="true"] {
+        border-color: rgba(10, 163, 163, 0.45);
+        background: rgba(10, 163, 163, 0.12);
+        box-shadow: var(--ring);
+      }
+
+      #productsGrid[data-view="list"] {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      #productsGrid[data-view="list"] .card {
+        min-height: unset;
+        flex-direction: row;
+      }
+
+      #productsGrid[data-view="list"] .thumb {
+        width: 96px;
+        min-width: 96px;
+        aspect-ratio: 1 / 1;
+      }
+
+      #productsGrid[data-view="list"] .card-body {
+        padding: 10px;
+      }
+
+      #productsGrid[data-view="list"] .desc {
+        -webkit-line-clamp: 2;
+      }
+
+      #productsGrid[data-view="compact"] {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      #productsGrid[data-view="compact"] .card {
+        min-height: 270px;
+      }
+
+      #productsGrid[data-view="compact"] .thumb {
+        aspect-ratio: 1 / 1;
+      }
+
+      #productsGrid[data-view="compact"] .price-now {
+        font-size: 15px;
+      }
+
+      .notice {
+        margin: 0 14px 14px;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(198, 40, 40, 0.22);
+        background: rgba(198, 40, 40, 0.08);
+        color: #7f1d1d;
+        font-weight: 800;
+        font-size: 12px;
       }
 
       .footerbar {
@@ -470,6 +581,111 @@
         justify-content: space-between;
         gap: 12px;
         flex-wrap: wrap;
+      }
+
+      .footer-links {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .footer-link {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.7);
+        padding: 6px 10px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 800;
+        font-size: 11px;
+        color: var(--muted);
+        user-select: none;
+      }
+
+      .footer-link:active {
+        transform: translateY(1px);
+      }
+
+      .info-body {
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .info-text {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 16px;
+        padding: 14px;
+        white-space: pre-wrap;
+        line-height: 1.7;
+        font-size: 13px;
+        color: var(--text);
+      }
+
+      .complaint-form textarea {
+        width: 100%;
+        min-height: 140px;
+        resize: vertical;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: 13px;
+        font-family: inherit;
+      }
+
+      .checkout-choices {
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.75);
+      }
+
+      .choice-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .choice-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        padding: 8px 10px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 900;
+        font-size: 12px;
+      }
+
+      .choice-pill input {
+        margin: 0;
+      }
+
+      .mini-note {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 800;
+      }
+
+      .checkrow {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-weight: 800;
+        font-size: 12px;
+        color: var(--text);
+      }
+
+      .checkrow input {
+        margin-top: 2px;
       }
 
       .meta {
@@ -633,6 +849,14 @@
         direction: ltr;
         unicode-bidi: plaintext;
         white-space: nowrap;
+      }
+
+      .cart-item.is-wadfow .cart-code1 {
+        color: #ff8a00;
+      }
+
+      .cart-item.is-wadfow .cart-line-total {
+        color: #ff8a00;
       }
 
       .cart-code2 {
@@ -806,6 +1030,10 @@
           justify-content: center;
         }
 
+        #productsGrid[data-view="compact"] {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
         .cart-drawer {
           top: auto;
           inset-inline: 0;
@@ -822,9 +1050,29 @@
         }
       }
 
+      @media (max-width: 560px) {
+        .topbar-inner {
+          flex-wrap: wrap;
+        }
+        .brand {
+          min-width: 0;
+          flex: 1 1 100%;
+        }
+        .controls {
+          flex: 1 1 100%;
+        }
+      }
+
       @media (max-width: 460px) {
         .grid {
           grid-template-columns: 1fr;
+        }
+        #productsGrid[data-view="compact"] {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        #productsGrid[data-view="list"] .thumb {
+          width: 86px;
+          min-width: 86px;
         }
       }
 
@@ -855,7 +1103,9 @@
       <header class="topbar">
         <div class="topbar-inner">
           <div class="brand">
-            <div class="logo" aria-hidden="true"></div>
+            <div class="logo" aria-hidden="true">
+              <img src="logo.png" alt="" loading="eager" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" />
+            </div>
             <div>
               <h1>TOTAL SYRIA TOOLS</h1>
               <p>بحث سريع + تصنيفات + سلة مشتريات</p>
@@ -884,6 +1134,7 @@
         <div class="topbar-inner" style="padding-top: 0; padding-bottom: 12px">
           <div class="pillbar" role="group" aria-label="التصنيفات">
             <button class="pill" type="button" data-category="ALL" aria-pressed="true">الكل</button>
+            <button class="pill" type="button" data-category="OUT_OF_STOCK" aria-pressed="false">منتهي الكمية</button>
             <button class="pill" type="button" data-category="WADFOW" aria-pressed="false">WADFOW</button>
             <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
             <button class="pill" type="button" data-category="UNAVAILABLE" aria-pressed="false">الغير متوفر</button>
@@ -902,11 +1153,17 @@
             </div>
             <div style="display: flex; gap: 10px; align-items: center">
               <span class="tag" id="activeFilters">الكل</span>
+              <div class="viewmodes" role="group" aria-label="عرض المنتجات">
+                <button class="viewbtn" type="button" data-view="grid" aria-pressed="true">شبكة</button>
+                <button class="viewbtn" type="button" data-view="compact" aria-pressed="false">مضغوط</button>
+                <button class="viewbtn" type="button" data-view="list" aria-pressed="false">قائمة</button>
+              </div>
             </div>
           </div>
 
           <div class="status" id="status" aria-hidden="true"></div>
-          <div class="grid" id="productsGrid" aria-live="polite"></div>
+          <div class="notice" id="categoryNote" style="display:none"></div>
+          <div class="grid" id="productsGrid" data-view="grid" aria-live="polite"></div>
         </section>
 
         <section class="panel" id="checkoutView" style="display:none">
@@ -934,6 +1191,41 @@
                 <span style="font-weight:800">رقم الهاتف</span>
                 <input id="phoneInput" type="tel" inputmode="tel" autocomplete="tel" required style="padding:12px;border:1px solid var(--border);border-radius:12px;direction:ltr;unicode-bidi:plaintext" />
               </label>
+              <div class="checkout-choices">
+                <div class="choice-row" role="group" aria-label="طريقة الاستلام">
+                  <label class="choice-pill">
+                    <input id="shipHomsRadio" type="radio" name="shipType" value="HOMS" checked />
+                    <span>استلام ضمن حمص</span>
+                  </label>
+                  <label class="choice-pill">
+                    <input id="shipGovRadio" type="radio" name="shipType" value="GOV" />
+                    <span>شحن للمحافظات</span>
+                  </label>
+                </div>
+                <div id="shipHomsBlock" style="display:grid;gap:8px">
+                  <div class="mini-note">تصلك مجاناً إلى موقعك</div>
+                  <label style="display:grid;gap:6px">
+                    <span style="font-weight:800">عنوان ضمن حمص</span>
+                    <input id="homsAddressInput" type="text" autocomplete="street-address" style="padding:12px;border:1px solid var(--border);border-radius:12px" />
+                  </label>
+                </div>
+                <div id="shipGovBlock" style="display:none;gap:8px">
+                  <div class="mini-note">شحن رخيص وسهل وخلال يومين</div>
+                  <button class="footer-link" id="shipDetailsBtn" type="button">أنا أول مرة أشحن ماهي تفاصيل؟</button>
+                  <label style="display:grid;gap:6px">
+                    <span style="font-weight:800">عنوان مركز الشحن</span>
+                    <input id="shipCenterInput" type="text" autocomplete="street-address" style="padding:12px;border:1px solid var(--border);border-radius:12px" />
+                  </label>
+                </div>
+              </div>
+              <label style="display:grid;gap:6px">
+                <span style="font-weight:800">ملاحظات الطلب</span>
+                <textarea id="orderNotesInput" placeholder="اكتب أي ملاحظة تخص الطلب..." style="padding:12px;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:13px;min-height:110px;resize:vertical"></textarea>
+              </label>
+              <label class="checkrow">
+                <input id="allowVodafoneSwitchInput" type="checkbox" />
+                <span>في حال عدم توفر توتال لا أمانع من تبديله بوادفو ( علماً نفس شركة )</span>
+              </label>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
                 <button class="btn btn-primary" id="confirmOrderBtn" type="submit" style="flex:1">إتمام الطلب</button>
                 <button class="btn btn-ghost" id="copyInvoiceBtn" type="button" style="flex:1;display:none">نسخ الفاتورة</button>
@@ -943,6 +1235,29 @@
               </div>
             </form>
             <div id="orderSummary" style="display:grid;gap:10px"></div>
+          </div>
+        </section>
+
+        <section class="panel" id="infoView" style="display:none">
+          <div class="panel-header">
+            <div>
+              <h2 id="infoTitle">—</h2>
+              <p class="panel-sub" id="infoMeta">—</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button class="btn btn-ghost" id="backFromInfoBtn" type="button">رجوع</button>
+            </div>
+          </div>
+          <div class="info-body">
+            <div class="status" id="infoStatus" aria-hidden="true"></div>
+            <div class="info-text" id="infoText"></div>
+            <form class="complaint-form" id="complaintForm" style="display:none;gap:10px">
+              <textarea id="complaintInput" required placeholder="اكتب المشكلة بالتفصيل..."></textarea>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" id="sendComplaintBtn" type="submit" style="flex:1">إرسال شكوى</button>
+              </div>
+              <div class="panel-sub" id="complaintNote" style="display:none">تم إرسال الشكوى.</div>
+            </form>
           </div>
         </section>
       </main>
@@ -962,6 +1277,15 @@
           <div class="meta">
             <span style="font-size:11px;color:var(--muted);font-weight:700">BY HJY.co</span>
           </div>
+          <div class="footer-links" id="footerLinks">
+            <button class="footer-link" type="button" data-info="about_us">من نحن</button>
+            <button class="footer-link" type="button" data-info="location">موقعنا</button>
+            <button class="footer-link" type="button" data-info="faq">أشيع الأسئلة</button>
+            <button class="footer-link" type="button" data-info="shipping">تفاصيل الشحن</button>
+            <button class="footer-link" type="button" data-info="how_to_order">كيفية الطلب</button>
+            <button class="footer-link" type="button" data-info="developer">المطور</button>
+            <button class="footer-link" type="button" data-info="complaint">إرسال شكوى</button>
+          </div>
         </div>
       </footer>
     </div>
@@ -972,6 +1296,7 @@
         <div>
           <h2>سلة المشتريات</h2>
           <p class="panel-sub" id="cartMeta">—</p>
+          <p class="panel-sub" id="cartMinNote" style="font-weight:900;color:#c62828">اقل فاتورة للطلب هي 25$</p>
         </div>
         <button class="cart-close" id="cartCloseBtn" type="button">إغلاق</button>
       </div>
@@ -983,11 +1308,14 @@
     <script>
       const CONFIG = {
         CSV_URL: "products.csv",
+        ABOUT_URLS: ["about.csv", "about"],
+        OUT_OF_STOCK_URLS: ["TOTAL_out_of_stock.csv", "TOTAL_out_of_stock"],
         ITEMS_PER_PAGE: 20,
         MARKUP_RATE: 0.1,
         DISCOUNT_TOTAL: 0.03,
         DISCOUNT_WADFOW: 0.05,
         SEARCH_MIN_CHARS: 3,
+        MIN_ORDER_TOTAL: 25,
         TELEGRAM_BOT_TOKEN: "8539011678:AAEcx0KoMJPO_biAaKyPA8SgsQZAe0gC3S4",
         TELEGRAM_CHAT_ID: "2067991553",
       };
@@ -1003,6 +1331,7 @@
         search: document.getElementById("searchInput"),
         sort: document.getElementById("sortSelect"),
         pills: Array.from(document.querySelectorAll(".pill[data-category]")),
+        viewBtns: Array.from(document.querySelectorAll(".viewbtn[data-view]")),
         resultsMeta: document.getElementById("resultsMeta"),
         activeFilters: document.getElementById("activeFilters"),
         rangeText: document.getElementById("rangeText"),
@@ -1010,6 +1339,7 @@
         prevPage: document.getElementById("prevPage"),
         nextPage: document.getElementById("nextPage"),
         status: document.getElementById("status"),
+        categoryNote: document.getElementById("categoryNote"),
         hint: document.getElementById("hint"),
         cartToggle: document.getElementById("cartToggle"),
         cartPanel: document.getElementById("cartPanel"),
@@ -1018,6 +1348,7 @@
         cartCount: document.getElementById("cartCount"),
         cartContent: document.getElementById("cartContent"),
         cartMeta: document.getElementById("cartMeta"),
+        cartMinNote: document.getElementById("cartMinNote"),
         cartSummary: document.getElementById("cartSummary"),
         cartActions: document.getElementById("cartActions"),
         shopView: document.getElementById("shopView"),
@@ -1028,11 +1359,30 @@
         fullNameInput: document.getElementById("fullNameInput"),
         govInput: document.getElementById("govInput"),
         phoneInput: document.getElementById("phoneInput"),
+        shipHomsRadio: document.getElementById("shipHomsRadio"),
+        shipGovRadio: document.getElementById("shipGovRadio"),
+        shipHomsBlock: document.getElementById("shipHomsBlock"),
+        shipGovBlock: document.getElementById("shipGovBlock"),
+        homsAddressInput: document.getElementById("homsAddressInput"),
+        shipCenterInput: document.getElementById("shipCenterInput"),
+        shipDetailsBtn: document.getElementById("shipDetailsBtn"),
+        orderNotesInput: document.getElementById("orderNotesInput"),
+        allowVodafoneSwitchInput: document.getElementById("allowVodafoneSwitchInput"),
         confirmOrderBtn: document.getElementById("confirmOrderBtn"),
         copyInvoiceBtn: document.getElementById("copyInvoiceBtn"),
         invoiceNote: document.getElementById("invoiceNote"),
         orderSummary: document.getElementById("orderSummary"),
         backToShopBtn: document.getElementById("backToShopBtn"),
+        footerLinks: document.getElementById("footerLinks"),
+        infoView: document.getElementById("infoView"),
+        infoTitle: document.getElementById("infoTitle"),
+        infoMeta: document.getElementById("infoMeta"),
+        infoStatus: document.getElementById("infoStatus"),
+        infoText: document.getElementById("infoText"),
+        backFromInfoBtn: document.getElementById("backFromInfoBtn"),
+        complaintForm: document.getElementById("complaintForm"),
+        complaintInput: document.getElementById("complaintInput"),
+        complaintNote: document.getElementById("complaintNote"),
       };
 
       const state = {
@@ -1045,10 +1395,106 @@
         cart: new Map(),
         lastQueryTokens: [],
         lastInvoiceText: "",
+        viewMode: "grid",
+        outOfStockSet: new Set(),
+        infoPages: new Map(),
+        currentInfoKey: "",
       };
+
+      function setInfoStatus(text, isError = false) {
+        if (!text) {
+          els.infoStatus.setAttribute("aria-hidden", "true");
+          els.infoStatus.textContent = "";
+          return;
+        }
+        els.infoStatus.setAttribute("aria-hidden", "false");
+        els.infoStatus.style.color = isError ? "#c62828" : "";
+        els.infoStatus.textContent = text;
+      }
 
       function safeLower(v) {
         return String(v ?? "").toLowerCase();
+      }
+
+      async function fetchTextFirstAvailable(urls) {
+        for (const u of urls) {
+          try {
+            const res = await fetch(String(u), { cache: "no-store" });
+            if (!res.ok) continue;
+            const text = await res.text();
+            if (String(text ?? "").trim().length === 0) continue;
+            return { url: String(u), text };
+          } catch {}
+        }
+        return null;
+      }
+
+      function parseCsvText(text) {
+        const raw = String(text ?? "");
+        const lines = raw.split(/\r?\n/).filter((l) => l.trim().length > 0);
+        if (lines.length === 0) return { headers: [], rows: [], delimiter: "," };
+        const headerLine = String(lines[0] ?? "").replace(/^\uFEFF/, "");
+        const delimiter = detectCsvDelimiter(headerLine);
+        const headers = parseCsvLine(headerLine, delimiter).map(cleanCell);
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const colsRaw = parseCsvLine(lines[i], delimiter);
+          const cols = normalizeCsvRow(colsRaw, delimiter, headers.length).map(cleanCell);
+          rows.push(cols);
+        }
+        return { headers, rows, delimiter };
+      }
+
+      function normalizeInfoHeader(h) {
+        return String(h ?? "").replace(/^\uFEFF/, "").trim();
+      }
+
+      async function loadInfoPages() {
+        const res = await fetchTextFirstAvailable(CONFIG.ABOUT_URLS);
+        state.infoPages.clear();
+        const defaults = new Map([
+          ["about_us", { title: "من نحن", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
+          ["location", { title: "موقعنا", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
+          ["faq", { title: "أشيع الأسئلة", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
+          ["shipping", { title: "تفاصيل الشحن", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
+          ["how_to_order", { title: "كيفية الطلب", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
+          ["developer", { title: "المطور", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
+        ]);
+        for (const [k, v] of defaults.entries()) state.infoPages.set(k, v);
+        if (!res) return;
+        const table = parseCsvText(res.text);
+        if (table.headers.length === 0 || table.rows.length === 0) return;
+        const row = table.rows[0] ?? [];
+        const byHeader = new Map();
+        for (let i = 0; i < table.headers.length; i++) {
+          byHeader.set(normalizeInfoHeader(table.headers[i]), String(row[i] ?? "").trim());
+        }
+        const map = [
+          ["about_us", "من نحن"],
+          ["location", "موقعنا"],
+          ["faq", "أشيع الأسئلة"],
+          ["shipping", "تفاصيل الشحن"],
+          ["how_to_order", "كيفية الطلب"],
+          ["developer", "المطور"],
+        ];
+        for (const [key, header] of map) {
+          const text = byHeader.get(header);
+          if (typeof text === "string" && text.trim().length > 0) state.infoPages.set(key, { title: header, text });
+        }
+      }
+
+      async function loadOutOfStockSet() {
+        state.outOfStockSet.clear();
+        const res = await fetchTextFirstAvailable(CONFIG.OUT_OF_STOCK_URLS);
+        if (!res) return;
+        const table = parseCsvText(res.text);
+        if (table.headers.length === 0) return;
+        const idx = table.headers.findIndex((h) => safeLower(h).includes("code1"));
+        if (idx === -1) return;
+        for (const r of table.rows) {
+          const code1 = String(r[idx] ?? "").trim();
+          if (code1) state.outOfStockSet.add(code1);
+        }
       }
 
       function parseCsvLine(line, delimiter = ",") {
@@ -1191,7 +1637,9 @@
 
         let list = state.allProducts;
 
-        if (state.category !== "ALL") {
+        if (state.category === "OUT_OF_STOCK") {
+          list = list.filter((p) => p.isOutOfStock);
+        } else if (state.category !== "ALL") {
           list = list.filter((p) => p.category === state.category);
         }
 
@@ -1242,6 +1690,8 @@
         const catLabel =
           state.category === "ALL"
             ? "الكل"
+            : state.category === "OUT_OF_STOCK"
+            ? "منتهي الكمية"
             : state.category === "WADFOW"
             ? "WADFOW"
             : state.category === "TOTAL"
@@ -1262,17 +1712,26 @@
         if (state.filteredProducts.length === 0) {
           els.grid.innerHTML = "";
           setStatus("لا توجد نتائج مطابقة. جرّب كلمات مختلفة أو غيّر التصنيف.");
+          els.categoryNote.style.display = "none";
           return;
         }
         setStatus("");
+
+        if (state.category === "OUT_OF_STOCK") {
+          els.categoryNote.style.display = "";
+          els.categoryNote.textContent = "هذه المنتجات انتهت الآن ستتوفر لاحقاً ويحدث الموقع....";
+        } else {
+          els.categoryNote.style.display = "none";
+        }
 
         let html = "";
         for (const p of items) {
           const showOld = p.discountPercent > 0 && p.priceAfter < p.priceBefore;
           const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
+          const isWadfow = p.category === "WADFOW";
           html += `
-            <article class="card" data-key="${escapeHtmlAttr(p.key)}">
+            <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
               ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
               <div class="thumb">
                 <img
@@ -1299,9 +1758,13 @@
                 </div>
                 <div class="actions">
                   ${
-                    p.category === "UNAVAILABLE"
+                    p.isOutOfStock
+                      ? `<button class="btn btn-disabled" type="button" disabled>منتهي الكمية</button>`
+                      : p.category === "UNAVAILABLE"
                       ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
-                      : `<button class="btn btn-primary" type="button" data-add="${escapeHtmlAttr(p.key)}">إضافة للسلة</button>`
+                      : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
+                          p.key
+                        )}">إضافة للسلة</button>`
                   }
                   <button class="btn btn-ghost" type="button" data-copy="${escapeHtmlAttr(p.key)}">نسخ CODE1</button>
                 </div>
@@ -1332,6 +1795,7 @@
           pill.setAttribute("aria-pressed", isOn ? "true" : "false");
         }
         applyFilters();
+        updateFooterLinksVisibility();
       }
 
       function cartCountTotal() {
@@ -1362,6 +1826,8 @@
             if (!row || typeof row.key !== "string") continue;
             const p = state.allProducts.find((x) => x.key === row.key);
             if (!p) continue;
+            if (p.category === "UNAVAILABLE") continue;
+            if (p.isOutOfStock) continue;
             const qty = Math.max(1, Math.min(999, Number(row.qty) || 1));
             state.cart.set(row.key, { product: p, qty });
           }
@@ -1372,6 +1838,7 @@
         const p = state.allProducts.find((x) => x.key === key);
         if (!p) return;
         if (p.category === "UNAVAILABLE") return;
+        if (p.isOutOfStock) return;
         const existing = state.cart.get(key);
         state.cart.set(key, { product: p, qty: Math.min(999, (existing?.qty ?? 0) + 1) });
         saveCart();
@@ -1415,7 +1882,7 @@
         for (const [key, it] of state.cart.entries()) {
           const aboutLong = String(it.product.about ?? "").length > 110;
           itemsHtml += `
-            <div class="cart-item">
+            <div class="cart-item${it.product.category === "WADFOW" ? " is-wadfow" : ""}">
               <div class="cart-row">
                 <div class="cart-thumb">
                   <img
@@ -1451,7 +1918,7 @@
                         <button type="button" data-inc="${escapeHtmlAttr(key)}">+</button>
                       </div>
                     </div>
-                    <div style="direction:ltr;unicode-bidi:plaintext;font-weight:900;color:var(--primary-3)">$${formatMoney(
+                    <div class="cart-line-total" style="direction:ltr;unicode-bidi:plaintext;font-weight:900;color:var(--primary-3)">$${formatMoney(
                       it.qty * it.product.priceAfter
                     )}</div>
                   </div>
@@ -1461,6 +1928,7 @@
           `;
         }
         const total = cartTotals();
+        const meetsMin = total >= CONFIG.MIN_ORDER_TOTAL;
         els.cartContent.innerHTML = itemsHtml;
         els.cartSummary.innerHTML = `
           <div class="sum-row">
@@ -1470,7 +1938,9 @@
         `;
         els.cartActions.innerHTML = `
           <button class="btn btn-danger" type="button" id="clearCartBtn">تفريغ</button>
-          <button class="btn btn-primary" type="button" id="checkoutBtn">إتمام الطلب</button>
+          <button class="btn ${meetsMin ? "btn-primary" : "btn-muted"}" type="button" id="checkoutBtn" ${
+            meetsMin ? "" : "disabled"
+          }>إتمام الطلب</button>
         `;
       }
 
@@ -1510,18 +1980,90 @@
       function showShopView() {
         els.shopView.style.display = "";
         els.checkoutView.style.display = "none";
+        els.infoView.style.display = "none";
         setCheckoutStatus("");
+        setInfoStatus("");
+        updateFooterLinksVisibility();
+      }
+
+      function showInfoView(infoKey) {
+        els.shopView.style.display = "none";
+        els.checkoutView.style.display = "none";
+        els.infoView.style.display = "";
+        setCheckoutStatus("");
+        setStatus("");
+        setInfoStatus("");
+        els.complaintNote.style.display = "none";
+        updateFooterLinksVisibility();
+
+        state.currentInfoKey = String(infoKey ?? "");
+        if (state.currentInfoKey === "complaint") {
+          els.infoTitle.textContent = "إرسال شكوى";
+          els.infoMeta.textContent = "نصلح المشكلة بأسرع وقت";
+          els.infoText.textContent = "";
+          els.complaintForm.style.display = "grid";
+          els.complaintInput.value = "";
+          return;
+        }
+        els.complaintForm.style.display = "none";
+        const entry = state.infoPages.get(state.currentInfoKey);
+        if (!entry) {
+          els.infoTitle.textContent = "—";
+          els.infoMeta.textContent = "";
+          els.infoText.textContent = "الصفحة غير موجودة.";
+          return;
+        }
+        els.infoTitle.textContent = entry.title;
+        els.infoMeta.textContent = "—";
+        els.infoText.textContent = String(entry.text ?? "");
+      }
+
+      function setHash(next) {
+        const v = String(next ?? "").trim();
+        if (!v) return;
+        if (location.hash === `#${v}`) return;
+        location.hash = v;
+      }
+
+      function applyHashRoute() {
+        const h = String(location.hash ?? "").replace(/^#/, "");
+        if (h.startsWith("info=")) {
+          const key = decodeURIComponent(h.slice("info=".length));
+          return showInfoView(key);
+        }
+        if (h === "checkout") return checkout();
+        return showShopView();
+      }
+
+      function updateFooterLinksVisibility() {
+        const inShop = els.shopView.style.display !== "none";
+        const shouldShow = inShop && state.category === "ALL";
+        els.footerLinks.style.display = shouldShow ? "flex" : "none";
       }
 
       function buildInvoiceText(details) {
         const name = String(details.name ?? "").trim();
         const gov = String(details.gov ?? "").trim();
         const phone = String(details.phone ?? "").trim();
+        const shipType = String(details.shipType ?? "").trim();
+        const homsAddress = String(details.homsAddress ?? "").trim();
+        const shipCenter = String(details.shipCenter ?? "").trim();
+        const notes = String(details.notes ?? "").trim();
+        const allowSwitch = Boolean(details.allowSwitch);
         const lines = [];
         lines.push("طلب جديد");
         lines.push(`الاسم الثلاثي: ${name}`);
         lines.push(`المحافظة: ${gov}`);
         lines.push(`رقم الهاتف: ${phone}`);
+        if (shipType === "HOMS") {
+          lines.push("طريقة الاستلام: استلام ضمن حمص");
+          if (homsAddress) lines.push(`عنوان ضمن حمص: ${homsAddress}`);
+        } else if (shipType === "GOV") {
+          lines.push("طريقة الاستلام: شحن للمحافظات");
+          if (shipCenter) lines.push(`عنوان مركز الشحن: ${shipCenter}`);
+        }
+        if (notes) lines.push(`ملاحظات الطلب: ${notes}`);
+        lines.push(`بديل توتال إلى وادفو عند عدم توفره: ${allowSwitch ? "نعم" : "لا"}`);
         lines.push("");
         lines.push("تفاصيل الطلب:");
         for (const it of state.cart.values()) {
@@ -1591,7 +2133,7 @@
         let html = `<div style="display:grid;gap:10px">`;
         for (const it of state.cart.values()) {
           html += `
-            <div class="cart-item">
+            <div class="cart-item${it.product.category === "WADFOW" ? " is-wadfow" : ""}">
               <div class="cart-row">
                 <div class="cart-thumb">
                   <img
@@ -1609,7 +2151,7 @@
                       <span class="cart-code1">${escapeHtml(it.product.code1)}</span>
                       <span class="cart-code2">${escapeHtml(it.product.code2)}</span>
                     </div>
-                    <span style="direction:ltr;unicode-bidi:plaintext;font-weight:900;color:var(--primary-3)">$${formatMoney(
+                    <span class="cart-line-total" style="direction:ltr;unicode-bidi:plaintext;font-weight:900;color:var(--primary-3)">$${formatMoney(
                       it.qty * it.product.priceAfter
                     )}</span>
                   </div>
@@ -1630,16 +2172,25 @@
       }
 
       function checkout() {
-        if (state.cart.size === 0) return;
+        if (state.cart.size === 0) return showShopView();
+        if (cartTotals() < CONFIG.MIN_ORDER_TOTAL) {
+          openCart(true);
+          showShopView();
+          setHash("shop");
+          return;
+        }
         openCart(false);
         els.shopView.style.display = "none";
         els.checkoutView.style.display = "";
+        els.infoView.style.display = "none";
+        updateFooterLinksVisibility();
         els.copyInvoiceBtn.style.display = "none";
         els.invoiceNote.style.display = "none";
         els.confirmOrderBtn.disabled = false;
         els.confirmOrderBtn.textContent = "إتمام الطلب";
         setCheckoutStatus("");
         renderCheckoutSummary();
+        setHash("checkout");
       }
 
       function debounce(fn, wait) {
@@ -1656,6 +2207,18 @@
             const cat = p.getAttribute("data-category");
             if (!cat) return;
             togglePill(cat);
+          })
+        );
+
+        els.viewBtns.forEach((b) =>
+          b.addEventListener("click", () => {
+            const v = b.getAttribute("data-view");
+            if (!v) return;
+            state.viewMode = v;
+            localStorage.setItem("hjy_view_mode_v1", v);
+            els.grid.setAttribute("data-view", v);
+            for (const btn of els.viewBtns) btn.setAttribute("aria-pressed", btn === b ? "true" : "false");
+            render();
           })
         );
 
@@ -1763,10 +2326,32 @@
         });
 
         els.backToShopBtn.addEventListener("click", () => showShopView());
+        els.backFromInfoBtn.addEventListener("click", () => setHash("shop"));
+
+        els.footerLinks.addEventListener("click", (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLElement)) return;
+          const key = t.getAttribute("data-info");
+          if (!key) return;
+          setHash(`info=${encodeURIComponent(key)}`);
+        });
+
+        els.shipHomsRadio.addEventListener("change", () => {
+          if (!els.shipHomsRadio.checked) return;
+          els.shipHomsBlock.style.display = "grid";
+          els.shipGovBlock.style.display = "none";
+        });
+        els.shipGovRadio.addEventListener("change", () => {
+          if (!els.shipGovRadio.checked) return;
+          els.shipHomsBlock.style.display = "none";
+          els.shipGovBlock.style.display = "grid";
+        });
+        els.shipDetailsBtn.addEventListener("click", () => setHash(`info=${encodeURIComponent("shipping")}`));
 
         els.checkoutForm.addEventListener("submit", async (e) => {
           e.preventDefault();
           if (state.cart.size === 0) return;
+          if (cartTotals() < CONFIG.MIN_ORDER_TOTAL) return setCheckoutStatus(`اقل فاتورة للطلب هي ${CONFIG.MIN_ORDER_TOTAL}$`, true);
           const name = String(els.fullNameInput.value ?? "").trim();
           const gov = String(els.govInput.value ?? "").trim();
           const phone = String(els.phoneInput.value ?? "").trim();
@@ -1774,7 +2359,15 @@
           if (gov.length < 2) return setCheckoutStatus("يرجى إدخال المحافظة.", true);
           if (phone.replace(/[^0-9]/g, "").length < 9) return setCheckoutStatus("يرجى إدخال رقم هاتف صحيح.", true);
 
-          const invoice = buildInvoiceText({ name, gov, phone });
+          const shipType = els.shipHomsRadio.checked ? "HOMS" : "GOV";
+          const homsAddress = String(els.homsAddressInput.value ?? "").trim();
+          const shipCenter = String(els.shipCenterInput.value ?? "").trim();
+          if (shipType === "HOMS" && homsAddress.length < 4) return setCheckoutStatus("يرجى إدخال عنوان ضمن حمص.", true);
+          if (shipType === "GOV" && shipCenter.length < 4) return setCheckoutStatus("يرجى إدخال عنوان مركز الشحن.", true);
+          const notes = String(els.orderNotesInput.value ?? "").trim();
+          const allowSwitch = Boolean(els.allowVodafoneSwitchInput.checked);
+
+          const invoice = buildInvoiceText({ name, gov, phone, shipType, homsAddress, shipCenter, notes, allowSwitch });
           state.lastInvoiceText = invoice;
           els.copyInvoiceBtn.style.display = "";
           els.invoiceNote.style.display = "";
@@ -1796,12 +2389,28 @@
           if (!state.lastInvoiceText) return;
           await copyText(state.lastInvoiceText);
         });
+
+        els.complaintForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const msg = String(els.complaintInput.value ?? "").trim();
+          if (msg.length < 6) return setInfoStatus("يرجى كتابة تفاصيل أكثر.", true);
+          els.complaintNote.style.display = "none";
+          setInfoStatus("جارٍ إرسال الشكوى...", false);
+          try {
+            await sendToTelegram(`شكوى جديدة\n\n${msg}`);
+            setInfoStatus("تم إرسال الشكوى.", false);
+            els.complaintNote.style.display = "";
+          } catch {
+            setInfoStatus("تعذر الإرسال. حاول لاحقاً.", true);
+          }
+        });
       }
 
       async function loadProducts() {
         els.hint.textContent = "تحميل...";
         setStatus("تحميل المنتجات من CSV...");
         try {
+          await Promise.all([loadInfoPages(), loadOutOfStockSet()]);
           const res = await fetch(CONFIG.CSV_URL, { cache: "no-store" });
           if (!res.ok) throw new Error("Fetch failed");
           const data = await res.text();
@@ -1828,6 +2437,7 @@
             const discountPercent = discountForCategory(category);
             const key = `${String(code1).trim()}::${String(code2).trim()}`;
             const search = safeLower(`${code1} ${code2} ${about}`);
+            const isOutOfStock = state.outOfStockSet.has(String(code1).trim());
 
             products.push({
               key,
@@ -1841,6 +2451,7 @@
               photo: String(photo).trim(),
               category,
               search,
+              isOutOfStock,
             });
           }
 
@@ -1861,7 +2472,19 @@
       }
 
       wireEvents();
-      loadProducts();
+      try {
+        const savedView = String(localStorage.getItem("hjy_view_mode_v1") ?? "").trim();
+        if (savedView) state.viewMode = savedView;
+        else if (window.matchMedia && window.matchMedia("(max-width: 520px)").matches) state.viewMode = "list";
+      } catch {}
+      els.grid.setAttribute("data-view", state.viewMode);
+      for (const b of els.viewBtns) b.setAttribute("aria-pressed", b.getAttribute("data-view") === state.viewMode ? "true" : "false");
+      updateFooterLinksVisibility();
+      window.addEventListener("hashchange", applyHashRoute);
+      loadProducts().then(() => {
+        if (!location.hash) setHash("shop");
+        applyHashRoute();
+      });
       renderCart();
     </script>
   </body>
