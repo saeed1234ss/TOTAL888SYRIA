@@ -1481,7 +1481,36 @@
 
       function parseCsvText(text) {
         const raw = String(text ?? "");
-        const lines = raw.split(/\r?\n/).filter((l) => l.trim().length > 0);
+        const splitCsvRows = (input) => {
+          const s = String(input ?? "");
+          const rows = [];
+          let cur = "";
+          let inQuotes = false;
+          for (let i = 0; i < s.length; i++) {
+            const ch = s[i];
+            if (ch === '"') {
+              if (inQuotes && s[i + 1] === '"') {
+                cur += '""';
+                i++;
+                continue;
+              }
+              inQuotes = !inQuotes;
+              cur += ch;
+              continue;
+            }
+            if ((ch === "\n" || ch === "\r") && !inQuotes) {
+              if (ch === "\r" && s[i + 1] === "\n") i++;
+              if (cur.trim().length > 0) rows.push(cur);
+              cur = "";
+              continue;
+            }
+            cur += ch;
+          }
+          if (cur.trim().length > 0) rows.push(cur);
+          return rows;
+        };
+
+        const lines = splitCsvRows(raw).filter((l) => l.trim().length > 0);
         if (lines.length === 0) return { headers: [], rows: [], delimiter: "," };
         const headerLine = String(lines[0] ?? "").replace(/^\uFEFF/, "");
         const delimiter = detectCsvDelimiter(headerLine);
