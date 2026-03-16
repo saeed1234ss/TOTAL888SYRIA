@@ -1060,19 +1060,49 @@
         }
         .controls {
           flex: 1 1 100%;
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .search {
+          width: 100%;
+        }
+        .select {
+          width: 100%;
+        }
+        .cart-button {
+          width: 100%;
+          justify-content: space-between;
         }
       }
 
       @media (max-width: 460px) {
         .grid {
-          grid-template-columns: 1fr;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         #productsGrid[data-view="compact"] {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+        #productsGrid[data-view="compact"] .card {
+          min-height: 230px;
+        }
+        #productsGrid[data-view="compact"] .desc {
+          -webkit-line-clamp: 2;
+        }
         #productsGrid[data-view="list"] .thumb {
           width: 86px;
           min-width: 86px;
+        }
+        .card {
+          min-height: 280px;
+        }
+        .card-body {
+          padding: 10px 10px 8px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .grid {
+          grid-template-columns: 1fr;
         }
       }
 
@@ -1108,13 +1138,12 @@
             </div>
             <div>
               <h1>TOTAL SYRIA TOOLS</h1>
-              <p>بحث سريع + تصنيفات + سلة مشتريات</p>
             </div>
           </div>
 
           <div class="controls">
             <div class="search" role="search">
-              <input id="searchInput" type="search" placeholder="ابحث بالاسم أو CODE1 / CODE2 أو كلمات من الوصف..." autocomplete="off" />
+              <input id="searchInput" type="search" placeholder="يمكنك بحث بكتابة اسم المنتج أو الكود" autocomplete="off" />
             </div>
 
             <select id="sortSelect" class="select" aria-label="الترتيب">
@@ -1140,7 +1169,7 @@
             <button class="pill" type="button" data-category="UNAVAILABLE" aria-pressed="false">الغير متوفر</button>
             <button class="pill" type="button" data-category="UNCATEGORIZED" aria-pressed="false">غير مصنف</button>
           </div>
-          <p class="panel-sub" id="hint" style="margin-inline-start: auto">تحميل البيانات...</p>
+          <p class="panel-sub" id="hint" style="margin-inline-start: auto">جاري تحميل المنتجات يرجى الانتظار قليلاً ....</p>
         </div>
       </header>
 
@@ -1216,12 +1245,27 @@
                     <span style="font-weight:800">عنوان مركز الشحن</span>
                     <input id="shipCenterInput" type="text" autocomplete="street-address" style="padding:12px;border:1px solid var(--border);border-radius:12px" />
                   </label>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="btn btn-ghost" id="masaratBranchesBtn" type="button" style="flex:1">فروع مسارات</button>
+                    <button class="btn btn-ghost" id="qadmousBranchesBtn" type="button" style="flex:1">فروع القدموس</button>
+                  </div>
+                  <div class="mini-note">يرجى اختيار الفرع القريب منكم</div>
                 </div>
               </div>
               <label style="display:grid;gap:6px">
                 <span style="font-weight:800">ملاحظات الطلب</span>
                 <textarea id="orderNotesInput" placeholder="اكتب أي ملاحظة تخص الطلب..." style="padding:12px;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:13px;min-height:110px;resize:vertical"></textarea>
               </label>
+              <div style="display:grid;gap:8px">
+                <label class="checkrow">
+                  <input id="shipUsdInput" type="checkbox" checked />
+                  <span>شحن بالدولار <span class="mini-note">يفضل ذلك</span></span>
+                </label>
+                <label class="checkrow">
+                  <input id="shipSypInput" type="checkbox" />
+                  <span>شحن بالسوري <span class="mini-note">سيتم تطبيق زيادة + 1.5 ل.س جديدة لسعر صرف لحظة الإرسال بسبب تذبذب الصرف</span></span>
+                </label>
+              </div>
               <label class="checkrow">
                 <input id="allowVodafoneSwitchInput" type="checkbox" />
                 <span>في حال عدم توفر توتال لا أمانع من تبديله بوادفو ( علماً نفس شركة )</span>
@@ -1230,6 +1274,7 @@
                 <button class="btn btn-primary" id="confirmOrderBtn" type="submit" style="flex:1">إتمام الطلب</button>
                 <button class="btn btn-ghost" id="copyInvoiceBtn" type="button" style="flex:1;display:none">نسخ الفاتورة</button>
               </div>
+              <div class="mini-note">سيتم تواصل معك خلال واتساب بعد إتمام الطلب قبل أن نرسل الطرد</div>
               <div id="invoiceNote" class="panel-sub" style="display:none">
                 يمكنك نسخ الفاتورة وإرسالها إلينا على الواتساب. الفاتورة المنسوخة تحتوي كل التفاصيل بشكل مرتب وسطر تحت سطر.
               </div>
@@ -1366,7 +1411,11 @@
         homsAddressInput: document.getElementById("homsAddressInput"),
         shipCenterInput: document.getElementById("shipCenterInput"),
         shipDetailsBtn: document.getElementById("shipDetailsBtn"),
+        masaratBranchesBtn: document.getElementById("masaratBranchesBtn"),
+        qadmousBranchesBtn: document.getElementById("qadmousBranchesBtn"),
         orderNotesInput: document.getElementById("orderNotesInput"),
+        shipUsdInput: document.getElementById("shipUsdInput"),
+        shipSypInput: document.getElementById("shipSypInput"),
         allowVodafoneSwitchInput: document.getElementById("allowVodafoneSwitchInput"),
         confirmOrderBtn: document.getElementById("confirmOrderBtn"),
         copyInvoiceBtn: document.getElementById("copyInvoiceBtn"),
@@ -1399,6 +1448,7 @@
         outOfStockSet: new Set(),
         infoPages: new Map(),
         currentInfoKey: "",
+        lastMainRoute: "shop",
       };
 
       function setInfoStatus(text, isError = false) {
@@ -1459,6 +1509,8 @@
           ["shipping", { title: "تفاصيل الشحن", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
           ["how_to_order", { title: "كيفية الطلب", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
           ["developer", { title: "المطور", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
+          ["masarat_branches", { title: "فروع مسارات", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
+          ["qadmous_branches", { title: "فروع القدموس", text: "سيتم عرض النص تلقائياً من ملف about.csv عند رفعه على GitHub." }],
         ]);
         for (const [k, v] of defaults.entries()) state.infoPages.set(k, v);
         if (!res) return;
@@ -1476,6 +1528,8 @@
           ["shipping", "تفاصيل الشحن"],
           ["how_to_order", "كيفية الطلب"],
           ["developer", "المطور"],
+          ["masarat_branches", "فروع مسارات"],
+          ["qadmous_branches", "فروع القدموس"],
         ];
         for (const [key, header] of map) {
           const text = byHeader.get(header);
@@ -1766,7 +1820,6 @@
                           p.key
                         )}">إضافة للسلة</button>`
                   }
-                  <button class="btn btn-ghost" type="button" data-copy="${escapeHtmlAttr(p.key)}">نسخ CODE1</button>
                 </div>
               </div>
             </article>
@@ -2015,13 +2068,48 @@
         }
         els.infoTitle.textContent = entry.title;
         els.infoMeta.textContent = "—";
-        els.infoText.textContent = String(entry.text ?? "");
+        els.infoText.innerHTML = "";
+        const textEl = document.createElement("div");
+        textEl.textContent = String(entry.text ?? "");
+        els.infoText.appendChild(textEl);
+
+        if (state.currentInfoKey === "shipping") {
+          const row = document.createElement("div");
+          row.style.display = "flex";
+          row.style.gap = "10px";
+          row.style.flexWrap = "wrap";
+          row.style.marginTop = "12px";
+
+          const b1 = document.createElement("button");
+          b1.type = "button";
+          b1.className = "btn btn-ghost";
+          b1.style.flex = "1";
+          b1.textContent = "فروع مسارات";
+          b1.addEventListener("click", () => setHash(`info=${encodeURIComponent("masarat_branches")}`));
+
+          const b2 = document.createElement("button");
+          b2.type = "button";
+          b2.className = "btn btn-ghost";
+          b2.style.flex = "1";
+          b2.textContent = "فروع القدموس";
+          b2.addEventListener("click", () => setHash(`info=${encodeURIComponent("qadmous_branches")}`));
+
+          row.appendChild(b1);
+          row.appendChild(b2);
+          els.infoText.appendChild(row);
+        }
       }
 
       function setHash(next) {
         const v = String(next ?? "").trim();
         if (!v) return;
         if (location.hash === `#${v}`) return;
+        if (v.startsWith("info=")) {
+          const cur = String(location.hash ?? "").replace(/^#/, "");
+          if (!cur.startsWith("info=") && cur.trim().length > 0) state.lastMainRoute = cur;
+        } else {
+          state.lastMainRoute = v;
+        }
         location.hash = v;
       }
 
@@ -2048,6 +2136,7 @@
         const shipType = String(details.shipType ?? "").trim();
         const homsAddress = String(details.homsAddress ?? "").trim();
         const shipCenter = String(details.shipCenter ?? "").trim();
+        const shipCurrency = String(details.shipCurrency ?? "").trim();
         const notes = String(details.notes ?? "").trim();
         const allowSwitch = Boolean(details.allowSwitch);
         const lines = [];
@@ -2055,6 +2144,7 @@
         lines.push(`الاسم الثلاثي: ${name}`);
         lines.push(`المحافظة: ${gov}`);
         lines.push(`رقم الهاتف: ${phone}`);
+        if (shipCurrency) lines.push(`شحن العملة: ${shipCurrency}`);
         if (shipType === "HOMS") {
           lines.push("طريقة الاستلام: استلام ضمن حمص");
           if (homsAddress) lines.push(`عنوان ضمن حمص: ${homsAddress}`);
@@ -2106,19 +2196,29 @@
         const token = String(CONFIG.TELEGRAM_BOT_TOKEN ?? "").trim();
         const chatId = String(CONFIG.TELEGRAM_CHAT_ID ?? "").trim();
         if (!token || !chatId) return;
-        const chunks = splitText(text, 3500);
+        const cleaned = String(text ?? "").trim();
+        if (!cleaned) return;
+        const chunks = splitText(cleaned, 3500).filter((c) => String(c ?? "").trim().length > 0);
+        if (chunks.length === 0) return;
         for (let i = 0; i < chunks.length; i++) {
-          const part = chunks[i];
+          const part = String(chunks[i] ?? "").trim();
+          if (!part) continue;
           const prefix = chunks.length > 1 ? `(${i + 1}/${chunks.length})\n` : "";
-          const url =
-            `https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage` +
-            `?chat_id=${encodeURIComponent(chatId)}` +
-            `&text=${encodeURIComponent(prefix + part)}` +
-            `&disable_web_page_preview=true`;
-          const img = new Image();
-          img.referrerPolicy = "no-referrer";
-          img.src = url;
-          await new Promise((r) => setTimeout(r, 180));
+          const url = `https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`;
+          try {
+            const res = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: chatId,
+                text: prefix + part,
+                disable_web_page_preview: true,
+              }),
+              cache: "no-store",
+            });
+            if (!res.ok) throw new Error("Telegram send failed");
+          } catch {}
+          await new Promise((r) => setTimeout(r, 220));
         }
       }
 
@@ -2256,13 +2356,6 @@
             }, 900);
             return;
           }
-          const copyKey = t.getAttribute("data-copy");
-          if (copyKey) {
-            const p = state.allProducts.find((x) => x.key === copyKey);
-            if (!p) return;
-            await copyText(p.code1);
-            return;
-          }
           const moreKey = t.getAttribute("data-more");
           if (moreKey) {
             const desc = els.grid.querySelector(`[data-desc="${CSS.escape(moreKey)}"]`);
@@ -2326,7 +2419,7 @@
         });
 
         els.backToShopBtn.addEventListener("click", () => showShopView());
-        els.backFromInfoBtn.addEventListener("click", () => setHash("shop"));
+        els.backFromInfoBtn.addEventListener("click", () => setHash(state.lastMainRoute || "shop"));
 
         els.footerLinks.addEventListener("click", (e) => {
           const t = e.target;
@@ -2347,6 +2440,21 @@
           els.shipGovBlock.style.display = "grid";
         });
         els.shipDetailsBtn.addEventListener("click", () => setHash(`info=${encodeURIComponent("shipping")}`));
+        els.masaratBranchesBtn.addEventListener("click", () => setHash(`info=${encodeURIComponent("masarat_branches")}`));
+        els.qadmousBranchesBtn.addEventListener("click", () => setHash(`info=${encodeURIComponent("qadmous_branches")}`));
+
+        const syncCurrency = (source) => {
+          if (source === "USD") {
+            if (els.shipUsdInput.checked) els.shipSypInput.checked = false;
+            if (!els.shipUsdInput.checked && !els.shipSypInput.checked) els.shipUsdInput.checked = true;
+            return;
+          }
+          if (els.shipSypInput.checked) els.shipUsdInput.checked = false;
+          if (!els.shipUsdInput.checked && !els.shipSypInput.checked) els.shipUsdInput.checked = true;
+        };
+        els.shipUsdInput.addEventListener("change", () => syncCurrency("USD"));
+        els.shipSypInput.addEventListener("change", () => syncCurrency("SYP"));
+        syncCurrency("USD");
 
         els.checkoutForm.addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -2364,10 +2472,11 @@
           const shipCenter = String(els.shipCenterInput.value ?? "").trim();
           if (shipType === "HOMS" && homsAddress.length < 4) return setCheckoutStatus("يرجى إدخال عنوان ضمن حمص.", true);
           if (shipType === "GOV" && shipCenter.length < 4) return setCheckoutStatus("يرجى إدخال عنوان مركز الشحن.", true);
+          const shipCurrency = els.shipSypInput.checked ? "سوري" : "دولار";
           const notes = String(els.orderNotesInput.value ?? "").trim();
           const allowSwitch = Boolean(els.allowVodafoneSwitchInput.checked);
 
-          const invoice = buildInvoiceText({ name, gov, phone, shipType, homsAddress, shipCenter, notes, allowSwitch });
+          const invoice = buildInvoiceText({ name, gov, phone, shipType, homsAddress, shipCenter, shipCurrency, notes, allowSwitch });
           state.lastInvoiceText = invoice;
           els.copyInvoiceBtn.style.display = "";
           els.invoiceNote.style.display = "";
@@ -2407,8 +2516,8 @@
       }
 
       async function loadProducts() {
-        els.hint.textContent = "تحميل...";
-        setStatus("تحميل المنتجات من CSV...");
+        els.hint.textContent = "جاري تحميل المنتجات يرجى الانتظار قليلاً ....";
+        setStatus("جاري تحميل المنتجات يرجى الانتظار قليلاً ....");
         try {
           await Promise.all([loadInfoPages(), loadOutOfStockSet()]);
           const res = await fetch(CONFIG.CSV_URL, { cache: "no-store" });
@@ -2475,7 +2584,7 @@
       try {
         const savedView = String(localStorage.getItem("hjy_view_mode_v1") ?? "").trim();
         if (savedView) state.viewMode = savedView;
-        else if (window.matchMedia && window.matchMedia("(max-width: 520px)").matches) state.viewMode = "list";
+        else if (window.matchMedia && window.matchMedia("(max-width: 520px)").matches) state.viewMode = "compact";
       } catch {}
       els.grid.setAttribute("data-view", state.viewMode);
       for (const b of els.viewBtns) b.setAttribute("aria-pressed", b.getAttribute("data-view") === state.viewMode ? "true" : "false");
