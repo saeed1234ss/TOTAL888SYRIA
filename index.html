@@ -531,7 +531,19 @@
         gap: 10px;
       }
 
+      #homeProductsGrid[data-view="list"] {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 14px;
+      }
+
       #productsGrid[data-view="list"] .card {
+        min-height: unset;
+        flex-direction: row;
+      }
+
+      #homeProductsGrid[data-view="list"] .card {
         min-height: unset;
         flex-direction: row;
       }
@@ -542,7 +554,17 @@
         aspect-ratio: 1 / 1;
       }
 
+      #homeProductsGrid[data-view="list"] .thumb {
+        width: 96px;
+        min-width: 96px;
+        aspect-ratio: 1 / 1;
+      }
+
       #productsGrid[data-view="list"] .card-body {
+        padding: 10px;
+      }
+
+      #homeProductsGrid[data-view="list"] .card-body {
         padding: 10px;
       }
 
@@ -556,7 +578,18 @@
         gap: 10px;
       }
 
+      #homeProductsGrid[data-view="compact"] {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+        padding: 14px;
+      }
+
       #productsGrid[data-view="compact"] .card {
+        min-height: 270px;
+      }
+
+      #homeProductsGrid[data-view="compact"] .card {
         min-height: 270px;
       }
 
@@ -564,7 +597,15 @@
         aspect-ratio: 1 / 1;
       }
 
+      #homeProductsGrid[data-view="compact"] .thumb {
+        aspect-ratio: 1 / 1;
+      }
+
       #productsGrid[data-view="compact"] .price-now {
+        font-size: 15px;
+      }
+
+      #homeProductsGrid[data-view="compact"] .price-now {
         font-size: 15px;
       }
 
@@ -1102,6 +1143,10 @@
           grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
+        #homeProductsGrid[data-view="compact"] {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
         .cart-drawer {
           top: auto;
           inset-inline: 0;
@@ -1150,7 +1195,13 @@
         #productsGrid[data-view="compact"] {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+        #homeProductsGrid[data-view="compact"] {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
         #productsGrid[data-view="compact"] .card {
+          min-height: 230px;
+        }
+        #homeProductsGrid[data-view="compact"] .card {
           min-height: 230px;
         }
         #productsGrid[data-view="compact"] .desc {
@@ -1166,6 +1217,10 @@
           width: 100%;
         }
         #productsGrid[data-view="list"] .thumb {
+          width: 86px;
+          min-width: 86px;
+        }
+        #homeProductsGrid[data-view="list"] .thumb {
           width: 86px;
           min-width: 86px;
         }
@@ -1301,14 +1356,13 @@
               <h2>الرئيسية</h2>
               <p class="panel-sub">منتجات مختارة</p>
             </div>
-          </div>
-          <div class="status" id="homeStatus" aria-hidden="true"></div>
-          <div class="grid" id="homeProductsGrid" data-view="brief" aria-live="polite"></div>
-          <div class="home-note">
-            <div class="home-links">
+            <div style="display:flex;gap:10px;align-items:center">
               <button class="btn btn-ghost" id="goShopBtn" type="button">التسوق</button>
+              <button class="btn btn-ghost" id="orderDetailsBtn" type="button">تفاصيل الطلب ▾</button>
             </div>
           </div>
+          <div class="status" id="homeStatus" aria-hidden="true"></div>
+          <div class="grid" id="homeProductsGrid" data-view="compact" aria-live="polite"></div>
         </section>
 
         <section class="panel" id="shopView">
@@ -1327,7 +1381,7 @@
 
           <div class="status" id="status" aria-hidden="true"></div>
           <div class="notice" id="categoryNote" style="display:none"></div>
-          <div class="grid" id="productsGrid" data-view="grid" aria-live="polite"></div>
+          <div class="grid" id="productsGrid" data-view="compact" aria-live="polite"></div>
         </section>
 
         <section class="panel" id="productView" style="display:none">
@@ -1585,6 +1639,7 @@
         orderSummary: document.getElementById("orderSummary"),
         backToShopBtn: document.getElementById("backToShopBtn"),
         goShopBtn: document.getElementById("goShopBtn"),
+        orderDetailsBtn: document.getElementById("orderDetailsBtn"),
         footerLinks: document.getElementById("footerLinks"),
         infoView: document.getElementById("infoView"),
         infoTitle: document.getElementById("infoTitle"),
@@ -1607,7 +1662,7 @@
         cart: new Map(),
         lastQueryTokens: [],
         lastInvoiceText: "",
-        viewMode: "grid",
+        viewMode: "compact",
         outOfStockSet: new Set(),
         infoPages: new Map(),
         currentInfoKey: "",
@@ -2055,6 +2110,7 @@
           pill.setAttribute("aria-pressed", isOn ? "true" : "false");
         }
         applyFilters();
+        if (els.homeView.style.display !== "none") setHash("shop");
         updateFooterLinksVisibility();
       }
 
@@ -2437,8 +2493,7 @@
       }
 
       function updateFooterLinksVisibility() {
-        const inHome = els.homeView.style.display !== "none";
-        els.footerLinks.style.display = inHome ? "flex" : "none";
+        els.footerLinks.style.display = "flex";
       }
 
       function buildInvoiceText(details) {
@@ -2631,7 +2686,9 @@
           state.viewMode = v;
           localStorage.setItem("hjy_view_mode_v1", v);
           els.grid.setAttribute("data-view", v);
+          els.homeGrid.setAttribute("data-view", v);
           render();
+          renderHome();
         });
 
         els.categoriesToggle.addEventListener("click", () => {
@@ -2765,6 +2822,9 @@
         els.backFromInfoBtn.addEventListener("click", () => setHash(state.lastMainRoute || "shop"));
         els.backFromProductBtn.addEventListener("click", () => setHash(state.lastMainRoute || "shop"));
         els.goShopBtn.addEventListener("click", () => setHash("shop"));
+        els.orderDetailsBtn.addEventListener("click", () => {
+          els.footerLinks.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
 
         els.footerLinks.addEventListener("click", (e) => {
           const t = e.target;
@@ -3026,9 +3086,10 @@
       try {
         const savedView = String(localStorage.getItem("hjy_view_mode_v1") ?? "").trim();
         if (savedView) state.viewMode = savedView;
-        else if (window.matchMedia && window.matchMedia("(max-width: 520px)").matches) state.viewMode = "compact";
+        else state.viewMode = "compact";
       } catch {}
       els.grid.setAttribute("data-view", state.viewMode);
+      els.homeGrid.setAttribute("data-view", state.viewMode);
       els.viewSelect.value = state.viewMode;
       updateFooterLinksVisibility();
       window.addEventListener("hashchange", applyHashRoute);
