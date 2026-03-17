@@ -171,6 +171,22 @@
         width: 100%;
       }
 
+      .catsbar .pager button {
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .catsbar .select {
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+
+      .results-line {
+        white-space: nowrap;
+      }
+
       .cat-toggle {
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.75);
@@ -509,32 +525,6 @@
         flex: 1;
       }
 
-      .viewmodes {
-        display: inline-flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-      }
-
-      .viewbtn {
-        border: 1px solid var(--border);
-        background: var(--surface);
-        color: var(--text);
-        padding: 6px 9px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 800;
-        cursor: pointer;
-        user-select: none;
-      }
-
-      .viewbtn[aria-pressed="true"] {
-        border-color: rgba(10, 163, 163, 0.45);
-        background: rgba(10, 163, 163, 0.12);
-        box-shadow: var(--ring);
-      }
-
       #productsGrid[data-view="list"] {
         display: grid;
         grid-template-columns: 1fr;
@@ -668,23 +658,6 @@
         gap: 8px;
         align-items: center;
         justify-content: center;
-      }
-
-      .footer-extras {
-        width: 100%;
-        display: none;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .app[data-route="home"] .footer-extras {
-        display: flex;
-      }
-
-      .footer-extras a {
-        text-decoration: none;
       }
 
       .footer-link {
@@ -1153,20 +1126,20 @@
           min-width: 0;
           flex: 1 1 100%;
         }
-        .controls {
-          flex: 1 1 100%;
-          flex-direction: column;
-          align-items: stretch;
+        .app:not([data-route="home"]) .topbar-inner {
+          flex-wrap: nowrap;
         }
-        .search {
-          width: 100%;
+        .app:not([data-route="home"]) .controls {
+          flex: 1 1 auto;
+          flex-direction: row;
+          align-items: center;
         }
-        .select {
-          width: 100%;
+        .app:not([data-route="home"]) .search {
+          width: auto;
         }
-        .cart-button {
-          width: 100%;
-          justify-content: space-between;
+        .app:not([data-route="home"]) .cart-button {
+          width: auto;
+          justify-content: center;
         }
       }
 
@@ -1297,9 +1270,20 @@
             <button class="cat-toggle" id="categoriesToggle" type="button" aria-expanded="false">
               التصنيفات <span class="chev">▾</span>
             </button>
+            <div class="pager" aria-label="التنقل بين الصفحات">
+              <button id="prevPage" type="button" aria-label="السابق">▶</button>
+              <button id="nextPage" type="button" aria-label="التالي">◀</button>
+            </div>
+            <select class="select" id="viewSelect" aria-label="طريقة العرض">
+              <option value="grid">شبكة</option>
+              <option value="compact">مضغوط</option>
+              <option value="brief">مختصر</option>
+              <option value="list">قائمة</option>
+            </select>
             <div class="pillbar categories-panel" id="categoriesPanel" role="group" aria-label="التصنيفات" hidden>
+              <button class="pill" type="button" data-category="HOME" aria-pressed="false">الصفحة الرئيسية</button>
               <button class="pill" type="button" data-category="ALL" aria-pressed="true">الكل</button>
-              <button class="pill" type="button" data-category="OUT_OF_STOCK" aria-pressed="false">منتهي الكمية</button>
+              <button class="pill" type="button" data-category="OUT_OF_STOCK" aria-pressed="false">منتهي</button>
               <button class="pill" type="button" data-category="WADFOW" aria-pressed="false">WADFOW</button>
               <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
               <button class="pill" type="button" data-category="UNAVAILABLE" aria-pressed="false">الغير متوفر</button>
@@ -1322,8 +1306,6 @@
           <div class="grid" id="homeProductsGrid" data-view="brief" aria-live="polite"></div>
           <div class="home-note">
             <div class="home-links">
-              <a class="btn btn-primary" href="https://wa.me/qr/6VKRZ35KPU57J1" target="_blank" rel="noopener">متابعة طلب عبر واتساب</a>
-              <a class="btn btn-ghost" href="https://t.me/TotalToolsSyria888" target="_blank" rel="noopener" aria-label="تيلغرام">📨</a>
               <button class="btn btn-ghost" id="goShopBtn" type="button">التسوق</button>
             </div>
           </div>
@@ -1332,25 +1314,14 @@
         <section class="panel" id="shopView">
           <div class="panel-header">
             <div>
-              <h2>المنتجات</h2>
-              <p class="panel-sub">
-                عرض <bdi id="rangeText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> من
-                <bdi id="totalText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> منتج
+              <p class="panel-sub results-line">
+                <bdi id="rangeText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> /
+                <bdi id="totalText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi>
                 <span id="resultsMeta" style="color:var(--muted)">—</span>
               </p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center">
               <span class="tag" id="activeFilters">الكل</span>
-              <div class="pager">
-                <button id="prevPage" type="button">السابق</button>
-                <button id="nextPage" type="button">التالي</button>
-              </div>
-              <div class="viewmodes" role="group" aria-label="عرض المنتجات">
-                <button class="viewbtn" type="button" data-view="grid" aria-pressed="true">شبكة</button>
-                <button class="viewbtn" type="button" data-view="compact" aria-pressed="false">مضغوط</button>
-                <button class="viewbtn" type="button" data-view="list" aria-pressed="false">قائمة</button>
-                <button class="viewbtn" type="button" data-view="brief" aria-pressed="false">مختصر</button>
-              </div>
             </div>
           </div>
 
@@ -1452,7 +1423,16 @@
                 <button class="btn btn-ghost" id="copyInvoiceBtn" type="button" style="flex:1;display:none">نسخ الفاتورة</button>
               </div>
               <div class="mini-note">سيتم تواصل معك خلال واتساب بعد إتمام الطلب قبل أن نرسل الطرد</div>
-              <a class="btn btn-primary" href="https://wa.me/qr/6VKRZ35KPU57J1" target="_blank" rel="noopener">متابعة طلب عبر واتساب</a>
+              <a
+                class="btn btn-primary"
+                id="whatsappAfterOrder"
+                href="https://wa.me/qr/6VKRZ35KPU57J1"
+                target="_blank"
+                rel="noopener"
+                style="display:none"
+              >
+                تواصل معنا على واتساب
+              </a>
               <div id="invoiceNote" class="panel-sub" style="display:none">
                 يمكنك نسخ الفاتورة وإرسالها إلينا على الواتساب. الفاتورة المنسوخة تحتوي كل التفاصيل بشكل مرتب وسطر تحت سطر.
               </div>
@@ -1498,10 +1478,6 @@
             <button class="footer-link" type="button" data-info="how_to_order">كيفية الطلب</button>
             <button class="footer-link" type="button" data-info="developer">المطور</button>
             <button class="footer-link" type="button" data-info="complaint">إرسال شكوى</button>
-          </div>
-          <div class="footer-extras" id="footerExtras">
-            <a class="footer-link" href="https://wa.me/qr/6VKRZ35KPU57J1" target="_blank" rel="noopener">متابعة طلب عبر واتساب</a>
-            <a class="footer-link" href="https://t.me/TotalToolsSyria888" target="_blank" rel="noopener" aria-label="تيلغرام">📨</a>
           </div>
         </div>
       </footer>
@@ -1552,7 +1528,7 @@
         homeGrid: document.getElementById("homeProductsGrid"),
         search: document.getElementById("searchInput"),
         pills: Array.from(document.querySelectorAll(".pill[data-category]")),
-        viewBtns: Array.from(document.querySelectorAll(".viewbtn[data-view]")),
+        viewSelect: document.getElementById("viewSelect"),
         categoriesToggle: document.getElementById("categoriesToggle"),
         categoriesPanel: document.getElementById("categoriesPanel"),
         resultsMeta: document.getElementById("resultsMeta"),
@@ -1605,11 +1581,11 @@
         confirmOrderBtn: document.getElementById("confirmOrderBtn"),
         copyInvoiceBtn: document.getElementById("copyInvoiceBtn"),
         invoiceNote: document.getElementById("invoiceNote"),
+        whatsappAfterOrder: document.getElementById("whatsappAfterOrder"),
         orderSummary: document.getElementById("orderSummary"),
         backToShopBtn: document.getElementById("backToShopBtn"),
         goShopBtn: document.getElementById("goShopBtn"),
         footerLinks: document.getElementById("footerLinks"),
-        footerExtras: document.getElementById("footerExtras"),
         infoView: document.getElementById("infoView"),
         infoTitle: document.getElementById("infoTitle"),
         infoMeta: document.getElementById("infoMeta"),
@@ -1654,8 +1630,55 @@
         return String(v ?? "").toLowerCase();
       }
 
+      function isAbsoluteUrl(u) {
+        return /^[a-z][a-z0-9+.-]*:\/\//i.test(String(u ?? "").trim());
+      }
+
+      function githubRawBases() {
+        const host = String(location.hostname ?? "");
+        if (!host.endsWith(".github.io")) return [];
+        const owner = host.split(".")[0] ?? "";
+        const seg = String(location.pathname ?? "")
+          .split("/")
+          .filter(Boolean);
+        const repo = seg[0] ?? "";
+        if (!owner || !repo) return [];
+        return [
+          `https://raw.githubusercontent.com/${owner}/${repo}/main/`,
+          `https://raw.githubusercontent.com/${owner}/${repo}/master/`,
+        ];
+      }
+
+      function buildFetchCandidates(urls) {
+        const rawBases = githubRawBases();
+        const out = [];
+        const seen = new Set();
+        for (const u of urls ?? []) {
+          const s = String(u ?? "").trim();
+          if (!s) continue;
+          const candidates = [];
+          if (isAbsoluteUrl(s)) {
+            candidates.push(s);
+          } else {
+            try {
+              candidates.push(new URL(s, location.href).toString());
+            } catch {}
+            const clean = s.replace(/^\/+/, "");
+            for (const base of rawBases) candidates.push(`${base}${clean}`);
+          }
+          for (const c of candidates) {
+            const key = String(c ?? "").trim();
+            if (!key || seen.has(key)) continue;
+            seen.add(key);
+            out.push(key);
+          }
+        }
+        return out;
+      }
+
       async function fetchTextFirstAvailable(urls) {
-        for (const u of urls) {
+        const candidates = buildFetchCandidates(urls);
+        for (const u of candidates) {
           try {
             const res = await fetch(String(u), { cache: "no-store" });
             if (!res.ok) continue;
@@ -1946,7 +1969,7 @@
           state.category === "ALL"
             ? "الكل"
             : state.category === "OUT_OF_STOCK"
-            ? "منتهي الكمية"
+            ? "منتهي"
             : state.category === "WADFOW"
             ? "WADFOW"
             : state.category === "TOTAL"
@@ -1957,7 +1980,7 @@
         const qTrimmed = state.query.trim();
         const qLabel = qTrimmed.length >= CONFIG.SEARCH_MIN_CHARS ? ` / بحث: ${qTrimmed}` : "";
         els.activeFilters.textContent = `${catLabel}${qLabel}`;
-        els.resultsMeta.textContent = ` — صفحة ${state.page}/${pageCount}`;
+        els.resultsMeta.textContent = ` — ${state.page}/${pageCount}`;
 
         if (state.allProducts.length === 0) {
           els.grid.innerHTML = "";
@@ -1987,12 +2010,12 @@
           const isWadfow = p.category === "WADFOW";
           const addButton =
             p.isOutOfStock
-              ? `<button class="btn btn-disabled" type="button" disabled>منتهي الكمية</button>`
+              ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
               : p.category === "UNAVAILABLE"
               ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
               : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
                   p.key
-                )}" aria-label="إضافة">🛒+</button>`;
+                )}" aria-label="إضافة">إضافة</button>`;
 
           if (state.viewMode === "brief") {
             html += `
@@ -2067,6 +2090,12 @@
       }
 
       function togglePill(nextCategory) {
+        if (nextCategory === "HOME") {
+          els.categoriesPanel.setAttribute("hidden", "");
+          els.categoriesToggle.setAttribute("aria-expanded", "false");
+          setHash("home");
+          return;
+        }
         state.category = nextCategory;
         for (const pill of els.pills) {
           const isOn = pill.getAttribute("data-category") === nextCategory;
@@ -2227,12 +2256,12 @@
           await navigator.clipboard.writeText(text);
           els.hint.textContent = "تم النسخ";
           setTimeout(() => {
-            els.hint.textContent = "جاهز";
+            els.hint.textContent = "";
           }, 1200);
         } catch {
           els.hint.textContent = "لم يتم النسخ";
           setTimeout(() => {
-            els.hint.textContent = "جاهز";
+            els.hint.textContent = "";
           }, 1200);
         }
       }
@@ -2300,12 +2329,12 @@
         const showOld = p.discountPercent > 0 && p.priceAfter < p.priceBefore;
         const addButton =
           p.isOutOfStock
-            ? `<button class="btn btn-disabled" type="button" disabled>منتهي الكمية</button>`
+            ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
             : p.category === "UNAVAILABLE"
             ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
             : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
                 p.key
-              )}" aria-label="إضافة">🛒+</button>`;
+              )}" aria-label="إضافة">إضافة</button>`;
         els.productDetails.innerHTML = `
           <div class="card${isWadfow ? " is-wadfow" : ""}" style="min-height:unset">
             <div class="thumb" style="aspect-ratio:4/3">
@@ -2526,7 +2555,9 @@
         const token = String(CONFIG.TELEGRAM_BOT_TOKEN ?? "").trim();
         const chatId = String(CONFIG.TELEGRAM_CHAT_ID ?? "").trim();
         if (!token || !chatId) return;
-        const cleaned = String(text ?? "").trim();
+        const cleaned = String(text ?? "")
+          .replace(/[\u200B-\u200F\uFEFF]/g, "")
+          .trim();
         if (!cleaned) return;
         const chunks = splitText(cleaned, 3500).filter((c) => String(c ?? "").trim().length > 0);
         if (chunks.length === 0) return;
@@ -2616,6 +2647,7 @@
         updateFooterLinksVisibility();
         els.copyInvoiceBtn.style.display = "none";
         els.invoiceNote.style.display = "none";
+        els.whatsappAfterOrder.style.display = "none";
         els.confirmOrderBtn.disabled = false;
         els.confirmOrderBtn.textContent = "إتمام الطلب";
         setCheckoutStatus("");
@@ -2640,17 +2672,14 @@
           })
         );
 
-        els.viewBtns.forEach((b) =>
-          b.addEventListener("click", () => {
-            const v = b.getAttribute("data-view");
-            if (!v) return;
-            state.viewMode = v;
-            localStorage.setItem("hjy_view_mode_v1", v);
-            els.grid.setAttribute("data-view", v);
-            for (const btn of els.viewBtns) btn.setAttribute("aria-pressed", btn === b ? "true" : "false");
-            render();
-          })
-        );
+        els.viewSelect.addEventListener("change", () => {
+          const v = String(els.viewSelect.value ?? "").trim();
+          if (!v) return;
+          state.viewMode = v;
+          localStorage.setItem("hjy_view_mode_v1", v);
+          els.grid.setAttribute("data-view", v);
+          render();
+        });
 
         els.categoriesToggle.addEventListener("click", () => {
           const isHidden = els.categoriesPanel.hasAttribute("hidden");
@@ -2688,7 +2717,7 @@
             addToCartByKey(addKey);
             els.hint.textContent = "تمت الإضافة";
             setTimeout(() => {
-              if (els.hint.textContent === "تمت الإضافة") els.hint.textContent = "جاهز";
+              if (els.hint.textContent === "تمت الإضافة") els.hint.textContent = "";
             }, 900);
             return;
           }
@@ -2715,7 +2744,7 @@
             addToCartByKey(addKey);
             els.hint.textContent = "تمت الإضافة";
             setTimeout(() => {
-              if (els.hint.textContent === "تمت الإضافة") els.hint.textContent = "جاهز";
+              if (els.hint.textContent === "تمت الإضافة") els.hint.textContent = "";
             }, 900);
             return;
           }
@@ -2855,6 +2884,7 @@
             setCheckoutStatus("تم تجهيز الفاتورة. يمكنك نسخها وإرسالها إلينا على الواتساب.", false);
           }
           await copyText(invoice);
+          els.whatsappAfterOrder.style.display = "";
         });
 
         els.copyInvoiceBtn.addEventListener("click", async () => {
@@ -2929,7 +2959,7 @@
 
           state.allProducts = products;
           state.filteredProducts = products;
-          els.hint.textContent = "جاهز";
+          els.hint.textContent = "";
           setStatus("");
           loadCart();
           renderCart();
@@ -2987,12 +3017,12 @@
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           const addButton =
             p.isOutOfStock
-              ? `<button class="btn btn-disabled" type="button" disabled>منتهي الكمية</button>`
+              ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
               : p.category === "UNAVAILABLE"
               ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
               : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
                   p.key
-                )}" aria-label="إضافة">🛒+</button>`;
+                )}" aria-label="إضافة">إضافة</button>`;
           html += `
             <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
               ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
@@ -3025,7 +3055,7 @@
         else if (window.matchMedia && window.matchMedia("(max-width: 520px)").matches) state.viewMode = "compact";
       } catch {}
       els.grid.setAttribute("data-view", state.viewMode);
-      for (const b of els.viewBtns) b.setAttribute("aria-pressed", b.getAttribute("data-view") === state.viewMode ? "true" : "false");
+      els.viewSelect.value = state.viewMode;
       updateFooterLinksVisibility();
       window.addEventListener("hashchange", applyHashRoute);
       loadProducts().then(() => {
