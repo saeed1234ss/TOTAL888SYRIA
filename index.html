@@ -1501,7 +1501,7 @@
     <script>
       const CONFIG = {
         CSV_URL: "products.csv",
-        HOME_PRODUCTS_URLS: ["home-products.csv", "home-products"],
+        HOME_PRODUCTS_URLS: ["home.csv", "home"],
         ABOUT_URLS: ["about.csv", "about"],
         OUT_OF_STOCK_URLS: ["TOTAL_out_of_stock.csv", "TOTAL_out_of_stock"],
         ITEMS_PER_PAGE: 20,
@@ -2932,7 +2932,7 @@
         setHomeStatus("جاري تجهيز الصفحة الرئيسية...", false);
         try {
           const res = await fetchTextFirstAvailable(CONFIG.HOME_PRODUCTS_URLS);
-          if (!res.ok) throw new Error("home-products missing");
+          if (!res.ok) throw new Error("home missing");
           const table = parseCsvText(res.text);
           const idx = table.headers.findIndex((h) => safeLower(h).includes("code1"));
           if (idx < 0) throw new Error("missing CODE1");
@@ -2955,7 +2955,7 @@
           setHomeStatus("", false);
         } catch {
           state.homeProducts = [];
-          setHomeStatus("ارفع ملف home-products.csv ليظهر محتوى الصفحة الرئيسية.", false);
+          setHomeStatus("ارفع ملف home.csv ليظهر محتوى الصفحة الرئيسية.", false);
         }
       }
 
