@@ -2758,6 +2758,14 @@
             }, 900);
             return;
           }
+          const moreKey = t.getAttribute("data-more");
+          if (moreKey) {
+            const desc = els.homeGrid.querySelector(`[data-desc="${CSS.escape(moreKey)}"]`);
+            if (!(desc instanceof HTMLElement)) return;
+            const isExpanded = desc.classList.toggle("is-expanded");
+            t.textContent = isExpanded ? "إخفاء" : "قراءة المزيد...";
+            return;
+          }
           const card = t.closest("article.card");
           if (!(card instanceof HTMLElement)) return;
           const key = card.getAttribute("data-key");
@@ -3047,8 +3055,10 @@
         }
         let html = "";
         for (const p of state.homeProducts) {
-          const isWadfow = p.category === "WADFOW";
+          const showOld = p.discountPercent > 0 && p.priceAfter < p.priceBefore;
+          const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
+          const isWadfow = p.category === "WADFOW";
           const addButton =
             p.isOutOfStock
               ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
@@ -3057,27 +3067,62 @@
               : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
                   p.key
                 )}" aria-label="إضافة">إضافة</button>`;
-          html += `
-            <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
-              ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
-              <div class="thumb">
-                <img
-                  src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
-                  alt="${escapeHtmlAttr(p.code1)}"
-                  loading="lazy"
-                  decoding="async"
-                  referrerpolicy="no-referrer"
-                  onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
-                />
-              </div>
-              <div class="card-body">
-                <div class="prices">
-                  <span class="price-now">$${formatMoney(p.priceAfter)}</span>
+
+          if (state.viewMode === "brief") {
+            html += `
+              <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
+                ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+                <div class="thumb">
+                  <img
+                    src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
+                    alt="${escapeHtmlAttr(p.code1)}"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                    onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                  />
                 </div>
-                <div class="actions">${addButton}</div>
-              </div>
-            </article>
-          `;
+                <div class="card-body">
+                  <div class="prices">
+                    <span class="price-now">$${formatMoney(p.priceAfter)}</span>
+                  </div>
+                  <div class="actions">${addButton}</div>
+                </div>
+              </article>
+            `;
+            continue;
+          }
+
+          html += `
+              <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
+                ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+                <div class="thumb">
+                  <img
+                    src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
+                    alt="${escapeHtmlAttr(p.code1)}"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                    onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                  />
+                </div>
+                <div class="card-body">
+                  <div class="code">
+                    <div class="code-left">
+                      <span class="code1">${escapeHtml(p.code1)}</span>
+                      <span class="code2">${escapeHtml(p.code2)}</span>
+                    </div>
+                  </div>
+                  <p class="desc" data-desc="${escapeHtmlAttr(p.key)}">${escapeHtml(p.about)}</p>
+                  ${aboutLong ? `<button class="readmore" type="button" data-more="${escapeHtmlAttr(p.key)}">قراءة المزيد...</button>` : ""}
+                  <div class="prices">
+                    <span class="price-now">$${formatMoney(p.priceAfter)}</span>
+                    ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
+                  </div>
+                  <div class="actions">${addButton}</div>
+                </div>
+              </article>
+            `;
         }
         els.homeGrid.innerHTML = html;
       }
