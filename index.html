@@ -47,9 +47,7 @@
       }
 
       .promo-bar {
-        position: sticky;
-        top: 0;
-        z-index: 70;
+        position: static;
         background: var(--promo);
         color: #fff;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -69,9 +67,7 @@
       }
 
       .topbar {
-        position: sticky;
-        top: 42px;
-        z-index: 50;
+        position: static;
         border-bottom: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(10px);
@@ -167,6 +163,38 @@
         -webkit-overflow-scrolling: touch;
       }
 
+      .catsbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
+      .cat-toggle {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.75);
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text);
+      }
+
+      .cat-toggle .chev {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .categories-panel[hidden] {
+        display: none !important;
+      }
+
       .pill {
         border: 1px solid var(--border);
         background: var(--surface);
@@ -227,7 +255,7 @@
       .layout {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 18px 16px 90px;
+        padding: 18px 16px 18px;
         display: block;
         align-items: start;
       }
@@ -493,9 +521,9 @@
         border: 1px solid var(--border);
         background: var(--surface);
         color: var(--text);
-        padding: 7px 10px;
+        padding: 6px 9px;
         border-radius: 999px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 800;
         cursor: pointer;
         user-select: none;
@@ -550,6 +578,59 @@
         font-size: 15px;
       }
 
+      #productsGrid[data-view="brief"] {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      #homeProductsGrid[data-view="brief"] {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        padding: 14px;
+      }
+
+      #productsGrid[data-view="brief"] .card {
+        min-height: unset;
+      }
+
+      #homeProductsGrid[data-view="brief"] .card {
+        min-height: unset;
+      }
+
+      #productsGrid[data-view="brief"] .thumb {
+        aspect-ratio: 1 / 1;
+      }
+
+      #homeProductsGrid[data-view="brief"] .thumb {
+        aspect-ratio: 1 / 1;
+      }
+
+      #productsGrid[data-view="brief"] .card-body {
+        padding: 10px;
+        gap: 8px;
+      }
+
+      #homeProductsGrid[data-view="brief"] .card-body {
+        padding: 10px;
+        gap: 8px;
+      }
+
+      #productsGrid[data-view="brief"] .prices {
+        margin-top: 0;
+      }
+
+      #productsGrid[data-view="brief"] .actions {
+        margin-top: 0;
+      }
+
+      #productsGrid[data-view="brief"] .btn,
+      #homeProductsGrid[data-view="brief"] .btn {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+
       .notice {
         margin: 0 14px 14px;
         padding: 12px 12px;
@@ -562,14 +643,11 @@
       }
 
       .footerbar {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 40;
+        position: static;
         background: rgba(255, 255, 255, 0.9);
         border-top: 1px solid var(--border);
         backdrop-filter: blur(10px);
+        margin-top: 16px;
       }
 
       .footerbar-inner {
@@ -590,6 +668,23 @@
         gap: 8px;
         align-items: center;
         justify-content: center;
+      }
+
+      .footer-extras {
+        width: 100%;
+        display: none;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .app[data-route="home"] .footer-extras {
+        display: flex;
+      }
+
+      .footer-extras a {
+        text-decoration: none;
       }
 
       .footer-link {
@@ -1088,6 +1183,15 @@
         #productsGrid[data-view="compact"] .desc {
           -webkit-line-clamp: 2;
         }
+        #productsGrid[data-view="brief"] {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        #homeProductsGrid[data-view="brief"] {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        #productsGrid[data-view="brief"] .thumb {
+          width: 100%;
+        }
         #productsGrid[data-view="list"] .thumb {
           width: 86px;
           min-width: 86px;
@@ -1123,16 +1227,51 @@
           flex: 1;
         }
       }
+
+      .app[data-route="home"] #promoBar {
+        display: block;
+      }
+
+      .app[data-route="home"] #brandBlock {
+        display: flex;
+      }
+
+      .app:not([data-route="home"]) #promoBar,
+      .app:not([data-route="home"]) #brandBlock {
+        display: none;
+      }
+
+      .app:not([data-route="home"]) .topbar-inner {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .home-note {
+        padding: 14px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .home-links {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .home-links a {
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
-    <div class="app">
-      <div class="promo-bar">
+    <div class="app" id="appRoot" data-route="home">
+      <div class="promo-bar" id="promoBar">
         <div class="promo-bar-inner">خصومات حصرية: خصم 3% لـ TOTAL و خصم 5% لـ WADFOW</div>
       </div>
       <header class="topbar">
         <div class="topbar-inner">
-          <div class="brand">
+          <div class="brand" id="brandBlock">
             <div class="logo" aria-hidden="true">
               <img src="logo.png" alt="" loading="eager" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" />
             </div>
@@ -1145,13 +1284,6 @@
             <div class="search" role="search">
               <input id="searchInput" type="search" placeholder="يمكنك بحث بكتابة اسم المنتج أو الكود" autocomplete="off" />
             </div>
-
-            <select id="sortSelect" class="select" aria-label="الترتيب">
-              <option value="relevance">أفضل تطابق</option>
-              <option value="priceAsc">الأرخص</option>
-              <option value="priceDesc">الأغلى</option>
-              <option value="code">حسب الكود</option>
-            </select>
           </div>
 
           <button class="cart-button" id="cartToggle" type="button">
@@ -1161,31 +1293,63 @@
         </div>
 
         <div class="topbar-inner" style="padding-top: 0; padding-bottom: 12px">
-          <div class="pillbar" role="group" aria-label="التصنيفات">
-            <button class="pill" type="button" data-category="ALL" aria-pressed="true">الكل</button>
-            <button class="pill" type="button" data-category="OUT_OF_STOCK" aria-pressed="false">منتهي الكمية</button>
-            <button class="pill" type="button" data-category="WADFOW" aria-pressed="false">WADFOW</button>
-            <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
-            <button class="pill" type="button" data-category="UNAVAILABLE" aria-pressed="false">الغير متوفر</button>
-            <button class="pill" type="button" data-category="UNCATEGORIZED" aria-pressed="false">غير مصنف</button>
+          <div class="catsbar">
+            <button class="cat-toggle" id="categoriesToggle" type="button" aria-expanded="false">
+              التصنيفات <span class="chev">▾</span>
+            </button>
+            <div class="pillbar categories-panel" id="categoriesPanel" role="group" aria-label="التصنيفات" hidden>
+              <button class="pill" type="button" data-category="ALL" aria-pressed="true">الكل</button>
+              <button class="pill" type="button" data-category="OUT_OF_STOCK" aria-pressed="false">منتهي الكمية</button>
+              <button class="pill" type="button" data-category="WADFOW" aria-pressed="false">WADFOW</button>
+              <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
+              <button class="pill" type="button" data-category="UNAVAILABLE" aria-pressed="false">الغير متوفر</button>
+              <button class="pill" type="button" data-category="UNCATEGORIZED" aria-pressed="false">غير مصنف</button>
+            </div>
+            <p class="panel-sub" id="hint" style="margin-inline-start: auto">جاري تحميل المنتجات يرجى الانتظار قليلاً ....</p>
           </div>
-          <p class="panel-sub" id="hint" style="margin-inline-start: auto">جاري تحميل المنتجات يرجى الانتظار قليلاً ....</p>
         </div>
       </header>
 
       <main class="layout">
+        <section class="panel" id="homeView" style="display:none">
+          <div class="panel-header">
+            <div>
+              <h2>الرئيسية</h2>
+              <p class="panel-sub">منتجات مختارة</p>
+            </div>
+          </div>
+          <div class="status" id="homeStatus" aria-hidden="true"></div>
+          <div class="grid" id="homeProductsGrid" data-view="brief" aria-live="polite"></div>
+          <div class="home-note">
+            <div class="home-links">
+              <a class="btn btn-primary" href="https://wa.me/qr/6VKRZ35KPU57J1" target="_blank" rel="noopener">متابعة طلب عبر واتساب</a>
+              <a class="btn btn-ghost" href="https://t.me/TotalToolsSyria888" target="_blank" rel="noopener" aria-label="تيلغرام">📨</a>
+              <button class="btn btn-ghost" id="goShopBtn" type="button">التسوق</button>
+            </div>
+          </div>
+        </section>
+
         <section class="panel" id="shopView">
           <div class="panel-header">
             <div>
               <h2>المنتجات</h2>
-              <p class="panel-sub" id="resultsMeta">—</p>
+              <p class="panel-sub">
+                عرض <bdi id="rangeText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> من
+                <bdi id="totalText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> منتج
+                <span id="resultsMeta" style="color:var(--muted)">—</span>
+              </p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center">
               <span class="tag" id="activeFilters">الكل</span>
+              <div class="pager">
+                <button id="prevPage" type="button">السابق</button>
+                <button id="nextPage" type="button">التالي</button>
+              </div>
               <div class="viewmodes" role="group" aria-label="عرض المنتجات">
                 <button class="viewbtn" type="button" data-view="grid" aria-pressed="true">شبكة</button>
                 <button class="viewbtn" type="button" data-view="compact" aria-pressed="false">مضغوط</button>
                 <button class="viewbtn" type="button" data-view="list" aria-pressed="false">قائمة</button>
+                <button class="viewbtn" type="button" data-view="brief" aria-pressed="false">مختصر</button>
               </div>
             </div>
           </div>
@@ -1193,6 +1357,19 @@
           <div class="status" id="status" aria-hidden="true"></div>
           <div class="notice" id="categoryNote" style="display:none"></div>
           <div class="grid" id="productsGrid" data-view="grid" aria-live="polite"></div>
+        </section>
+
+        <section class="panel" id="productView" style="display:none">
+          <div class="panel-header">
+            <div>
+              <h2 id="productTitle">تفاصيل المنتج</h2>
+              <p class="panel-sub" id="productMeta">—</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button class="btn btn-ghost" id="backFromProductBtn" type="button">رجوع</button>
+            </div>
+          </div>
+          <div style="padding:14px;display:grid;gap:12px" id="productDetails"></div>
         </section>
 
         <section class="panel" id="checkoutView" style="display:none">
@@ -1275,6 +1452,7 @@
                 <button class="btn btn-ghost" id="copyInvoiceBtn" type="button" style="flex:1;display:none">نسخ الفاتورة</button>
               </div>
               <div class="mini-note">سيتم تواصل معك خلال واتساب بعد إتمام الطلب قبل أن نرسل الطرد</div>
+              <a class="btn btn-primary" href="https://wa.me/qr/6VKRZ35KPU57J1" target="_blank" rel="noopener">متابعة طلب عبر واتساب</a>
               <div id="invoiceNote" class="panel-sub" style="display:none">
                 يمكنك نسخ الفاتورة وإرسالها إلينا على الواتساب. الفاتورة المنسوخة تحتوي كل التفاصيل بشكل مرتب وسطر تحت سطر.
               </div>
@@ -1310,16 +1488,6 @@
       <footer class="footerbar">
         <div class="footerbar-inner">
           <div class="meta">
-            <span>
-              عرض <bdi id="rangeText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> من
-              <bdi id="totalText" style="direction:ltr;unicode-bidi:plaintext;font-weight:800">—</bdi> منتج
-            </span>
-          </div>
-          <div class="pager">
-            <button id="prevPage" type="button">السابق</button>
-            <button id="nextPage" type="button">التالي</button>
-          </div>
-          <div class="meta">
             <span style="font-size:11px;color:var(--muted);font-weight:700">BY HJY.co</span>
           </div>
           <div class="footer-links" id="footerLinks">
@@ -1330,6 +1498,10 @@
             <button class="footer-link" type="button" data-info="how_to_order">كيفية الطلب</button>
             <button class="footer-link" type="button" data-info="developer">المطور</button>
             <button class="footer-link" type="button" data-info="complaint">إرسال شكوى</button>
+          </div>
+          <div class="footer-extras" id="footerExtras">
+            <a class="footer-link" href="https://wa.me/qr/6VKRZ35KPU57J1" target="_blank" rel="noopener">متابعة طلب عبر واتساب</a>
+            <a class="footer-link" href="https://t.me/TotalToolsSyria888" target="_blank" rel="noopener" aria-label="تيلغرام">📨</a>
           </div>
         </div>
       </footer>
@@ -1353,6 +1525,7 @@
     <script>
       const CONFIG = {
         CSV_URL: "products.csv",
+        HOME_PRODUCTS_URLS: ["home-products.csv", "home-products"],
         ABOUT_URLS: ["about.csv", "about"],
         OUT_OF_STOCK_URLS: ["TOTAL_out_of_stock.csv", "TOTAL_out_of_stock"],
         ITEMS_PER_PAGE: 20,
@@ -1372,11 +1545,16 @@
         );
 
       const els = {
+        appRoot: document.getElementById("appRoot"),
+        promoBar: document.getElementById("promoBar"),
+        brandBlock: document.getElementById("brandBlock"),
         grid: document.getElementById("productsGrid"),
+        homeGrid: document.getElementById("homeProductsGrid"),
         search: document.getElementById("searchInput"),
-        sort: document.getElementById("sortSelect"),
         pills: Array.from(document.querySelectorAll(".pill[data-category]")),
         viewBtns: Array.from(document.querySelectorAll(".viewbtn[data-view]")),
+        categoriesToggle: document.getElementById("categoriesToggle"),
+        categoriesPanel: document.getElementById("categoriesPanel"),
         resultsMeta: document.getElementById("resultsMeta"),
         activeFilters: document.getElementById("activeFilters"),
         rangeText: document.getElementById("rangeText"),
@@ -1384,6 +1562,7 @@
         prevPage: document.getElementById("prevPage"),
         nextPage: document.getElementById("nextPage"),
         status: document.getElementById("status"),
+        homeStatus: document.getElementById("homeStatus"),
         categoryNote: document.getElementById("categoryNote"),
         hint: document.getElementById("hint"),
         cartToggle: document.getElementById("cartToggle"),
@@ -1396,7 +1575,13 @@
         cartMinNote: document.getElementById("cartMinNote"),
         cartSummary: document.getElementById("cartSummary"),
         cartActions: document.getElementById("cartActions"),
+        homeView: document.getElementById("homeView"),
         shopView: document.getElementById("shopView"),
+        productView: document.getElementById("productView"),
+        productTitle: document.getElementById("productTitle"),
+        productMeta: document.getElementById("productMeta"),
+        productDetails: document.getElementById("productDetails"),
+        backFromProductBtn: document.getElementById("backFromProductBtn"),
         checkoutView: document.getElementById("checkoutView"),
         checkoutMeta: document.getElementById("checkoutMeta"),
         checkoutStatus: document.getElementById("checkoutStatus"),
@@ -1422,7 +1607,9 @@
         invoiceNote: document.getElementById("invoiceNote"),
         orderSummary: document.getElementById("orderSummary"),
         backToShopBtn: document.getElementById("backToShopBtn"),
+        goShopBtn: document.getElementById("goShopBtn"),
         footerLinks: document.getElementById("footerLinks"),
+        footerExtras: document.getElementById("footerExtras"),
         infoView: document.getElementById("infoView"),
         infoTitle: document.getElementById("infoTitle"),
         infoMeta: document.getElementById("infoMeta"),
@@ -1437,9 +1624,9 @@
       const state = {
         allProducts: [],
         filteredProducts: [],
+        homeProducts: [],
         category: "ALL",
         query: "",
-        sort: "relevance",
         page: 1,
         cart: new Map(),
         lastQueryTokens: [],
@@ -1449,6 +1636,7 @@
         infoPages: new Map(),
         currentInfoKey: "",
         lastMainRoute: "shop",
+        lastProductKey: "",
       };
 
       function setInfoStatus(text, isError = false) {
@@ -1729,23 +1917,7 @@
         if (tokens.length > 0) {
           list = list.filter((p) => tokens.every((t) => p.search.includes(t)));
         }
-
-        if (state.sort === "relevance" && tokens.length > 0) {
-          list = [...list].sort((a, b) => relevanceScore(b, tokens) - relevanceScore(a, tokens));
-        } else if (state.sort === "priceAsc") {
-          list = [...list].sort((a, b) => a.priceAfter - b.priceAfter);
-        } else if (state.sort === "priceDesc") {
-          list = [...list].sort((a, b) => b.priceAfter - a.priceAfter);
-        } else if (state.sort === "code") {
-          list = [...list].sort((a, b) => {
-            const a1 = safeLower(a.code1);
-            const b1 = safeLower(b.code1);
-            if (a1 !== b1) return a1 < b1 ? -1 : 1;
-            const a2 = safeLower(a.code2);
-            const b2 = safeLower(b.code2);
-            return a2 < b2 ? -1 : a2 > b2 ? 1 : 0;
-          });
-        }
+        if (tokens.length > 0) list = [...list].sort((a, b) => relevanceScore(b, tokens) - relevanceScore(a, tokens));
 
         state.filteredProducts = list;
         state.page = 1;
@@ -1785,7 +1957,7 @@
         const qTrimmed = state.query.trim();
         const qLabel = qTrimmed.length >= CONFIG.SEARCH_MIN_CHARS ? ` / بحث: ${qTrimmed}` : "";
         els.activeFilters.textContent = `${catLabel}${qLabel}`;
-        els.resultsMeta.textContent = `صفحة ${state.page} من ${pageCount} — عرض ${CONFIG.ITEMS_PER_PAGE} لكل صفحة`;
+        els.resultsMeta.textContent = ` — صفحة ${state.page}/${pageCount}`;
 
         if (state.allProducts.length === 0) {
           els.grid.innerHTML = "";
@@ -1813,46 +1985,70 @@
           const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           const isWadfow = p.category === "WADFOW";
-          html += `
-            <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
-              ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
-              <div class="thumb">
-                <img
-                  src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
-                  alt="${escapeHtmlAttr(p.code1)}"
-                  loading="lazy"
-                  decoding="async"
-                  referrerpolicy="no-referrer"
-                  onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
-                />
-              </div>
-              <div class="card-body">
-                <div class="code">
-                  <div class="code-left">
-                    <span class="code1">${escapeHtml(p.code1)}</span>
-                    <span class="code2">${escapeHtml(p.code2)}</span>
+          const addButton =
+            p.isOutOfStock
+              ? `<button class="btn btn-disabled" type="button" disabled>منتهي الكمية</button>`
+              : p.category === "UNAVAILABLE"
+              ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
+              : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
+                  p.key
+                )}" aria-label="إضافة">🛒+</button>`;
+
+          if (state.viewMode === "brief") {
+            html += `
+              <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
+                ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+                <div class="thumb">
+                  <img
+                    src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
+                    alt="${escapeHtmlAttr(p.code1)}"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                    onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                  />
+                </div>
+                <div class="card-body">
+                  <div class="prices">
+                    <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                   </div>
+                  <div class="actions">${addButton}</div>
                 </div>
-                <p class="desc" data-desc="${escapeHtmlAttr(p.key)}">${escapeHtml(p.about)}</p>
-                ${aboutLong ? `<button class="readmore" type="button" data-more="${escapeHtmlAttr(p.key)}">قراءة المزيد...</button>` : ""}
-                <div class="prices">
-                  <span class="price-now">$${formatMoney(p.priceAfter)}</span>
-                  ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
+              </article>
+            `;
+            continue;
+          }
+
+          html += `
+              <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
+                ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+                <div class="thumb">
+                  <img
+                    src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
+                    alt="${escapeHtmlAttr(p.code1)}"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                    onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                  />
                 </div>
-                <div class="actions">
-                  ${
-                    p.isOutOfStock
-                      ? `<button class="btn btn-disabled" type="button" disabled>منتهي الكمية</button>`
-                      : p.category === "UNAVAILABLE"
-                      ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
-                      : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
-                          p.key
-                        )}">إضافة للسلة</button>`
-                  }
+                <div class="card-body">
+                  <div class="code">
+                    <div class="code-left">
+                      <span class="code1">${escapeHtml(p.code1)}</span>
+                      <span class="code2">${escapeHtml(p.code2)}</span>
+                    </div>
+                  </div>
+                  <p class="desc" data-desc="${escapeHtmlAttr(p.key)}">${escapeHtml(p.about)}</p>
+                  ${aboutLong ? `<button class="readmore" type="button" data-more="${escapeHtmlAttr(p.key)}">قراءة المزيد...</button>` : ""}
+                  <div class="prices">
+                    <span class="price-now">$${formatMoney(p.priceAfter)}</span>
+                    ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
+                  </div>
+                  <div class="actions">${addButton}</div>
                 </div>
-              </div>
-            </article>
-          `;
+              </article>
+            `;
         }
         els.grid.innerHTML = html;
       }
@@ -2059,8 +2255,106 @@
         els.cartBackdrop.setAttribute("data-open", next);
       }
 
+      function setHomeStatus(text, isError = false) {
+        if (!text) {
+          els.homeStatus.setAttribute("aria-hidden", "true");
+          els.homeStatus.textContent = "";
+          return;
+        }
+        els.homeStatus.setAttribute("aria-hidden", "false");
+        els.homeStatus.style.color = isError ? "#c62828" : "";
+        els.homeStatus.textContent = text;
+      }
+
+      function setRoute(route) {
+        const r = String(route ?? "").trim() || "home";
+        els.appRoot.setAttribute("data-route", r);
+      }
+
+      function showHomeView() {
+        setRoute("home");
+        els.homeView.style.display = "";
+        els.shopView.style.display = "none";
+        els.productView.style.display = "none";
+        els.checkoutView.style.display = "none";
+        els.infoView.style.display = "none";
+        setStatus("");
+        setCheckoutStatus("");
+        setInfoStatus("");
+        updateFooterLinksVisibility();
+      }
+
+      function renderProductDetails(key) {
+        const k = String(key ?? "");
+        state.lastProductKey = k;
+        const p = state.allProducts.find((x) => x.key === k);
+        if (!p) {
+          els.productTitle.textContent = "تفاصيل المنتج";
+          els.productMeta.textContent = "غير موجود";
+          els.productDetails.innerHTML = "";
+          return;
+        }
+        els.productTitle.textContent = p.code1 || "تفاصيل المنتج";
+        els.productMeta.textContent = p.code2 ? p.code2 : "—";
+        const isWadfow = p.category === "WADFOW";
+        const showOld = p.discountPercent > 0 && p.priceAfter < p.priceBefore;
+        const addButton =
+          p.isOutOfStock
+            ? `<button class="btn btn-disabled" type="button" disabled>منتهي الكمية</button>`
+            : p.category === "UNAVAILABLE"
+            ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
+            : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
+                p.key
+              )}" aria-label="إضافة">🛒+</button>`;
+        els.productDetails.innerHTML = `
+          <div class="card${isWadfow ? " is-wadfow" : ""}" style="min-height:unset">
+            <div class="thumb" style="aspect-ratio:4/3">
+              <img
+                src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
+                alt="${escapeHtmlAttr(p.code1)}"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+                onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+              />
+            </div>
+            <div class="card-body">
+              <div class="code">
+                <div class="code-left">
+                  <span class="code1">${escapeHtml(p.code1)}</span>
+                  <span class="code2">${escapeHtml(p.code2)}</span>
+                </div>
+              </div>
+              <div class="prices">
+                <span class="price-now">$${formatMoney(p.priceAfter)}</span>
+                ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
+              </div>
+              <div class="desc is-expanded" style="display:block">${escapeHtml(p.about)}</div>
+              <div class="actions">${addButton}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function showProductView(productKey) {
+        setRoute("shop");
+        els.homeView.style.display = "none";
+        els.shopView.style.display = "none";
+        els.productView.style.display = "";
+        els.checkoutView.style.display = "none";
+        els.infoView.style.display = "none";
+        setStatus("");
+        setCheckoutStatus("");
+        setInfoStatus("");
+        updateFooterLinksVisibility();
+        renderProductDetails(productKey);
+      }
+
       function showShopView() {
+        setRoute("shop");
+        els.homeView.style.display = "none";
         els.shopView.style.display = "";
+        els.productView.style.display = "none";
         els.checkoutView.style.display = "none";
         els.infoView.style.display = "none";
         setCheckoutStatus("");
@@ -2069,7 +2363,10 @@
       }
 
       function showInfoView(infoKey) {
+        setRoute("shop");
+        els.homeView.style.display = "none";
         els.shopView.style.display = "none";
+        els.productView.style.display = "none";
         els.checkoutView.style.display = "none";
         els.infoView.style.display = "";
         setCheckoutStatus("");
@@ -2133,9 +2430,9 @@
         const v = String(next ?? "").trim();
         if (!v) return;
         if (location.hash === `#${v}`) return;
-        if (v.startsWith("info=")) {
+        if (v.startsWith("info=") || v.startsWith("product=")) {
           const cur = String(location.hash ?? "").replace(/^#/, "");
-          if (!cur.startsWith("info=") && cur.trim().length > 0) state.lastMainRoute = cur;
+          if (!cur.startsWith("info=") && !cur.startsWith("product=") && cur.trim().length > 0) state.lastMainRoute = cur;
         } else {
           state.lastMainRoute = v;
         }
@@ -2148,14 +2445,18 @@
           const key = decodeURIComponent(h.slice("info=".length));
           return showInfoView(key);
         }
+        if (h.startsWith("product=")) {
+          const key = decodeURIComponent(h.slice("product=".length));
+          return showProductView(key);
+        }
         if (h === "checkout") return checkout();
-        return showShopView();
+        if (h === "shop") return showShopView();
+        return showHomeView();
       }
 
       function updateFooterLinksVisibility() {
-        const inShop = els.shopView.style.display !== "none";
-        const shouldShow = inShop && state.category === "ALL";
-        els.footerLinks.style.display = shouldShow ? "flex" : "none";
+        const inHome = els.homeView.style.display !== "none";
+        els.footerLinks.style.display = inHome ? "flex" : "none";
       }
 
       function buildInvoiceText(details) {
@@ -2351,9 +2652,11 @@
           })
         );
 
-        els.sort.addEventListener("change", () => {
-          state.sort = els.sort.value;
-          applyFilters();
+        els.categoriesToggle.addEventListener("click", () => {
+          const isHidden = els.categoriesPanel.hasAttribute("hidden");
+          if (isHidden) els.categoriesPanel.removeAttribute("hidden");
+          else els.categoriesPanel.setAttribute("hidden", "");
+          els.categoriesToggle.setAttribute("aria-expanded", isHidden ? "true" : "false");
         });
 
         els.search.addEventListener(
@@ -2363,6 +2666,10 @@
             applyFilters();
           }, 180)
         );
+
+        els.search.addEventListener("focus", () => {
+          if (String(location.hash ?? "") === "#home" || !location.hash) setHash("shop");
+        });
 
         els.prevPage.addEventListener("click", () => {
           state.page = Math.max(1, state.page - 1);
@@ -2379,9 +2686,9 @@
           const addKey = t.getAttribute("data-add");
           if (addKey) {
             addToCartByKey(addKey);
-            els.hint.textContent = "تمت الإضافة للسلة";
+            els.hint.textContent = "تمت الإضافة";
             setTimeout(() => {
-              if (els.hint.textContent === "تمت الإضافة للسلة") els.hint.textContent = "جاهز";
+              if (els.hint.textContent === "تمت الإضافة") els.hint.textContent = "جاهز";
             }, 900);
             return;
           }
@@ -2391,7 +2698,32 @@
             if (!(desc instanceof HTMLElement)) return;
             const isExpanded = desc.classList.toggle("is-expanded");
             t.textContent = isExpanded ? "إخفاء" : "قراءة المزيد...";
+            return;
           }
+          const card = t.closest("article.card");
+          if (!(card instanceof HTMLElement)) return;
+          const key = card.getAttribute("data-key");
+          if (!key) return;
+          setHash(`product=${encodeURIComponent(key)}`);
+        });
+
+        els.homeGrid.addEventListener("click", (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLElement)) return;
+          const addKey = t.getAttribute("data-add");
+          if (addKey) {
+            addToCartByKey(addKey);
+            els.hint.textContent = "تمت الإضافة";
+            setTimeout(() => {
+              if (els.hint.textContent === "تمت الإضافة") els.hint.textContent = "جاهز";
+            }, 900);
+            return;
+          }
+          const card = t.closest("article.card");
+          if (!(card instanceof HTMLElement)) return;
+          const key = card.getAttribute("data-key");
+          if (!key) return;
+          setHash(`product=${encodeURIComponent(key)}`);
         });
 
         els.cartToggle.addEventListener("click", () => {
@@ -2449,6 +2781,8 @@
 
         els.backToShopBtn.addEventListener("click", () => showShopView());
         els.backFromInfoBtn.addEventListener("click", () => setHash(state.lastMainRoute || "shop"));
+        els.backFromProductBtn.addEventListener("click", () => setHash(state.lastMainRoute || "shop"));
+        els.goShopBtn.addEventListener("click", () => setHash("shop"));
 
         els.footerLinks.addEventListener("click", (e) => {
           const t = e.target;
@@ -2600,13 +2934,88 @@
           loadCart();
           renderCart();
           render();
-          els.totalText.textContent = String(products.length);
-          showShopView();
+          await loadHomeProducts();
+          renderHome();
         } catch (e) {
           els.hint.textContent = "فشل التحميل";
           setStatus("فشل تحميل products.csv. تأكد أن الملف موجود بنفس المجلد على GitHub Pages وبنفس الاسم.", true);
           els.grid.innerHTML = "";
+          setHomeStatus("فشل تحميل المنتجات.", true);
         }
+      }
+
+      async function loadHomeProducts() {
+        state.homeProducts = [];
+        setHomeStatus("جاري تجهيز الصفحة الرئيسية...", false);
+        try {
+          const res = await fetchTextFirstAvailable(CONFIG.HOME_PRODUCTS_URLS);
+          if (!res.ok) throw new Error("home-products missing");
+          const table = parseCsvText(res.text);
+          const idx = table.headers.findIndex((h) => safeLower(h).includes("code1"));
+          if (idx < 0) throw new Error("missing CODE1");
+          const wanted = [];
+          for (const row of table.rows) {
+            const code1 = String(row[idx] ?? "").trim();
+            if (!code1) continue;
+            wanted.push(code1);
+          }
+          const seen = new Set();
+          const picked = [];
+          for (const c of wanted) {
+            const key = safeLower(c);
+            if (seen.has(key)) continue;
+            seen.add(key);
+            const p = state.allProducts.find((x) => safeLower(x.code1) === key);
+            if (p) picked.push(p);
+          }
+          state.homeProducts = picked;
+          setHomeStatus("", false);
+        } catch {
+          state.homeProducts = [];
+          setHomeStatus("ارفع ملف home-products.csv ليظهر محتوى الصفحة الرئيسية.", false);
+        }
+      }
+
+      function renderHome() {
+        if (!Array.isArray(state.homeProducts) || state.homeProducts.length === 0) {
+          els.homeGrid.innerHTML = "";
+          return;
+        }
+        let html = "";
+        for (const p of state.homeProducts) {
+          const isWadfow = p.category === "WADFOW";
+          const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
+          const addButton =
+            p.isOutOfStock
+              ? `<button class="btn btn-disabled" type="button" disabled>منتهي الكمية</button>`
+              : p.category === "UNAVAILABLE"
+              ? `<button class="btn btn-disabled" type="button" disabled>غير متوفر</button>`
+              : `<button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
+                  p.key
+                )}" aria-label="إضافة">🛒+</button>`;
+          html += `
+            <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
+              ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+              <div class="thumb">
+                <img
+                  src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
+                  alt="${escapeHtmlAttr(p.code1)}"
+                  loading="lazy"
+                  decoding="async"
+                  referrerpolicy="no-referrer"
+                  onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                />
+              </div>
+              <div class="card-body">
+                <div class="prices">
+                  <span class="price-now">$${formatMoney(p.priceAfter)}</span>
+                </div>
+                <div class="actions">${addButton}</div>
+              </div>
+            </article>
+          `;
+        }
+        els.homeGrid.innerHTML = html;
       }
 
       wireEvents();
@@ -2620,7 +3029,7 @@
       updateFooterLinksVisibility();
       window.addEventListener("hashchange", applyHashRoute);
       loadProducts().then(() => {
-        if (!location.hash) setHash("shop");
+        if (!location.hash) setHash("home");
         applyHashRoute();
       });
       renderCart();
