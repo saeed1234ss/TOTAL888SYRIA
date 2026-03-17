@@ -2867,7 +2867,16 @@
         try {
           await Promise.all([loadInfoPages(), loadOutOfStockSet()]);
           const res = await fetch(CONFIG.CSV_URL, { cache: "no-store" });
-          if (!res.ok) throw new Error("Fetch failed");
+          if (!res.ok) {
+            els.hint.textContent = "فشل التحميل";
+            setStatus(
+              `فشل تحميل products.csv (${res.status}). تأكد أن الملف موجود بنفس المجلد على GitHub Pages وبنفس الاسم.`,
+              true
+            );
+            els.grid.innerHTML = "";
+            setHomeStatus("فشل تحميل المنتجات.", true);
+            return;
+          }
           const data = await res.text();
           const lines = data.split(/\r?\n/).filter((l) => l.trim().length > 0);
           if (lines.length <= 1) throw new Error("Empty CSV");
@@ -2930,33 +2939,45 @@
       async function loadHomeProducts() {
         state.homeProducts = [];
         setHomeStatus("جاري تجهيز الصفحة الرئيسية...", false);
-        try {
-          const res = await fetchTextFirstAvailable(CONFIG.HOME_PRODUCTS_URLS);
-          if (!res.ok) throw new Error("home missing");
-          const table = parseCsvText(res.text);
-          const idx = table.headers.findIndex((h) => safeLower(h).includes("code1"));
-          if (idx < 0) throw new Error("missing CODE1");
-          const wanted = [];
-          for (const row of table.rows) {
-            const code1 = String(row[idx] ?? "").trim();
-            if (!code1) continue;
-            wanted.push(code1);
-          }
-          const seen = new Set();
-          const picked = [];
-          for (const c of wanted) {
-            const key = safeLower(c);
-            if (seen.has(key)) continue;
-            seen.add(key);
-            const p = state.allProducts.find((x) => safeLower(x.code1) === key);
-            if (p) picked.push(p);
-          }
-          state.homeProducts = picked;
-          setHomeStatus("", false);
-        } catch {
+        const res = await fetchTextFirstAvailable(CONFIG.HOME_PRODUCTS_URLS);
+        if (!res) {
           state.homeProducts = [];
-          setHomeStatus("ارفع ملف home.csv ليظهر محتوى الصفحة الرئيسية.", false);
+          setHomeStatus("تعذر العثور على home.csv بجانب index.html.", false);
+          return;
         }
+        const table = parseCsvText(res.text);
+        const idx = table.headers.findIndex((h) => safeLower(h).includes("code1"));
+        if (idx < 0) {
+          state.homeProducts = [];
+          setHomeStatus("home.csv يجب أن يحتوي على عمود اسمه CODE1.", false);
+          return;
+        }
+        const wanted = [];
+        for (const row of table.rows) {
+          const code1 = String(row[idx] ?? "").trim();
+          if (!code1) continue;
+          wanted.push(code1);
+        }
+        if (wanted.length === 0) {
+          state.homeProducts = [];
+          setHomeStatus("home.csv فارغ.", false);
+          return;
+        }
+        const seen = new Set();
+        const picked = [];
+        for (const c of wanted) {
+          const key = safeLower(c);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          const p = state.allProducts.find((x) => safeLower(x.code1) === key);
+          if (p) picked.push(p);
+        }
+        state.homeProducts = picked;
+        if (picked.length === 0) {
+          setHomeStatus("لم يتم العثور على أكواد home.csv داخل products.csv.", false);
+          return;
+        }
+        setHomeStatus("", false);
       }
 
       function renderHome() {
