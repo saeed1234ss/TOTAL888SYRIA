@@ -23,6 +23,19 @@
         --promo: #c62828;
       }
 
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: light;
+          --bg: #ffffff;
+          --surface: #ffffff;
+          --text: #0b2b2a;
+          --muted: #4b6b69;
+        }
+        body {
+          background: #ffffff;
+        }
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -248,11 +261,20 @@
         gap: 8px;
         border: 1px solid rgba(10, 163, 163, 0.38);
         background: linear-gradient(135deg, rgba(10, 163, 163, 0.18), rgba(10, 163, 163, 0.05));
-        padding: 10px 12px;
+        padding: 9px 10px;
         border-radius: 999px;
         cursor: pointer;
         user-select: none;
         white-space: nowrap;
+      }
+
+      #cartToggle {
+        position: fixed;
+        inset-inline-end: 16px;
+        inset-block-end: 16px;
+        z-index: 95;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 18px 50px rgba(11, 43, 42, 0.22);
       }
 
       .badge {
@@ -842,10 +864,10 @@
 
       .cart-drawer {
         position: fixed;
-        top: 96px;
+        top: 80px;
         inset-inline-end: 16px;
-        width: min(440px, calc(100vw - 32px));
-        max-height: calc(100vh - 132px);
+        width: min(360px, calc(100vw - 32px));
+        max-height: calc(100vh - 120px);
         background: rgba(255, 255, 255, 0.96);
         border: 1px solid var(--border);
         border-radius: 18px;
@@ -868,6 +890,62 @@
       .cart-backdrop[data-open="true"] {
         opacity: 1;
         pointer-events: auto;
+      }
+
+      .toast {
+        position: fixed;
+        inset-inline: 16px;
+        inset-block-end: 86px;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 110;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 160ms ease, transform 160ms ease;
+      }
+
+      .toast[data-open="true"] {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast-bubble {
+        width: fit-content;
+        max-width: min(520px, calc(100vw - 32px));
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(11, 43, 42, 0.92);
+        color: #ffffff;
+        font-weight: 900;
+        font-size: 13px;
+        box-shadow: 0 18px 50px rgba(11, 43, 42, 0.22);
+        text-align: center;
+      }
+
+      .fav-btn {
+        position: absolute;
+        inset-inline-start: 10px;
+        inset-block-start: 10px;
+        z-index: 2;
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.92);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        user-select: none;
+        font-size: 18px;
+        line-height: 1;
+        color: rgba(11, 43, 42, 0.55);
+      }
+
+      .fav-btn[aria-pressed="true"] {
+        color: #c62828;
+        border-color: rgba(198, 40, 40, 0.35);
+        box-shadow: 0 10px 30px rgba(198, 40, 40, 0.18);
       }
 
       .cart-header {
@@ -1338,6 +1416,7 @@
             <div class="pillbar categories-panel" id="categoriesPanel" role="group" aria-label="التصنيفات" hidden>
               <button class="pill" type="button" data-category="HOME" aria-pressed="false">الصفحة الرئيسية</button>
               <button class="pill" type="button" data-category="ALL" aria-pressed="true">الكل</button>
+              <button class="pill" type="button" data-category="FAVORITES" aria-pressed="false">المفضلة</button>
               <button class="pill" type="button" data-category="OUT_OF_STOCK" aria-pressed="false">منتهي</button>
               <button class="pill" type="button" data-category="WADFOW" aria-pressed="false">WADFOW</button>
               <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
@@ -1382,6 +1461,12 @@
           <div class="status" id="status" aria-hidden="true"></div>
           <div class="notice" id="categoryNote" style="display:none"></div>
           <div class="grid" id="productsGrid" data-view="compact" aria-live="polite"></div>
+          <div style="padding:0 14px 14px;display:flex;justify-content:center">
+            <div class="pager" aria-label="التنقل بين الصفحات (أسفل)">
+              <button id="prevPageBottom" type="button" aria-label="السابق">▶</button>
+              <button id="nextPageBottom" type="button" aria-label="التالي">◀</button>
+            </div>
+          </div>
         </section>
 
         <section class="panel" id="productView" style="display:none">
@@ -1416,7 +1501,23 @@
               </label>
               <label style="display:grid;gap:6px">
                 <span style="font-weight:800">المحافظة</span>
-                <input id="govInput" type="text" autocomplete="address-level1" required style="padding:12px;border:1px solid var(--border);border-radius:12px" />
+                <select id="govInput" required style="padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface)">
+                  <option value="">اختر المحافظة</option>
+                  <option value="دمشق">دمشق</option>
+                  <option value="ريف دمشق">ريف دمشق</option>
+                  <option value="حلب">حلب</option>
+                  <option value="حمص">حمص</option>
+                  <option value="حماة">حماة</option>
+                  <option value="اللاذقية">اللاذقية</option>
+                  <option value="طرطوس">طرطوس</option>
+                  <option value="إدلب">إدلب</option>
+                  <option value="الرقة">الرقة</option>
+                  <option value="دير الزور">دير الزور</option>
+                  <option value="الحسكة">الحسكة</option>
+                  <option value="السويداء">السويداء</option>
+                  <option value="درعا">درعا</option>
+                  <option value="القنيطرة">القنيطرة</option>
+                </select>
               </label>
               <label style="display:grid;gap:6px">
                 <span style="font-weight:800">رقم الهاتف</span>
@@ -1530,6 +1631,8 @@
             <button class="footer-link" type="button" data-info="faq">أشيع الأسئلة</button>
             <button class="footer-link" type="button" data-info="shipping">تفاصيل الشحن</button>
             <button class="footer-link" type="button" data-info="how_to_order">كيفية الطلب</button>
+            <button class="footer-link" type="button" data-info="favorites">المفضلة</button>
+            <button class="footer-link" type="button" data-info="orders">طلباتي السابقة</button>
             <button class="footer-link" type="button" data-info="developer">المطور</button>
             <button class="footer-link" type="button" data-info="complaint">إرسال شكوى</button>
           </div>
@@ -1551,6 +1654,10 @@
       <div class="cart-summary" id="cartSummary"></div>
       <div class="cart-actions" id="cartActions"></div>
     </aside>
+
+    <div class="toast" id="toast" data-open="false" aria-live="polite" aria-atomic="true">
+      <div class="toast-bubble" id="toastBubble"></div>
+    </div>
 
     <script>
       const CONFIG = {
@@ -1591,6 +1698,8 @@
         totalText: document.getElementById("totalText"),
         prevPage: document.getElementById("prevPage"),
         nextPage: document.getElementById("nextPage"),
+        prevPageBottom: document.getElementById("prevPageBottom"),
+        nextPageBottom: document.getElementById("nextPageBottom"),
         status: document.getElementById("status"),
         homeStatus: document.getElementById("homeStatus"),
         categoryNote: document.getElementById("categoryNote"),
@@ -1650,6 +1759,8 @@
         complaintForm: document.getElementById("complaintForm"),
         complaintInput: document.getElementById("complaintInput"),
         complaintNote: document.getElementById("complaintNote"),
+        toast: document.getElementById("toast"),
+        toastBubble: document.getElementById("toastBubble"),
       };
 
       const state = {
@@ -1660,6 +1771,8 @@
         query: "",
         page: 1,
         cart: new Map(),
+        favorites: new Set(),
+        orders: [],
         lastQueryTokens: [],
         lastInvoiceText: "",
         viewMode: "compact",
@@ -1904,6 +2017,97 @@
         els.status.textContent = text;
       }
 
+      let toastTimer = null;
+      function showToast(message, durationMs = 2000) {
+        const msg = String(message ?? "").trim();
+        if (!msg) return;
+        if (!(els.toast instanceof HTMLElement) || !(els.toastBubble instanceof HTMLElement)) return;
+        els.toastBubble.textContent = msg;
+        els.toast.setAttribute("data-open", "true");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          els.toast.setAttribute("data-open", "false");
+        }, Math.max(300, Number(durationMs) || 2000));
+      }
+
+      function safeJsonParse(raw, fallback) {
+        try {
+          const v = JSON.parse(String(raw ?? ""));
+          return v ?? fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function loadFavorites() {
+        const parsed = safeJsonParse(localStorage.getItem("hjy_favorites_v1"), []);
+        if (!Array.isArray(parsed)) return;
+        state.favorites = new Set(parsed.filter((x) => typeof x === "string" && x.trim().length > 0));
+      }
+
+      function saveFavorites() {
+        localStorage.setItem("hjy_favorites_v1", JSON.stringify(Array.from(state.favorites.values())));
+      }
+
+      function isFavorite(key) {
+        return state.favorites.has(String(key ?? ""));
+      }
+
+      function toggleFavorite(key) {
+        const k = String(key ?? "").trim();
+        if (!k) return;
+        if (state.favorites.has(k)) {
+          state.favorites.delete(k);
+          saveFavorites();
+          showToast("تمت الإزالة من المفضلة", 1800);
+        } else {
+          state.favorites.add(k);
+          saveFavorites();
+          showToast("تمت الإضافة إلى المفضلة", 1800);
+        }
+        render();
+        renderHome();
+        if (state.lastProductKey === k && els.productView.style.display !== "none") renderProductDetails(k);
+        if (els.infoView.style.display !== "none" && (state.currentInfoKey === "favorites" || state.currentInfoKey === "orders"))
+          showInfoView(state.currentInfoKey);
+      }
+
+      function loadOrders() {
+        const parsed = safeJsonParse(localStorage.getItem("hjy_orders_v1"), []);
+        if (!Array.isArray(parsed)) return;
+        state.orders = parsed.filter((x) => x && typeof x === "object");
+      }
+
+      function saveOrders() {
+        localStorage.setItem("hjy_orders_v1", JSON.stringify(state.orders.slice(0, 30)));
+      }
+
+      function addOrderToHistory(details) {
+        const entry = {
+          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          createdAt: Date.now(),
+          name: String(details.name ?? "").trim(),
+          gov: String(details.gov ?? "").trim(),
+          phone: String(details.phone ?? "").trim(),
+          shipType: String(details.shipType ?? "").trim(),
+          shipCurrency: String(details.shipCurrency ?? "").trim(),
+          notes: String(details.notes ?? "").trim(),
+          allowSwitch: Boolean(details.allowSwitch),
+          total: cartTotals(),
+          items: Array.from(state.cart.values()).map((it) => ({
+            key: it.product.key,
+            code1: it.product.code1,
+            code2: it.product.code2,
+            about: it.product.about,
+            priceAfter: it.product.priceAfter,
+            qty: it.qty,
+          })),
+          invoice: String(details.invoice ?? "").trim(),
+        };
+        state.orders = [entry, ...(Array.isArray(state.orders) ? state.orders : [])].slice(0, 30);
+        saveOrders();
+      }
+
       function buildSearchTokens(q) {
         const cleaned = safeLower(q).trim();
         if (cleaned.length < CONFIG.SEARCH_MIN_CHARS) return [];
@@ -1936,10 +2140,14 @@
       function applyFilters() {
         const tokens = buildSearchTokens(state.query);
         state.lastQueryTokens = tokens;
+        const cleanedQuery = safeLower(state.query).trim();
+        const shortQuery = cleanedQuery.length > 0 && cleanedQuery.length < CONFIG.SEARCH_MIN_CHARS ? cleanedQuery : "";
 
         let list = state.allProducts;
 
-        if (state.category === "OUT_OF_STOCK") {
+        if (state.category === "FAVORITES") {
+          list = list.filter((p) => state.favorites.has(p.key));
+        } else if (state.category === "OUT_OF_STOCK") {
           list = list.filter((p) => p.isOutOfStock);
         } else if (state.category !== "ALL") {
           list = list.filter((p) => p.category === state.category);
@@ -1947,6 +2155,8 @@
 
         if (tokens.length > 0) {
           list = list.filter((p) => tokens.every((t) => p.search.includes(t)));
+        } else if (shortQuery) {
+          list = list.filter((p) => safeLower(p.code1).startsWith(shortQuery) || safeLower(p.code2).startsWith(shortQuery));
         }
         if (tokens.length > 0) list = [...list].sort((a, b) => relevanceScore(b, tokens) - relevanceScore(a, tokens));
 
@@ -1969,6 +2179,8 @@
 
         els.prevPage.disabled = state.page <= 1;
         els.nextPage.disabled = state.page >= pageCount;
+        if (els.prevPageBottom) els.prevPageBottom.disabled = state.page <= 1;
+        if (els.nextPageBottom) els.nextPageBottom.disabled = state.page >= pageCount;
 
         els.rangeText.textContent = state.filteredProducts.length === 0 ? "0-0" : `${startIndex + 1}-${endIndex}`;
         els.totalText.textContent = String(state.filteredProducts.length);
@@ -1976,6 +2188,8 @@
         const catLabel =
           state.category === "ALL"
             ? "الكل"
+            : state.category === "FAVORITES"
+            ? "المفضلة"
             : state.category === "OUT_OF_STOCK"
             ? "منتهي"
             : state.category === "WADFOW"
@@ -1986,7 +2200,7 @@
             ? "الغير متوفر"
             : "غير مصنف";
         const qTrimmed = state.query.trim();
-        const qLabel = qTrimmed.length >= CONFIG.SEARCH_MIN_CHARS ? ` / بحث: ${qTrimmed}` : "";
+        const qLabel = qTrimmed.length > 0 ? ` / بحث: ${qTrimmed}` : "";
         els.activeFilters.textContent = `${catLabel}${qLabel}`;
         els.resultsMeta.textContent = ` — ${state.page}/${pageCount}`;
 
@@ -2016,6 +2230,9 @@
           const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           const isWadfow = p.category === "WADFOW";
+          const favBtn = `<button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
+            isFavorite(p.key) ? "true" : "false"
+          }" aria-label="المفضلة">♥</button>`;
           const addButton =
             p.isOutOfStock
               ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
@@ -2028,7 +2245,7 @@
           if (state.viewMode === "brief") {
             html += `
               <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
-                ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+                ${favBtn}
                 <div class="thumb">
                   <img
                     src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
@@ -2053,6 +2270,7 @@
           html += `
               <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
                 ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+                ${favBtn}
                 <div class="thumb">
                   <img
                     src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
@@ -2159,6 +2377,7 @@
         state.cart.set(key, { product: p, qty: Math.min(999, (existing?.qty ?? 0) + 1) });
         saveCart();
         renderCart();
+        showToast("تمت الإضافة إلى السلة", 2000);
       }
 
       function setCartQty(key, qty) {
@@ -2336,6 +2555,9 @@
         els.productMeta.textContent = p.code2 ? p.code2 : "—";
         const isWadfow = p.category === "WADFOW";
         const showOld = p.discountPercent > 0 && p.priceAfter < p.priceBefore;
+        const favBtn = `<button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
+          isFavorite(p.key) ? "true" : "false"
+        }" aria-label="المفضلة">♥</button>`;
         const addButton =
           p.isOutOfStock
             ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
@@ -2346,6 +2568,7 @@
               )}" aria-label="إضافة">إضافة</button>`;
         els.productDetails.innerHTML = `
           <div class="card${isWadfow ? " is-wadfow" : ""}" style="min-height:unset">
+            ${favBtn}
             <div class="thumb" style="aspect-ratio:4/3">
               <img
                 src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
@@ -2420,6 +2643,97 @@
           els.infoText.textContent = "";
           els.complaintForm.style.display = "grid";
           els.complaintInput.value = "";
+          return;
+        }
+        if (state.currentInfoKey === "favorites") {
+          els.complaintForm.style.display = "none";
+          els.infoTitle.textContent = "المفضلة";
+          els.infoMeta.textContent = state.favorites.size === 0 ? "فارغة" : `${state.favorites.size} عنصر`;
+          const favs = Array.from(state.favorites.values());
+          const products = favs
+            .map((k) => state.allProducts.find((x) => x.key === k))
+            .filter(Boolean)
+            .filter((p) => p && p.category !== "UNAVAILABLE");
+          if (products.length === 0) {
+            els.infoText.textContent = "لا يوجد عناصر في المفضلة حالياً.";
+            return;
+          }
+          let html = `<div style="display:grid;gap:12px">`;
+          for (const p of products) {
+            const isWadfow = p.category === "WADFOW";
+            html += `
+              <div class="card${isWadfow ? " is-wadfow" : ""}" style="min-height:unset">
+                <button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="true" aria-label="المفضلة">♥</button>
+                <div class="thumb" style="aspect-ratio:4/3">
+                  <img
+                    src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
+                    alt="${escapeHtmlAttr(p.code1)}"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                    onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'"
+                  />
+                </div>
+                <div class="card-body">
+                  <div class="code">
+                    <div class="code-left">
+                      <span class="code1">${escapeHtml(p.code1)}</span>
+                      <span class="code2">${escapeHtml(p.code2)}</span>
+                    </div>
+                  </div>
+                  <div class="prices">
+                    <span class="price-now">$${formatMoney(p.priceAfter)}</span>
+                  </div>
+                  <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="btn btn-ghost" type="button" data-product="${escapeHtmlAttr(p.key)}" style="flex:1">تفاصيل</button>
+                    <button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
+                      p.key
+                    )}" style="flex:1">إضافة</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+          html += `</div>`;
+          els.infoText.innerHTML = html;
+          return;
+        }
+        if (state.currentInfoKey === "orders") {
+          els.complaintForm.style.display = "none";
+          els.infoTitle.textContent = "طلباتي السابقة";
+          els.infoMeta.textContent = Array.isArray(state.orders) && state.orders.length > 0 ? `${state.orders.length} طلب` : "لا يوجد";
+          if (!Array.isArray(state.orders) || state.orders.length === 0) {
+            els.infoText.textContent = "لا يوجد طلبات محفوظة حالياً.";
+            return;
+          }
+          let html = `<div style="display:grid;gap:12px">`;
+          for (const o of state.orders) {
+            const ts = Number(o.createdAt) || 0;
+            const date = ts ? new Date(ts).toLocaleString("ar-SY") : "—";
+            const itemsCount = Array.isArray(o.items) ? o.items.reduce((a, it) => a + (Number(it.qty) || 0), 0) : 0;
+            html += `
+              <div class="card" style="min-height:unset">
+                <div class="card-body">
+                  <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap">
+                    <div style="font-weight:900">${escapeHtml(String(o.name || "طلب"))}</div>
+                    <div style="direction:ltr;unicode-bidi:plaintext;font-weight:900;color:var(--primary-3)">$${formatMoney(
+                      Number(o.total) || 0
+                    )}</div>
+                  </div>
+                  <div class="panel-sub" style="margin-top:6px">التاريخ: ${escapeHtml(date)} • القطع: ${escapeHtml(
+              String(itemsCount)
+            )}</div>
+                  <div class="panel-sub">المحافظة: ${escapeHtml(String(o.gov || "—"))}</div>
+                  <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+                    <button class="btn btn-primary" type="button" data-order-reorder="${escapeHtmlAttr(String(o.id || ""))}" style="flex:1">إعادة الطلب</button>
+                    <button class="btn btn-ghost" type="button" data-order-copy="${escapeHtmlAttr(String(o.id || ""))}" style="flex:1">نسخ الفاتورة</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+          html += `</div>`;
+          els.infoText.innerHTML = html;
           return;
         }
         els.complaintForm.style.display = "none";
@@ -2718,17 +3032,32 @@
           state.page += 1;
           render();
         });
+        if (els.prevPageBottom) {
+          els.prevPageBottom.addEventListener("click", () => {
+            state.page = Math.max(1, state.page - 1);
+            render();
+          });
+        }
+        if (els.nextPageBottom) {
+          els.nextPageBottom.addEventListener("click", () => {
+            state.page += 1;
+            render();
+          });
+        }
 
         els.grid.addEventListener("click", async (e) => {
           const t = e.target;
           if (!(t instanceof HTMLElement)) return;
-          const addKey = t.getAttribute("data-add");
+          const favEl = t.closest("[data-fav]");
+          if (favEl instanceof HTMLElement) {
+            const k = favEl.getAttribute("data-fav");
+            if (k) toggleFavorite(k);
+            return;
+          }
+          const addEl = t.closest("[data-add]");
+          const addKey = addEl instanceof HTMLElement ? addEl.getAttribute("data-add") : null;
           if (addKey) {
             addToCartByKey(addKey);
-            els.hint.textContent = "تمت الإضافة";
-            setTimeout(() => {
-              if (els.hint.textContent === "تمت الإضافة") els.hint.textContent = "";
-            }, 900);
             return;
           }
           const moreKey = t.getAttribute("data-more");
@@ -2749,13 +3078,16 @@
         els.homeGrid.addEventListener("click", (e) => {
           const t = e.target;
           if (!(t instanceof HTMLElement)) return;
-          const addKey = t.getAttribute("data-add");
+          const favEl = t.closest("[data-fav]");
+          if (favEl instanceof HTMLElement) {
+            const k = favEl.getAttribute("data-fav");
+            if (k) toggleFavorite(k);
+            return;
+          }
+          const addEl = t.closest("[data-add]");
+          const addKey = addEl instanceof HTMLElement ? addEl.getAttribute("data-add") : null;
           if (addKey) {
             addToCartByKey(addKey);
-            els.hint.textContent = "تمت الإضافة";
-            setTimeout(() => {
-              if (els.hint.textContent === "تمت الإضافة") els.hint.textContent = "";
-            }, 900);
             return;
           }
           const moreKey = t.getAttribute("data-more");
@@ -2771,6 +3103,20 @@
           const key = card.getAttribute("data-key");
           if (!key) return;
           setHash(`product=${encodeURIComponent(key)}`);
+        });
+
+        els.productDetails.addEventListener("click", (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLElement)) return;
+          const favEl = t.closest("[data-fav]");
+          if (favEl instanceof HTMLElement) {
+            const k = favEl.getAttribute("data-fav");
+            if (k) toggleFavorite(k);
+            return;
+          }
+          const addEl = t.closest("[data-add]");
+          const addKey = addEl instanceof HTMLElement ? addEl.getAttribute("data-add") : null;
+          if (addKey) addToCartByKey(addKey);
         });
 
         els.cartToggle.addEventListener("click", () => {
@@ -2842,6 +3188,65 @@
           setHash(`info=${encodeURIComponent(key)}`);
         });
 
+        els.infoText.addEventListener("click", async (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLElement)) return;
+          const favEl = t.closest("[data-fav]");
+          if (favEl instanceof HTMLElement) {
+            const k = favEl.getAttribute("data-fav");
+            if (k) toggleFavorite(k);
+            return;
+          }
+          const prodEl = t.closest("[data-product]");
+          if (prodEl instanceof HTMLElement) {
+            const k = prodEl.getAttribute("data-product");
+            if (k) return setHash(`product=${encodeURIComponent(k)}`);
+          }
+          const addEl = t.closest("[data-add]");
+          if (addEl instanceof HTMLElement) {
+            const k = addEl.getAttribute("data-add");
+            if (k) return addToCartByKey(k);
+          }
+          const copyEl = t.closest("[data-order-copy]");
+          if (copyEl instanceof HTMLElement) {
+            const id = String(copyEl.getAttribute("data-order-copy") ?? "").trim();
+            const o = Array.isArray(state.orders) ? state.orders.find((x) => String(x.id) === id) : null;
+            if (!o) return;
+            const txt = String(o.invoice ?? "").trim();
+            if (!txt) return showToast("لا توجد فاتورة محفوظة", 1800);
+            await copyText(txt);
+            showToast("تم نسخ الفاتورة", 1800);
+            return;
+          }
+          const reorderEl = t.closest("[data-order-reorder]");
+          if (reorderEl instanceof HTMLElement) {
+            const id = String(reorderEl.getAttribute("data-order-reorder") ?? "").trim();
+            const o = Array.isArray(state.orders) ? state.orders.find((x) => String(x.id) === id) : null;
+            if (!o || !Array.isArray(o.items)) return;
+            let added = 0;
+            let skipped = 0;
+            for (const it of o.items) {
+              const key = String(it.key ?? "").trim();
+              const qty = Math.max(1, Math.min(999, Number(it.qty) || 1));
+              const p = state.allProducts.find((x) => x.key === key);
+              if (!p || p.category === "UNAVAILABLE" || p.isOutOfStock) {
+                skipped++;
+                continue;
+              }
+              state.cart.set(key, { product: p, qty });
+              added += qty;
+            }
+            saveCart();
+            renderCart();
+            openCart(true);
+            showShopView();
+            setHash("shop");
+            if (added > 0) showToast(`تمت إعادة الطلب (${added} قطعة)`, 2200);
+            else showToast("لم يتم إضافة أي عنصر (غير متوفر/منتهي)", 2200);
+            if (skipped > 0) showToast(`تم تخطي ${skipped} عنصر غير متوفر`, 2600);
+          }
+        });
+
         els.shipHomsRadio.addEventListener("change", () => {
           if (!els.shipHomsRadio.checked) return;
           els.shipHomsBlock.style.display = "grid";
@@ -2890,6 +3295,7 @@
           const allowSwitch = Boolean(els.allowVodafoneSwitchInput.checked);
 
           const invoice = buildInvoiceText({ name, gov, phone, shipType, homsAddress, shipCenter, shipCurrency, notes, allowSwitch });
+          addOrderToHistory({ name, gov, phone, shipType, shipCurrency, notes, allowSwitch, invoice });
           state.lastInvoiceText = invoice;
           els.copyInvoiceBtn.style.display = "";
           els.invoiceNote.style.display = "";
@@ -2930,8 +3336,14 @@
       }
 
       async function loadProducts() {
-        els.hint.textContent = "جاري تحميل المنتجات يرجى الانتظار قليلاً ....";
-        setStatus("جاري تحميل المنتجات يرجى الانتظار قليلاً ....");
+        const loadingText = "جاري تحميل الصفحة";
+        const slowNote = "الصفحة تحمل ببطء لقد شارفت على الانتهاء تأكد من سرعة الأنترنيت لديك";
+        els.hint.textContent = `${loadingText}...`;
+        setStatus(`${loadingText}...`);
+        setTimeout(() => {
+          if (String(els.hint.textContent ?? "").includes(loadingText)) els.hint.textContent = `${loadingText}... ${slowNote}`;
+          if (String(els.status.textContent ?? "").includes(loadingText)) setStatus(`${loadingText}... ${slowNote}`);
+        }, 1800);
         try {
           await Promise.all([loadInfoPages(), loadOutOfStockSet()]);
           const res = await fetch(CONFIG.CSV_URL, { cache: "no-store" });
@@ -3059,6 +3471,9 @@
           const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           const isWadfow = p.category === "WADFOW";
+          const favBtn = `<button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
+            isFavorite(p.key) ? "true" : "false"
+          }" aria-label="المفضلة">♥</button>`;
           const addButton =
             p.isOutOfStock
               ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
@@ -3071,7 +3486,7 @@
           if (state.viewMode === "brief") {
             html += `
               <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
-                ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+                ${favBtn}
                 <div class="thumb">
                   <img
                     src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
@@ -3096,6 +3511,7 @@
           html += `
               <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
                 ${discountText ? `<div class="discount-badge">${escapeHtml(discountText)}</div>` : ""}
+                ${favBtn}
                 <div class="thumb">
                   <img
                     src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
@@ -3128,6 +3544,10 @@
       }
 
       wireEvents();
+      try {
+        loadFavorites();
+        loadOrders();
+      } catch {}
       try {
         const savedView = String(localStorage.getItem("hjy_view_mode_v1") ?? "").trim();
         if (savedView) state.viewMode = savedView;
