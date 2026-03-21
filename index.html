@@ -151,6 +151,7 @@
         border: 1px solid var(--border);
         border-radius: 999px;
         box-shadow: 0 8px 22px rgba(11, 43, 42, 0.06);
+        position: relative;
       }
 
       .search input {
@@ -268,14 +269,56 @@
       }
 
       #cartToggle {
-        position: fixed;
+        position: fixed !important;
         inset-inline-end: 16px;
-        inset-block-end: 16px;
-        z-index: 95;
+        inset-block-end: max(16px, env(safe-area-inset-bottom));
+        z-index: 999;
         background: rgba(255, 255, 255, 0.96);
         box-shadow: 0 18px 50px rgba(11, 43, 42, 0.22);
         padding: 8px 10px;
         font-size: 12px;
+      }
+
+      .sort-gear {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.92);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        user-select: none;
+        font-size: 18px;
+        line-height: 1;
+        color: rgba(11, 43, 42, 0.7);
+      }
+
+      .sort-menu {
+        position: absolute;
+        inset-inline-end: 8px;
+        top: calc(100% + 8px);
+        z-index: 60;
+        width: 220px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 18px 50px rgba(11, 43, 42, 0.18);
+        padding: 8px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .sort-menu button {
+        width: 100%;
+        text-align: start;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.7);
+        padding: 10px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 800;
+        font-size: 13px;
       }
 
       .badge {
@@ -1433,6 +1476,12 @@
           <div class="controls">
             <div class="search" role="search">
               <input id="searchInput" type="search" placeholder="يمكنك بحث بكتابة اسم المنتج أو الكود" autocomplete="off" />
+              <button class="sort-gear" id="sortToggle" type="button" aria-label="خيارات البحث">⚙</button>
+              <div class="sort-menu" id="sortMenu" hidden>
+                <button type="button" data-sort="DEFAULT">بحث: افتراضي</button>
+                <button type="button" data-sort="PRICE_ASC">بحث: أرخص سعر</button>
+                <button type="button" data-sort="PRICE_DESC">بحث: أعلى سعر</button>
+              </div>
             </div>
           </div>
 
@@ -1755,6 +1804,8 @@
         grid: document.getElementById("productsGrid"),
         homeGrid: document.getElementById("homeProductsGrid"),
         search: document.getElementById("searchInput"),
+        sortToggle: document.getElementById("sortToggle"),
+        sortMenu: document.getElementById("sortMenu"),
         pills: Array.from(document.querySelectorAll(".pill[data-category]")),
         viewSelect: document.getElementById("viewSelect"),
         categoriesToggle: document.getElementById("categoriesToggle"),
@@ -1840,6 +1891,7 @@
         page: 1,
         favoritesPage: 1,
         ordersPage: 1,
+        sortMode: "DEFAULT",
         cart: new Map(),
         favorites: new Set(),
         orders: [],
@@ -1868,14 +1920,51 @@
         return String(v ?? "").toLowerCase();
       }
 
+      function getCachedText(cacheKey, maxAgeMs) {
+        const raw = localStorage.getItem(cacheKey);
+        const parsed = safeJsonParse(raw, null);
+        if (!parsed || typeof parsed !== "object") return null;
+        const ts = Number(parsed.ts) || 0;
+        const text = typeof parsed.text === "string" ? parsed.text : "";
+        if (!text) return null;
+        if (maxAgeMs && ts && Date.now() - ts > maxAgeMs) return null;
+        return text;
+      }
+
+      function setCachedText(cacheKey, text) {
+        const t = String(text ?? "");
+        if (!t.trim()) return;
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), text: t }));
+        } catch {}
+      }
+
+      async function fetchTextCached(url, maxAgeMs = 6 * 60 * 60 * 1000) {
+        const u = String(url ?? "").trim();
+        if (!u) return null;
+        const cacheKey = `hjy_text_cache_v1::${u}`;
+        const cached = getCachedText(cacheKey, maxAgeMs);
+        if (cached) return { url: u, text: cached, cached: true };
+        try {
+          const res = await fetch(u, { cache: "force-cache" });
+          if (!res.ok) throw new Error("Fetch failed");
+          const text = await res.text();
+          if (!String(text ?? "").trim()) throw new Error("Empty");
+          setCachedText(cacheKey, text);
+          return { url: u, text, cached: false };
+        } catch {
+          const stale = getCachedText(cacheKey, 0);
+          if (stale) return { url: u, text: stale, cached: true };
+          return null;
+        }
+      }
+
       async function fetchTextFirstAvailable(urls) {
         for (const u of urls) {
           try {
-            const res = await fetch(String(u), { cache: "no-store" });
-            if (!res.ok) continue;
-            const text = await res.text();
-            if (String(text ?? "").trim().length === 0) continue;
-            return { url: String(u), text };
+            const got = await fetchTextCached(String(u), 6 * 60 * 60 * 1000);
+            if (!got) continue;
+            return { url: String(got.url), text: got.text };
           } catch {}
         }
         return null;
@@ -2297,6 +2386,9 @@
           if (t.length > 0) list = [...list].sort((a, b) => relevanceScore(b, t) - relevanceScore(a, t));
         }
 
+        if (state.sortMode === "PRICE_ASC") list = [...list].sort((a, b) => (Number(a.priceAfter) || 0) - (Number(b.priceAfter) || 0));
+        if (state.sortMode === "PRICE_DESC") list = [...list].sort((a, b) => (Number(b.priceAfter) || 0) - (Number(a.priceAfter) || 0));
+
         state.filteredProducts = list;
         state.page = 1;
         render();
@@ -2442,7 +2534,6 @@
           if (state.viewMode === "brief") {
             html += `
               <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
-                ${favBtn}
                 <div class="thumb">
                   <img
                     src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
@@ -2457,7 +2548,7 @@
                   <div class="prices">
                     <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                   </div>
-                  <div class="actions" style="display:flex;gap:10px;align-items:center">${addButton}${favMini}</div>
+                  <div class="actions">${addButton}</div>
                 </div>
               </article>
             `;
@@ -2862,7 +2953,10 @@
           const start = (state.favoritesPage - 1) * per;
           const end = Math.min(products.length, start + per);
           const slice = products.slice(start, end);
-          let html = `<div class="panel-sub" style="margin-bottom:10px">هنا تعرض جميع المنتجات التي قمت بإضافتها إلى المفضلة</div>`;
+          let html = `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <button class="btn btn-ghost" type="button" data-fav-back="1">رجوع</button>
+            <div class="panel-sub">هنا تعرض جميع المنتجات التي قمت بإضافتها إلى المفضلة</div>
+          </div>`;
           if (pageCount > 1) {
             html += `<div class="pager" style="margin-bottom:12px;justify-content:flex-start">
               <button type="button" data-fav-page="${state.favoritesPage - 1}" ${state.favoritesPage <= 1 ? "disabled" : ""}>▶</button>
@@ -2878,7 +2972,6 @@
             }" aria-label="المفضلة">${isFavorite(p.key) ? "♥" : "♡"}</button>`;
             html += `
               <div class="card${isWadfow ? " is-wadfow" : ""}" style="min-height:unset">
-                <button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="true" aria-label="المفضلة">♥</button>
                 <div class="thumb" style="aspect-ratio:4/3">
                   <img
                     src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
@@ -2964,8 +3057,12 @@
                   <div class="panel-sub">المحافظة: ${escapeHtml(String(o.gov || "—"))}</div>
                   <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
                     <button class="btn btn-primary" type="button" data-order-reorder="${escapeHtmlAttr(String(o.id || ""))}" style="flex:1">إعادة الطلب</button>
+                    <button class="btn btn-ghost" type="button" data-order-details="${escapeHtmlAttr(String(o.id || ""))}" style="flex:1">إظهار الفاتورة</button>
                     <button class="btn btn-ghost" type="button" data-order-copy="${escapeHtmlAttr(String(o.id || ""))}" style="flex:1">نسخ الفاتورة</button>
                   </div>
+                  <pre data-order-invoice="${escapeHtmlAttr(String(o.id || ""))}" hidden style="white-space:pre-wrap;direction:ltr;unicode-bidi:plaintext;margin:10px 0 0;padding:10px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.7);overflow:auto;max-height:260px">${escapeHtml(
+                    String(o.invoice || "لا توجد فاتورة محفوظة")
+                  )}</pre>
                 </div>
               </div>
             `;
@@ -3209,7 +3306,10 @@
           return;
         }
         openCart(false);
+        setRoute("shop");
+        els.homeView.style.display = "none";
         els.shopView.style.display = "none";
+        els.productView.style.display = "none";
         els.checkoutView.style.display = "";
         els.infoView.style.display = "none";
         updateFooterLinksVisibility();
@@ -3265,6 +3365,42 @@
             applyFilters();
           }, 180)
         );
+
+        if (els.sortToggle && els.sortMenu) {
+          const closeSort = () => els.sortMenu.setAttribute("hidden", "");
+          const openSort = () => els.sortMenu.removeAttribute("hidden");
+
+          els.sortToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            const isHidden = els.sortMenu.hasAttribute("hidden");
+            if (isHidden) openSort();
+            else closeSort();
+          });
+
+          els.sortMenu.addEventListener("click", (e) => {
+            const t = e.target;
+            if (!(t instanceof HTMLElement)) return;
+            const mode = t.getAttribute("data-sort");
+            if (!mode) return;
+            state.sortMode = mode;
+            try {
+              localStorage.setItem("hjy_sort_mode_v1", mode);
+            } catch {}
+            closeSort();
+            applyFilters();
+            showToast(
+              mode === "PRICE_ASC" ? "تم تفعيل: أرخص سعر" : mode === "PRICE_DESC" ? "تم تفعيل: أعلى سعر" : "تم تفعيل: افتراضي",
+              1500
+            );
+          });
+
+          document.addEventListener("click", (e) => {
+            const t = e.target;
+            if (!(t instanceof HTMLElement)) return;
+            if (t.closest("#sortMenu") || t.closest("#sortToggle")) return;
+            closeSort();
+          });
+        }
 
         els.search.addEventListener("focus", () => {
           if (String(location.hash ?? "") === "#home" || !location.hash) setHash("shop");
@@ -3440,6 +3576,8 @@
         els.infoText.addEventListener("click", async (e) => {
           const t = e.target;
           if (!(t instanceof HTMLElement)) return;
+          const favBackEl = t.closest("[data-fav-back]");
+          if (favBackEl instanceof HTMLElement) return setHash(state.lastMainRoute || "shop");
           const favPageEl = t.closest("[data-fav-page]");
           if (favPageEl instanceof HTMLElement) {
             const next = Number(favPageEl.getAttribute("data-fav-page"));
@@ -3455,6 +3593,22 @@
             if (Number.isFinite(next)) {
               state.ordersPage = Math.max(1, next);
               showInfoView("orders");
+            }
+            return;
+          }
+          const orderDetailsEl = t.closest("[data-order-details]");
+          if (orderDetailsEl instanceof HTMLElement) {
+            const id = String(orderDetailsEl.getAttribute("data-order-details") ?? "").trim();
+            if (!id) return;
+            const block = els.infoText.querySelector(`[data-order-invoice="${CSS.escape(id)}"]`);
+            if (!(block instanceof HTMLElement)) return;
+            const isHidden = block.hasAttribute("hidden");
+            if (isHidden) {
+              block.removeAttribute("hidden");
+              orderDetailsEl.textContent = "إخفاء الفاتورة";
+            } else {
+              block.setAttribute("hidden", "");
+              orderDetailsEl.textContent = "إظهار الفاتورة";
             }
             return;
           }
@@ -3613,18 +3767,15 @@
         }, 1800);
         try {
           await Promise.all([loadInfoPages(), loadOutOfStockSet()]);
-          const res = await fetch(CONFIG.CSV_URL, { cache: "no-store" });
-          if (!res.ok) {
+          const got = await fetchTextCached(CONFIG.CSV_URL, 6 * 60 * 60 * 1000);
+          if (!got) {
             els.hint.textContent = "فشل التحميل";
-            setStatus(
-              `فشل تحميل products.csv (${res.status}). تأكد أن الملف موجود بنفس المجلد على GitHub Pages وبنفس الاسم.`,
-              true
-            );
+            setStatus("فشل تحميل products.csv. تأكد أن الملف موجود بنفس المجلد على GitHub Pages وبنفس الاسم.", true);
             els.grid.innerHTML = "";
             setHomeStatus("فشل تحميل المنتجات.", true);
             return;
           }
-          const data = await res.text();
+          const data = String(got.text ?? "");
           const lines = data.split(/\r?\n/).filter((l) => l.trim().length > 0);
           if (lines.length <= 1) throw new Error("Empty CSV");
 
@@ -3758,7 +3909,6 @@
           if (state.viewMode === "brief") {
             html += `
               <article class="card${isWadfow ? " is-wadfow" : ""}" data-key="${escapeHtmlAttr(p.key)}">
-                ${favBtn}
                 <div class="thumb">
                   <img
                     src="${escapeHtmlAttr(p.photo || PLACEHOLDER_IMG)}"
@@ -3773,7 +3923,7 @@
                   <div class="prices">
                     <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                   </div>
-                  <div class="actions" style="display:flex;gap:10px;align-items:center">${addButton}${favMini}</div>
+                  <div class="actions">${addButton}</div>
                 </div>
               </article>
             `;
@@ -3824,6 +3974,10 @@
         const savedView = String(localStorage.getItem("hjy_view_mode_v1") ?? "").trim();
         if (savedView) state.viewMode = savedView;
         else state.viewMode = "compact";
+      } catch {}
+      try {
+        const savedSort = String(localStorage.getItem("hjy_sort_mode_v1") ?? "").trim();
+        if (savedSort) state.sortMode = savedSort;
       } catch {}
       els.grid.setAttribute("data-view", state.viewMode);
       els.homeGrid.setAttribute("data-view", state.viewMode);
