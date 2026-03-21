@@ -270,8 +270,10 @@
 
       #cartToggle {
         position: fixed !important;
+        right: 16px;
+        bottom: 16px;
         inset-inline-end: 16px;
-        inset-block-end: max(16px, env(safe-area-inset-bottom));
+        inset-block-end: 16px;
         z-index: 999;
         background: rgba(255, 255, 255, 0.96);
         box-shadow: 0 18px 50px rgba(11, 43, 42, 0.22);
@@ -280,45 +282,31 @@
       }
 
       .sort-gear {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
         border-radius: 999px;
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.92);
         display: grid;
         place-items: center;
-        cursor: pointer;
         user-select: none;
         font-size: 18px;
         line-height: 1;
         color: rgba(11, 43, 42, 0.7);
       }
 
-      .sort-menu {
-        position: absolute;
-        inset-inline-end: 8px;
-        top: calc(100% + 8px);
-        z-index: 60;
-        width: 220px;
-        border-radius: 14px;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.96);
-        box-shadow: 0 18px 50px rgba(11, 43, 42, 0.18);
-        padding: 8px;
-        display: grid;
+      .sort-wrap {
+        display: inline-flex;
+        align-items: center;
         gap: 8px;
+        flex: 0 0 auto;
       }
 
-      .sort-menu button {
-        width: 100%;
-        text-align: start;
-        border: 1px solid var(--border);
+      .sort-select {
+        padding: 7px 10px;
+        font-size: 12px;
+        border-radius: 999px;
         background: rgba(255, 255, 255, 0.7);
-        padding: 10px 12px;
-        border-radius: 12px;
-        cursor: pointer;
-        font-weight: 800;
-        font-size: 13px;
       }
 
       .badge {
@@ -1476,11 +1464,13 @@
           <div class="controls">
             <div class="search" role="search">
               <input id="searchInput" type="search" placeholder="يمكنك بحث بكتابة اسم المنتج أو الكود" autocomplete="off" />
-              <button class="sort-gear" id="sortToggle" type="button" aria-label="خيارات البحث">⚙</button>
-              <div class="sort-menu" id="sortMenu" hidden>
-                <button type="button" data-sort="DEFAULT">بحث: افتراضي</button>
-                <button type="button" data-sort="PRICE_ASC">بحث: أرخص سعر</button>
-                <button type="button" data-sort="PRICE_DESC">بحث: أعلى سعر</button>
+              <div class="sort-wrap" aria-label="ترتيب البحث">
+                <span class="sort-gear" aria-hidden="true">⚙</span>
+                <select class="select sort-select" id="sortSelect" aria-label="ترتيب البحث">
+                  <option value="DEFAULT">بحث: افتراضي</option>
+                  <option value="PRICE_ASC">بحث: أرخص سعر</option>
+                  <option value="PRICE_DESC">بحث: أعلى سعر</option>
+                </select>
               </div>
             </div>
           </div>
@@ -1804,8 +1794,7 @@
         grid: document.getElementById("productsGrid"),
         homeGrid: document.getElementById("homeProductsGrid"),
         search: document.getElementById("searchInput"),
-        sortToggle: document.getElementById("sortToggle"),
-        sortMenu: document.getElementById("sortMenu"),
+        sortSelect: document.getElementById("sortSelect"),
         pills: Array.from(document.querySelectorAll(".pill[data-category]")),
         viewSelect: document.getElementById("viewSelect"),
         categoriesToggle: document.getElementById("categoriesToggle"),
@@ -1881,6 +1870,10 @@
         toast: document.getElementById("toast"),
         toastBubble: document.getElementById("toastBubble"),
       };
+
+      try {
+        if (els.cartToggle && els.cartToggle.parentElement !== document.body) document.body.appendChild(els.cartToggle);
+      } catch {}
 
       const state = {
         allProducts: [],
@@ -3366,39 +3359,18 @@
           }, 180)
         );
 
-        if (els.sortToggle && els.sortMenu) {
-          const closeSort = () => els.sortMenu.setAttribute("hidden", "");
-          const openSort = () => els.sortMenu.removeAttribute("hidden");
-
-          els.sortToggle.addEventListener("click", (e) => {
-            e.preventDefault();
-            const isHidden = els.sortMenu.hasAttribute("hidden");
-            if (isHidden) openSort();
-            else closeSort();
-          });
-
-          els.sortMenu.addEventListener("click", (e) => {
-            const t = e.target;
-            if (!(t instanceof HTMLElement)) return;
-            const mode = t.getAttribute("data-sort");
-            if (!mode) return;
+        if (els.sortSelect) {
+          els.sortSelect.addEventListener("change", () => {
+            const mode = String(els.sortSelect.value ?? "").trim() || "DEFAULT";
             state.sortMode = mode;
             try {
               localStorage.setItem("hjy_sort_mode_v1", mode);
             } catch {}
-            closeSort();
             applyFilters();
             showToast(
               mode === "PRICE_ASC" ? "تم تفعيل: أرخص سعر" : mode === "PRICE_DESC" ? "تم تفعيل: أعلى سعر" : "تم تفعيل: افتراضي",
               1500
             );
-          });
-
-          document.addEventListener("click", (e) => {
-            const t = e.target;
-            if (!(t instanceof HTMLElement)) return;
-            if (t.closest("#sortMenu") || t.closest("#sortToggle")) return;
-            closeSort();
           });
         }
 
@@ -3982,6 +3954,7 @@
       els.grid.setAttribute("data-view", state.viewMode);
       els.homeGrid.setAttribute("data-view", state.viewMode);
       els.viewSelect.value = state.viewMode;
+      if (els.sortSelect) els.sortSelect.value = state.sortMode || "DEFAULT";
       updateFooterLinksVisibility();
       window.addEventListener("hashchange", applyHashRoute);
       loadProducts().then(() => {
