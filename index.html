@@ -277,8 +277,30 @@
         z-index: 999;
         background: rgba(255, 255, 255, 0.96);
         box-shadow: 0 18px 50px rgba(11, 43, 42, 0.22);
-        padding: 8px 10px;
-        font-size: 12px;
+        width: 46px;
+        height: 46px;
+        padding: 0;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      #cartToggle .badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        font-size: 11px;
+      }
+
+      .cart-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .sort-gear {
@@ -1475,8 +1497,8 @@
             </div>
           </div>
 
-          <button class="cart-button" id="cartToggle" type="button">
-            <span>السلة</span>
+          <button class="cart-button" id="cartToggle" type="button" aria-label="سلة المشتريات">
+            <span class="cart-icon" aria-hidden="true">🛒</span>
             <span class="badge" id="cartCount">0</span>
           </button>
         </div>
