@@ -7,7 +7,8 @@
     <link rel="icon" href="logo.png" />
     <style>
       :root {
-        --bg: #e9f6f5;
+        color-scheme: light;
+        --bg: #ffffff;
         --surface: #ffffff;
         --text: #0b2b2a;
         --muted: #4b6b69;
@@ -43,9 +44,7 @@
       body {
         margin: 0;
         font-family: Arial, Helvetica, sans-serif;
-        background: radial-gradient(1100px 600px at 30% -10%, rgba(10, 163, 163, 0.18), transparent 60%),
-          radial-gradient(900px 500px at 90% 10%, rgba(11, 116, 116, 0.18), transparent 60%),
-          var(--bg);
+        background: #ffffff;
         color: var(--text);
       }
 
@@ -275,6 +274,8 @@
         z-index: 95;
         background: rgba(255, 255, 255, 0.96);
         box-shadow: 0 18px 50px rgba(11, 43, 42, 0.22);
+        padding: 8px 10px;
+        font-size: 12px;
       }
 
       .badge {
@@ -948,6 +949,44 @@
         box-shadow: 0 10px 30px rgba(198, 40, 40, 0.18);
       }
 
+      .btn-fav-mini {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .btn-square {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .checkout-total {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.88);
+        border-radius: 16px;
+        padding: 12px 14px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: baseline;
+        font-weight: 900;
+        font-size: 18px;
+        color: var(--primary-3);
+        direction: ltr;
+        unicode-bidi: plaintext;
+      }
+
       .cart-header {
         padding: 14px 14px 12px;
         display: flex;
@@ -1169,10 +1208,15 @@
         color: var(--muted);
         font-size: 13px;
         display: none;
+        white-space: pre-wrap;
       }
 
       .status[aria-hidden="false"] {
         display: block;
+      }
+
+      #hint {
+        white-space: pre-wrap;
       }
 
       @media (max-width: 1100px) {
@@ -1422,6 +1466,31 @@
               <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
               <button class="pill" type="button" data-category="UNAVAILABLE" aria-pressed="false">الغير متوفر</button>
               <button class="pill" type="button" data-category="UNCATEGORIZED" aria-pressed="false">غير مصنف</button>
+              <button class="pill" type="button" data-category="DRILLS" aria-pressed="false">مثاقب</button>
+              <button class="pill" type="button" data-category="GRINDING" aria-pressed="false">جلخ</button>
+              <button class="pill" type="button" data-category="HAMMERS" aria-pressed="false">كمبريسة</button>
+              <button class="pill" type="button" data-category="BATTERY" aria-pressed="false">بطارية</button>
+              <button class="pill" type="button" data-category="WOOD" aria-pressed="false">خشب</button>
+              <button class="pill" type="button" data-category="METAL" aria-pressed="false">حديد</button>
+              <button class="pill" type="button" data-category="CERAMIC" aria-pressed="false">سيراميك</button>
+              <button class="pill" type="button" data-category="GARDEN" aria-pressed="false">زراعة وأشجار</button>
+              <button class="pill" type="button" data-category="PLUMBING" aria-pressed="false">صحية</button>
+              <button class="pill" type="button" data-category="DISCS" aria-pressed="false">ديسك</button>
+              <button class="pill" type="button" data-category="BITS" aria-pressed="false">ريش</button>
+              <button class="pill" type="button" data-category="COMBO" aria-pressed="false">كومبو</button>
+              <button class="pill" type="button" data-category="SETS" aria-pressed="false">مجموعات</button>
+              <button class="pill" type="button" data-category="SAFETY" aria-pressed="false">سلامة</button>
+              <button class="pill" type="button" data-category="AIR" aria-pressed="false">هواء</button>
+              <button class="pill" type="button" data-category="MECHANIC" aria-pressed="false">ميكانيك</button>
+              <button class="pill" type="button" data-category="HAND" aria-pressed="false">يدوية</button>
+              <button class="pill" type="button" data-category="SINKS" aria-pressed="false">مغاسل</button>
+              <button class="pill" type="button" data-category="ELECTRIC" aria-pressed="false">كهرباء</button>
+              <button class="pill" type="button" data-category="PAINT" aria-pressed="false">دهان</button>
+              <button class="pill" type="button" data-category="MEASURE" aria-pressed="false">قياس وليزر</button>
+              <button class="pill" type="button" data-category="GENERATORS" aria-pressed="false">مولدات</button>
+              <button class="pill" type="button" data-category="PUMPS" aria-pressed="false">مضخات</button>
+              <button class="pill" type="button" data-category="VACUUMS" aria-pressed="false">مكانس</button>
+              <button class="pill" type="button" data-category="OTHER" aria-pressed="false">آخرى</button>
             </div>
             <p class="panel-sub" id="hint" style="margin-inline-start: auto">جاري تحميل المنتجات يرجى الانتظار قليلاً ....</p>
           </div>
@@ -1437,6 +1506,7 @@
             </div>
             <div style="display:flex;gap:10px;align-items:center">
               <button class="btn btn-ghost" id="goShopBtn" type="button">التسوق</button>
+              <button class="btn btn-ghost btn-square" id="homeFavoritesBtn" type="button" aria-label="المفضلة">♥</button>
               <button class="btn btn-ghost" id="orderDetailsBtn" type="button">تفاصيل الطلب ▾</button>
             </div>
           </div>
@@ -1504,19 +1574,15 @@
                 <select id="govInput" required style="padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface)">
                   <option value="">اختر المحافظة</option>
                   <option value="دمشق">دمشق</option>
-                  <option value="ريف دمشق">ريف دمشق</option>
-                  <option value="حلب">حلب</option>
                   <option value="حمص">حمص</option>
                   <option value="حماة">حماة</option>
                   <option value="اللاذقية">اللاذقية</option>
                   <option value="طرطوس">طرطوس</option>
                   <option value="إدلب">إدلب</option>
-                  <option value="الرقة">الرقة</option>
-                  <option value="دير الزور">دير الزور</option>
-                  <option value="الحسكة">الحسكة</option>
-                  <option value="السويداء">السويداء</option>
                   <option value="درعا">درعا</option>
-                  <option value="القنيطرة">القنيطرة</option>
+                  <option value="الحسكة">الحسكة</option>
+                  <option value="دير الزور">دير الزور</option>
+                  <option value="الرقة">الرقة</option>
                 </select>
               </label>
               <label style="display:grid;gap:6px">
@@ -1626,12 +1692,13 @@
             <span style="font-size:11px;color:var(--muted);font-weight:700">BY HJY.co</span>
           </div>
           <div class="footer-links" id="footerLinks">
+            <button class="footer-link" type="button" data-category="HOME">الصفحة الرئيسية</button>
+            <button class="footer-link" type="button" data-category="FAVORITES">المفضلة</button>
             <button class="footer-link" type="button" data-info="about_us">من نحن</button>
             <button class="footer-link" type="button" data-info="location">موقعنا</button>
             <button class="footer-link" type="button" data-info="faq">أشيع الأسئلة</button>
             <button class="footer-link" type="button" data-info="shipping">تفاصيل الشحن</button>
             <button class="footer-link" type="button" data-info="how_to_order">كيفية الطلب</button>
-            <button class="footer-link" type="button" data-info="favorites">المفضلة</button>
             <button class="footer-link" type="button" data-info="orders">طلباتي السابقة</button>
             <button class="footer-link" type="button" data-info="developer">المطور</button>
             <button class="footer-link" type="button" data-info="complaint">إرسال شكوى</button>
@@ -1749,6 +1816,7 @@
         backToShopBtn: document.getElementById("backToShopBtn"),
         goShopBtn: document.getElementById("goShopBtn"),
         orderDetailsBtn: document.getElementById("orderDetailsBtn"),
+        homeFavoritesBtn: document.getElementById("homeFavoritesBtn"),
         footerLinks: document.getElementById("footerLinks"),
         infoView: document.getElementById("infoView"),
         infoTitle: document.getElementById("infoTitle"),
@@ -1770,6 +1838,8 @@
         category: "ALL",
         query: "",
         page: 1,
+        favoritesPage: 1,
+        ordersPage: 1,
         cart: new Map(),
         favorites: new Set(),
         orders: [],
@@ -1979,6 +2049,50 @@
         return "UNCATEGORIZED";
       }
 
+      function getExtraCategoriesFromAbout(about) {
+        const a = safeLower(about);
+        const cats = [];
+
+        const defs = [
+          { key: "DRILLS", keywords: ["مثقب", "مثاقب"] },
+          { key: "GRINDING", keywords: ["جلخ", "صاروخ", "الجلخ", "الصاروخ"] },
+          { key: "HAMMERS", keywords: ["كمبريسة", "كسارة", "sds", "ازميل"] },
+          { key: "WOOD", keywords: ["خشب", "روتر", "دباسة", "مسامير"] },
+          { key: "METAL", keywords: ["ملحمة", "ترنس", "لحام"] },
+          { key: "CERAMIC", keywords: ["سيراميك", "بلاط"] },
+          { key: "GARDEN", keywords: ["حدائق", "شجر", "أشجار", "اعشاب", "أعشاب", "مرش", "مبيدات", "عشب"] },
+          { key: "PLUMBING", keywords: ["ونش", "صحية"] },
+          { key: "DISCS", keywords: ["ديسك", "حجر"] },
+          { key: "BITS", keywords: ["ريشة", "ريش"] },
+          { key: "COMBO", keywords: ["كومبو"] },
+          { key: "SETS", keywords: ["مجموعات", "طقم"] },
+          { key: "SAFETY", keywords: ["حذاء", "سلامة", "كف", "نظارة", "خزنة"] },
+          { key: "AIR", keywords: ["كمبراسور", "كمبرسور", "هواء", "ضاغط", "كور"] },
+          { key: "MECHANIC", keywords: ["ميكانيك", "ميكانيكي", "طقطاق", "عزق", "زيت", "مفتاح", "سداسي", "كريكو"] },
+          { key: "HAND", keywords: ["مقص", "مفك", "مصالب", "مفكات", "بنسة", "ملاقط", "ملقط", "بنسات", "زرداية", "قطاعة"] },
+          { key: "SINKS", keywords: ["مغاسل", "مغسل"] },
+          { key: "ELECTRIC", keywords: ["حزامات", "حزامة", "فاحص", "افو", "توال", "حبسات", "صوليات", "زلاطة"] },
+          { key: "PAINT", keywords: ["دهان"] },
+          { key: "MEASURE", keywords: ["شقلة", "ليزر", "متر بلاستيك", "متر كوشوك", "زيبق", "عجلة", "مسطرة", "مساطر"] },
+          { key: "GENERATORS", keywords: ["مولدة", "مولدات"] },
+          { key: "PUMPS", keywords: ["غاطس", "مضخة"] },
+          { key: "VACUUMS", keywords: ["مكنسة", "مكانس"] },
+        ];
+
+        const otherKeywords = [];
+        for (const d of defs) {
+          for (const k of d.keywords) otherKeywords.push(safeLower(k));
+          if (d.keywords.some((k) => a.includes(safeLower(k)))) cats.push(d.key);
+        }
+        otherKeywords.push("شاحن");
+
+        const hasBattery = a.includes("بطارية");
+        if (hasBattery && !otherKeywords.some((k) => k && a.includes(k))) cats.push("BATTERY");
+
+        if (cats.length === 0) cats.push("OTHER");
+        return cats;
+      }
+
       function calcPriceBefore(rawPrice) {
         if (!Number.isFinite(rawPrice)) return 0;
         return rawPrice * (1 + CONFIG.MARKUP_RATE);
@@ -2138,10 +2252,17 @@
       }
 
       function applyFilters() {
-        const tokens = buildSearchTokens(state.query);
+        const qTrimmed = String(state.query ?? "").trim();
+        const q = safeLower(qTrimmed);
+        const candidates = [];
+        if (q) candidates.push(q);
+        if (q.length >= 2) candidates.push(q.slice(0, -1));
+        if (q.length >= 3) candidates.push(q.slice(0, -2));
+        if (q.length >= 3) candidates.push(q.slice(0, 3));
+        const uniqCandidates = Array.from(new Set(candidates.filter((x) => x && x.trim().length > 0)));
+
+        const tokens = buildSearchTokens(qTrimmed);
         state.lastQueryTokens = tokens;
-        const cleanedQuery = safeLower(state.query).trim();
-        const shortQuery = cleanedQuery.length > 0 && cleanedQuery.length < CONFIG.SEARCH_MIN_CHARS ? cleanedQuery : "";
 
         let list = state.allProducts;
 
@@ -2149,16 +2270,32 @@
           list = list.filter((p) => state.favorites.has(p.key));
         } else if (state.category === "OUT_OF_STOCK") {
           list = list.filter((p) => p.isOutOfStock);
-        } else if (state.category !== "ALL") {
+        } else if (
+          state.category === "WADFOW" ||
+          state.category === "TOTAL" ||
+          state.category === "UNAVAILABLE" ||
+          state.category === "UNCATEGORIZED"
+        ) {
           list = list.filter((p) => p.category === state.category);
+        } else if (state.category !== "ALL") {
+          list = list.filter((p) => Array.isArray(p.extraCategories) && p.extraCategories.includes(state.category));
         }
 
-        if (tokens.length > 0) {
-          list = list.filter((p) => tokens.every((t) => p.search.includes(t)));
-        } else if (shortQuery) {
-          list = list.filter((p) => safeLower(p.code1).startsWith(shortQuery) || safeLower(p.code2).startsWith(shortQuery));
+        if (uniqCandidates.length > 0) {
+          let matched = [];
+          let used = "";
+          for (const cand of uniqCandidates) {
+            const res = list.filter((p) => String(p.search ?? "").includes(cand));
+            if (res.length > 0) {
+              matched = res;
+              used = cand;
+              break;
+            }
+          }
+          list = matched;
+          const t = buildSearchTokens(used);
+          if (t.length > 0) list = [...list].sort((a, b) => relevanceScore(b, t) - relevanceScore(a, t));
         }
-        if (tokens.length > 0) list = [...list].sort((a, b) => relevanceScore(b, tokens) - relevanceScore(a, tokens));
 
         state.filteredProducts = list;
         state.page = 1;
@@ -2198,7 +2335,57 @@
             ? "TOTAL"
             : state.category === "UNAVAILABLE"
             ? "الغير متوفر"
-            : "غير مصنف";
+            : state.category === "UNCATEGORIZED"
+            ? "غير مصنف"
+            : state.category === "DRILLS"
+            ? "مثاقب"
+            : state.category === "GRINDING"
+            ? "جلخ"
+            : state.category === "HAMMERS"
+            ? "كمبريسة"
+            : state.category === "BATTERY"
+            ? "بطارية"
+            : state.category === "WOOD"
+            ? "خشب"
+            : state.category === "METAL"
+            ? "حديد"
+            : state.category === "CERAMIC"
+            ? "سيراميك"
+            : state.category === "GARDEN"
+            ? "زراعة وأشجار"
+            : state.category === "PLUMBING"
+            ? "صحية"
+            : state.category === "DISCS"
+            ? "ديسك"
+            : state.category === "BITS"
+            ? "ريش"
+            : state.category === "COMBO"
+            ? "كومبو"
+            : state.category === "SETS"
+            ? "مجموعات"
+            : state.category === "SAFETY"
+            ? "سلامة"
+            : state.category === "AIR"
+            ? "هواء"
+            : state.category === "MECHANIC"
+            ? "ميكانيك"
+            : state.category === "HAND"
+            ? "يدوية"
+            : state.category === "SINKS"
+            ? "مغاسل"
+            : state.category === "ELECTRIC"
+            ? "كهرباء"
+            : state.category === "PAINT"
+            ? "دهان"
+            : state.category === "MEASURE"
+            ? "قياس وليزر"
+            : state.category === "GENERATORS"
+            ? "مولدات"
+            : state.category === "PUMPS"
+            ? "مضخات"
+            : state.category === "VACUUMS"
+            ? "مكانس"
+            : "آخرى";
         const qTrimmed = state.query.trim();
         const qLabel = qTrimmed.length > 0 ? ` / بحث: ${qTrimmed}` : "";
         els.activeFilters.textContent = `${catLabel}${qLabel}`;
@@ -2211,13 +2398,20 @@
 
         if (state.filteredProducts.length === 0) {
           els.grid.innerHTML = "";
-          setStatus("لا توجد نتائج مطابقة. جرّب كلمات مختلفة أو غيّر التصنيف.");
+          if (qTrimmed.length > 0) {
+            setStatus("عذراً لم نجد شيء بالمخزون , \nيرجى البحث بـ صيغ مختلفة وكتابة أسماء علمية تجارية شائعة", true);
+          } else {
+            setStatus("لا توجد نتائج مطابقة. جرّب كلمات مختلفة أو غيّر التصنيف.");
+          }
           els.categoryNote.style.display = "none";
           return;
         }
         setStatus("");
 
-        if (state.category === "OUT_OF_STOCK") {
+        if (state.category === "FAVORITES") {
+          els.categoryNote.style.display = "";
+          els.categoryNote.textContent = "هنا تعرض جميع المنتجات التي قمت بإضافتها إلى المفضلة";
+        } else if (state.category === "OUT_OF_STOCK") {
           els.categoryNote.style.display = "";
           els.categoryNote.textContent = "هذه المنتجات انتهت الآن ستتوفر لاحقاً ويحدث الموقع....";
         } else {
@@ -2230,6 +2424,9 @@
           const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           const isWadfow = p.category === "WADFOW";
+          const favMini = `<button class="btn btn-ghost btn-fav-mini" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
+            isFavorite(p.key) ? "true" : "false"
+          }" aria-label="المفضلة">${isFavorite(p.key) ? "♥" : "♡"}</button>`;
           const favBtn = `<button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
             isFavorite(p.key) ? "true" : "false"
           }" aria-label="المفضلة">♥</button>`;
@@ -2260,7 +2457,7 @@
                   <div class="prices">
                     <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                   </div>
-                  <div class="actions">${addButton}</div>
+                  <div class="actions" style="display:flex;gap:10px;align-items:center">${addButton}${favMini}</div>
                 </div>
               </article>
             `;
@@ -2294,7 +2491,7 @@
                     <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                     ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
                   </div>
-                  <div class="actions">${addButton}</div>
+                  <div class="actions" style="display:flex;gap:10px;align-items:center">${addButton}${favMini}</div>
                 </div>
               </article>
             `;
@@ -2640,7 +2837,8 @@
         if (state.currentInfoKey === "complaint") {
           els.infoTitle.textContent = "إرسال شكوى";
           els.infoMeta.textContent = "نصلح المشكلة بأسرع وقت";
-          els.infoText.textContent = "";
+          els.infoText.textContent =
+            "لا يتم ظهور هوية المرسل , يمكنك إرسال أي ملاحظات أو اقتراحات أو مشاكل وغيرها , نأسف في حال وجود أي تقصير منا , مع تحياتي , مدير مبيعات شركة توتال سوريا";
           els.complaintForm.style.display = "grid";
           els.complaintInput.value = "";
           return;
@@ -2655,12 +2853,29 @@
             .filter(Boolean)
             .filter((p) => p && p.category !== "UNAVAILABLE");
           if (products.length === 0) {
-            els.infoText.textContent = "لا يوجد عناصر في المفضلة حالياً.";
+            els.infoText.textContent = "هنا تعرض جميع المنتجات التي قمت بإضافتها إلى المفضلة \n\nلا يوجد عناصر في المفضلة حالياً.";
             return;
           }
-          let html = `<div style="display:grid;gap:12px">`;
-          for (const p of products) {
+          const per = 20;
+          const pageCount = Math.max(1, Math.ceil(products.length / per));
+          state.favoritesPage = Math.max(1, Math.min(pageCount, Number(state.favoritesPage) || 1));
+          const start = (state.favoritesPage - 1) * per;
+          const end = Math.min(products.length, start + per);
+          const slice = products.slice(start, end);
+          let html = `<div class="panel-sub" style="margin-bottom:10px">هنا تعرض جميع المنتجات التي قمت بإضافتها إلى المفضلة</div>`;
+          if (pageCount > 1) {
+            html += `<div class="pager" style="margin-bottom:12px;justify-content:flex-start">
+              <button type="button" data-fav-page="${state.favoritesPage - 1}" ${state.favoritesPage <= 1 ? "disabled" : ""}>▶</button>
+              <button type="button" data-fav-page="${state.favoritesPage + 1}" ${state.favoritesPage >= pageCount ? "disabled" : ""}>◀</button>
+              <span class="panel-sub" style="margin-inline-start:8px">${state.favoritesPage}/${pageCount}</span>
+            </div>`;
+          }
+          html += `<div style="display:grid;gap:12px">`;
+          for (const p of slice) {
             const isWadfow = p.category === "WADFOW";
+            const favMini = `<button class="btn btn-ghost btn-fav-mini" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
+              isFavorite(p.key) ? "true" : "false"
+            }" aria-label="المفضلة">${isFavorite(p.key) ? "♥" : "♡"}</button>`;
             html += `
               <div class="card${isWadfow ? " is-wadfow" : ""}" style="min-height:unset">
                 <button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="true" aria-label="المفضلة">♥</button>
@@ -2689,12 +2904,20 @@
                     <button class="btn ${isWadfow ? "btn-wadfow" : "btn-primary"}" type="button" data-add="${escapeHtmlAttr(
                       p.key
                     )}" style="flex:1">إضافة</button>
+                    ${favMini}
                   </div>
                 </div>
               </div>
             `;
           }
           html += `</div>`;
+          if (pageCount > 1) {
+            html += `<div class="pager" style="margin-top:12px;justify-content:flex-start">
+              <button type="button" data-fav-page="${state.favoritesPage - 1}" ${state.favoritesPage <= 1 ? "disabled" : ""}>▶</button>
+              <button type="button" data-fav-page="${state.favoritesPage + 1}" ${state.favoritesPage >= pageCount ? "disabled" : ""}>◀</button>
+              <span class="panel-sub" style="margin-inline-start:8px">${state.favoritesPage}/${pageCount}</span>
+            </div>`;
+          }
           els.infoText.innerHTML = html;
           return;
         }
@@ -2706,8 +2929,23 @@
             els.infoText.textContent = "لا يوجد طلبات محفوظة حالياً.";
             return;
           }
-          let html = `<div style="display:grid;gap:12px">`;
-          for (const o of state.orders) {
+          const orders = state.orders;
+          const per = 20;
+          const pageCount = Math.max(1, Math.ceil(orders.length / per));
+          state.ordersPage = Math.max(1, Math.min(pageCount, Number(state.ordersPage) || 1));
+          const start = (state.ordersPage - 1) * per;
+          const end = Math.min(orders.length, start + per);
+          const slice = orders.slice(start, end);
+          let html = "";
+          if (pageCount > 1) {
+            html += `<div class="pager" style="margin-bottom:12px;justify-content:flex-start">
+              <button type="button" data-orders-page="${state.ordersPage - 1}" ${state.ordersPage <= 1 ? "disabled" : ""}>▶</button>
+              <button type="button" data-orders-page="${state.ordersPage + 1}" ${state.ordersPage >= pageCount ? "disabled" : ""}>◀</button>
+              <span class="panel-sub" style="margin-inline-start:8px">${state.ordersPage}/${pageCount}</span>
+            </div>`;
+          }
+          html += `<div style="display:grid;gap:12px">`;
+          for (const o of slice) {
             const ts = Number(o.createdAt) || 0;
             const date = ts ? new Date(ts).toLocaleString("ar-SY") : "—";
             const itemsCount = Array.isArray(o.items) ? o.items.reduce((a, it) => a + (Number(it.qty) || 0), 0) : 0;
@@ -2733,6 +2971,13 @@
             `;
           }
           html += `</div>`;
+          if (pageCount > 1) {
+            html += `<div class="pager" style="margin-top:12px;justify-content:flex-start">
+              <button type="button" data-orders-page="${state.ordersPage - 1}" ${state.ordersPage <= 1 ? "disabled" : ""}>▶</button>
+              <button type="button" data-orders-page="${state.ordersPage + 1}" ${state.ordersPage >= pageCount ? "disabled" : ""}>◀</button>
+              <span class="panel-sub" style="margin-inline-start:8px">${state.ordersPage}/${pageCount}</span>
+            </div>`;
+          }
           els.infoText.innerHTML = html;
           return;
         }
@@ -2912,8 +3157,9 @@
           return;
         }
         const total = formatMoney(cartTotals());
-        els.checkoutMeta.textContent = `${cartCountTotal()} قطعة — الإجمالي $${total}`;
+        els.checkoutMeta.textContent = `${cartCountTotal()} قطعة`;
         let html = `<div style="display:grid;gap:10px">`;
+        html += `<div class="checkout-total"><span>الإجمالي</span><span>$${total}</span></div>`;
         for (const it of state.cart.values()) {
           html += `
             <div class="cart-item${it.product.category === "WADFOW" ? " is-wadfow" : ""}">
@@ -3176,6 +3422,7 @@
         els.backFromInfoBtn.addEventListener("click", () => setHash(state.lastMainRoute || "shop"));
         els.backFromProductBtn.addEventListener("click", () => setHash(state.lastMainRoute || "shop"));
         els.goShopBtn.addEventListener("click", () => setHash("shop"));
+        if (els.homeFavoritesBtn) els.homeFavoritesBtn.addEventListener("click", () => togglePill("FAVORITES"));
         els.orderDetailsBtn.addEventListener("click", () => {
           els.footerLinks.scrollIntoView({ behavior: "smooth", block: "start" });
         });
@@ -3183,6 +3430,8 @@
         els.footerLinks.addEventListener("click", (e) => {
           const t = e.target;
           if (!(t instanceof HTMLElement)) return;
+          const cat = t.getAttribute("data-category");
+          if (cat) return togglePill(cat);
           const key = t.getAttribute("data-info");
           if (!key) return;
           setHash(`info=${encodeURIComponent(key)}`);
@@ -3191,6 +3440,24 @@
         els.infoText.addEventListener("click", async (e) => {
           const t = e.target;
           if (!(t instanceof HTMLElement)) return;
+          const favPageEl = t.closest("[data-fav-page]");
+          if (favPageEl instanceof HTMLElement) {
+            const next = Number(favPageEl.getAttribute("data-fav-page"));
+            if (Number.isFinite(next)) {
+              state.favoritesPage = Math.max(1, next);
+              showInfoView("favorites");
+            }
+            return;
+          }
+          const ordersPageEl = t.closest("[data-orders-page]");
+          if (ordersPageEl instanceof HTMLElement) {
+            const next = Number(ordersPageEl.getAttribute("data-orders-page"));
+            if (Number.isFinite(next)) {
+              state.ordersPage = Math.max(1, next);
+              showInfoView("orders");
+            }
+            return;
+          }
           const favEl = t.closest("[data-fav]");
           if (favEl instanceof HTMLElement) {
             const k = favEl.getAttribute("data-fav");
@@ -3337,7 +3604,7 @@
 
       async function loadProducts() {
         const loadingText = "جاري تحميل الصفحة";
-        const slowNote = "الصفحة تحمل ببطء لقد شارفت على الانتهاء تأكد من سرعة الأنترنيت لديك";
+        const slowNote = "الصفحة تحمل ببطء لقد شارفت على الانتهاء\nتأكد من سرعة الأنترنيت لديك";
         els.hint.textContent = `${loadingText}...`;
         setStatus(`${loadingText}...`);
         setTimeout(() => {
@@ -3376,6 +3643,7 @@
             if (!code1 && !code2) continue;
 
             const category = getCategoryFromAbout(about);
+            const extraCategories = getExtraCategoriesFromAbout(about);
             const priceBefore = calcPriceBefore(rawPrice);
             const priceAfter = calcPriceAfter(priceBefore, category);
             const discountPercent = discountForCategory(category);
@@ -3394,6 +3662,7 @@
               discountPercent,
               photo: String(photo).trim(),
               category,
+              extraCategories,
               search,
               isOutOfStock,
             });
@@ -3471,6 +3740,9 @@
           const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           const isWadfow = p.category === "WADFOW";
+          const favMini = `<button class="btn btn-ghost btn-fav-mini" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
+            isFavorite(p.key) ? "true" : "false"
+          }" aria-label="المفضلة">${isFavorite(p.key) ? "♥" : "♡"}</button>`;
           const favBtn = `<button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
             isFavorite(p.key) ? "true" : "false"
           }" aria-label="المفضلة">♥</button>`;
@@ -3501,7 +3773,7 @@
                   <div class="prices">
                     <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                   </div>
-                  <div class="actions">${addButton}</div>
+                  <div class="actions" style="display:flex;gap:10px;align-items:center">${addButton}${favMini}</div>
                 </div>
               </article>
             `;
@@ -3535,7 +3807,7 @@
                     <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                     ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
                   </div>
-                  <div class="actions">${addButton}</div>
+                  <div class="actions" style="display:flex;gap:10px;align-items:center">${addButton}${favMini}</div>
                 </div>
               </article>
             `;
