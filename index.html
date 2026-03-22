@@ -977,39 +977,31 @@
         text-align: center;
       }
 
-      .rating-stars {
-        display: flex;
-        gap: 10px;
+      .rating-bar {
+        display: inline-flex;
+        gap: 6px;
         align-items: center;
-        flex-wrap: wrap;
-      }
-
-      .rating-stars input {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .rating-stars label {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
+        padding: 10px 12px;
         border: 1px solid var(--border);
+        border-radius: 14px;
         background: rgba(255, 255, 255, 0.7);
-        display: grid;
-        place-items: center;
-        cursor: pointer;
+        pointer-events: none;
         user-select: none;
-        font-size: 18px;
-        font-weight: 900;
-        color: rgba(11, 43, 42, 0.7);
+        width: fit-content;
       }
 
-      .rating-stars input:checked + label {
-        border-color: rgba(10, 163, 163, 0.45);
-        box-shadow: 0 12px 28px rgba(10, 163, 163, 0.16);
-        color: rgba(11, 43, 42, 0.92);
-        background: rgba(10, 163, 163, 0.08);
+      .rating-bar .star {
+        font-size: 18px;
+        line-height: 1;
+        color: rgba(120, 120, 120, 0.9);
+      }
+
+      .rating-bar[data-rating="1"] .star:nth-child(-n + 1),
+      .rating-bar[data-rating="2"] .star:nth-child(-n + 2),
+      .rating-bar[data-rating="3"] .star:nth-child(-n + 3),
+      .rating-bar[data-rating="4"] .star:nth-child(-n + 4),
+      .rating-bar[data-rating="5"] .star:nth-child(-n + 5) {
+        color: #ff8f00;
       }
 
       .fav-btn {
@@ -3038,21 +3030,12 @@
             <div class="panel-sub" style="margin-bottom:10px">${escapeHtml(note)}</div>
             <form id="ratingForm" style="display:grid;gap:10px;max-width:520px">
               <div class="panel-sub" id="ratingLabel">التقييم: 0/5 — سيء جدا</div>
-              <div class="rating-stars" role="group" aria-label="التقييم بالنجوم">
-                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                  <input id="rate0" type="radio" name="rating" value="0" checked />
-                  <label for="rate0" aria-label="0">0</label>
-                  <input id="rate1" type="radio" name="rating" value="1" />
-                  <label for="rate1" aria-label="1 نجمة">★</label>
-                  <input id="rate2" type="radio" name="rating" value="2" />
-                  <label for="rate2" aria-label="2 نجوم">★★</label>
-                  <input id="rate3" type="radio" name="rating" value="3" />
-                  <label for="rate3" aria-label="3 نجوم">★★★</label>
-                  <input id="rate4" type="radio" name="rating" value="4" />
-                  <label for="rate4" aria-label="4 نجوم">★★★★</label>
-                  <input id="rate5" type="radio" name="rating" value="5" />
-                  <label for="rate5" aria-label="5 نجوم">★★★★★</label>
-                </div>
+              <div class="rating-bar" id="ratingBar" data-rating="0" aria-label="النجوم">
+                <span class="star" aria-hidden="true">★</span>
+                <span class="star" aria-hidden="true">★</span>
+                <span class="star" aria-hidden="true">★</span>
+                <span class="star" aria-hidden="true">★</span>
+                <span class="star" aria-hidden="true">★</span>
               </div>
               <select class="select" id="ratingRank" aria-label="ترتيب التقييم">
                 <option value="سيء جدا">سيء جدا</option>
@@ -3064,7 +3047,7 @@
               </select>
               <textarea id="ratingMsg" required placeholder="اكتب ملاحظتك أو اقتراحك..." style="padding:12px;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:13px;min-height:120px;resize:vertical"></textarea>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <button class="btn btn-primary" type="submit" style="flex:1">ترسل إلي إلى التيلغرام</button>
+                <button class="btn btn-primary" type="submit" style="flex:1">إرسال</button>
               </div>
               <div class="panel-sub" id="ratingDone" style="display:none">تم إرسال التقييم.</div>
             </form>
@@ -3796,10 +3779,9 @@
             if (out instanceof HTMLElement) out.textContent = `التقييم: ${value}/5 — ${labels[value]}`;
             const sel = form.querySelector("#ratingRank");
             if (sel instanceof HTMLSelectElement) sel.value = labels[value];
-            const radio = form.querySelector(`#rate${value}`);
-            if (radio instanceof HTMLInputElement) radio.checked = true;
+            const bar = form.querySelector("#ratingBar");
+            if (bar instanceof HTMLElement) bar.setAttribute("data-rating", String(value));
           };
-          if (t instanceof HTMLInputElement && t.name === "rating") return setRating(t.value);
           if (t instanceof HTMLSelectElement && t.id === "ratingRank") {
             const idx = labels.indexOf(String(t.value ?? ""));
             if (idx >= 0) return setRating(idx);
@@ -3812,14 +3794,16 @@
           e.preventDefault();
           const msgEl = form.querySelector("#ratingMsg");
           const doneEl = form.querySelector("#ratingDone");
-          const ratingEl = form.querySelector('input[name="rating"]:checked');
           const msg = msgEl instanceof HTMLTextAreaElement ? String(msgEl.value ?? "").trim() : "";
-          const rating = ratingEl instanceof HTMLInputElement ? Math.max(0, Math.min(5, Number(ratingEl.value) || 0)) : 0;
-          if (msg.length < 3) return setInfoStatus("يرجى كتابة ملاحظة.", true);
           const labels = ["سيء جدا", "ضعيف", "مقبول", "جيد", "جيدا جدا", "ممتاز جدا"];
+          const rankSel = form.querySelector("#ratingRank");
+          const rank = rankSel instanceof HTMLSelectElement ? String(rankSel.value ?? "").trim() : labels[0];
+          const idx = labels.indexOf(rank);
+          const rating = Math.max(0, Math.min(5, idx >= 0 ? idx : 0));
+          if (msg.length < 3) return setInfoStatus("يرجى كتابة ملاحظة.", true);
           setInfoStatus("جارٍ إرسال التقييم...", false);
           try {
-            await sendToTelegram(`تقييم جديد\nالتقييم: ${rating}/5 — ${labels[rating]}\n\n${msg}`);
+            await sendToTelegram(`تقييم جديد\nالتقييم: ${rating}/5 — ${rank}\n\n${msg}`);
             setInfoStatus("تم إرسال التقييم.", false);
             if (msgEl instanceof HTMLTextAreaElement) msgEl.value = "";
             if (doneEl instanceof HTMLElement) doneEl.style.display = "";
