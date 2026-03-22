@@ -977,6 +977,41 @@
         text-align: center;
       }
 
+      .rating-stars {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .rating-stars input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .rating-stars label {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.7);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        user-select: none;
+        font-size: 18px;
+        font-weight: 900;
+        color: rgba(11, 43, 42, 0.7);
+      }
+
+      .rating-stars input:checked + label {
+        border-color: rgba(10, 163, 163, 0.45);
+        box-shadow: 0 12px 28px rgba(10, 163, 163, 0.16);
+        color: rgba(11, 43, 42, 0.92);
+        background: rgba(10, 163, 163, 0.08);
+      }
+
       .fav-btn {
         position: absolute;
         inset-inline-start: 10px;
@@ -1487,7 +1522,6 @@
             <div class="search" role="search">
               <input id="searchInput" type="search" placeholder="يمكنك بحث بكتابة اسم المنتج أو الكود" autocomplete="off" />
               <div class="sort-wrap" aria-label="ترتيب البحث">
-                <span class="sort-gear" aria-hidden="true">⚙</span>
                 <select class="select sort-select" id="sortSelect" aria-label="ترتيب البحث">
                   <option value="DEFAULT">بحث: افتراضي</option>
                   <option value="PRICE_ASC">بحث: أرخص سعر</option>
@@ -1755,6 +1789,7 @@
           <div class="footer-links" id="footerLinks">
             <button class="footer-link" type="button" data-category="HOME">الصفحة الرئيسية</button>
             <button class="footer-link" type="button" data-category="FAVORITES">المفضلة</button>
+            <button class="footer-link" type="button" data-info="rating">التقييم</button>
             <button class="footer-link" type="button" data-info="about_us">من نحن</button>
             <button class="footer-link" type="button" data-info="location">موقعنا</button>
             <button class="footer-link" type="button" data-info="faq">أشيع الأسئلة</button>
@@ -2300,6 +2335,65 @@
         localStorage.setItem("hjy_orders_v1", JSON.stringify(state.orders.slice(0, 30)));
       }
 
+      function loadCustomerDraft() {
+        const parsed = safeJsonParse(localStorage.getItem("hjy_customer_v1"), null);
+        if (!parsed || typeof parsed !== "object") return;
+        const d = parsed;
+        const name = String(d.name ?? "").trim();
+        const gov = String(d.gov ?? "").trim();
+        const phone = String(d.phone ?? "").trim();
+        const shipType = String(d.shipType ?? "").trim();
+        const homsAddress = String(d.homsAddress ?? "").trim();
+        const shipCenter = String(d.shipCenter ?? "").trim();
+        const notes = String(d.notes ?? "").trim();
+        const shipCurrency = String(d.shipCurrency ?? "").trim();
+        const allowSwitch = Boolean(d.allowSwitch);
+
+        if (els.fullNameInput && !String(els.fullNameInput.value ?? "").trim() && name) els.fullNameInput.value = name;
+        if (els.govInput && !String(els.govInput.value ?? "").trim() && gov) els.govInput.value = gov;
+        if (els.phoneInput && !String(els.phoneInput.value ?? "").trim() && phone) els.phoneInput.value = phone;
+        if (els.homsAddressInput && !String(els.homsAddressInput.value ?? "").trim() && homsAddress) els.homsAddressInput.value = homsAddress;
+        if (els.shipCenterInput && !String(els.shipCenterInput.value ?? "").trim() && shipCenter) els.shipCenterInput.value = shipCenter;
+        if (els.orderNotesInput && !String(els.orderNotesInput.value ?? "").trim() && notes) els.orderNotesInput.value = notes;
+        if (els.allowVodafoneSwitchInput) els.allowVodafoneSwitchInput.checked = allowSwitch;
+
+        if (shipType === "GOV") {
+          if (els.shipGovRadio) els.shipGovRadio.checked = true;
+          if (els.shipGovBlock) els.shipGovBlock.style.display = "grid";
+          if (els.shipHomsBlock) els.shipHomsBlock.style.display = "none";
+        } else {
+          if (els.shipHomsRadio) els.shipHomsRadio.checked = true;
+          if (els.shipHomsBlock) els.shipHomsBlock.style.display = "grid";
+          if (els.shipGovBlock) els.shipGovBlock.style.display = "none";
+        }
+
+        if (els.shipSypInput && els.shipUsdInput) {
+          if (shipCurrency === "سوري") {
+            els.shipSypInput.checked = true;
+            els.shipUsdInput.checked = false;
+          } else if (shipCurrency === "دولار") {
+            els.shipUsdInput.checked = true;
+            els.shipSypInput.checked = false;
+          }
+        }
+      }
+
+      function saveCustomerDraft() {
+        const name = String(els.fullNameInput?.value ?? "").trim();
+        const gov = String(els.govInput?.value ?? "").trim();
+        const phone = String(els.phoneInput?.value ?? "").trim();
+        const shipType = els.shipHomsRadio?.checked ? "HOMS" : "GOV";
+        const homsAddress = String(els.homsAddressInput?.value ?? "").trim();
+        const shipCenter = String(els.shipCenterInput?.value ?? "").trim();
+        const notes = String(els.orderNotesInput?.value ?? "").trim();
+        const shipCurrency = els.shipSypInput?.checked ? "سوري" : "دولار";
+        const allowSwitch = Boolean(els.allowVodafoneSwitchInput?.checked);
+        localStorage.setItem(
+          "hjy_customer_v1",
+          JSON.stringify({ name, gov, phone, shipType, homsAddress, shipCenter, notes, shipCurrency, allowSwitch })
+        );
+      }
+
       function addOrderToHistory(details) {
         const entry = {
           id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -2355,6 +2449,47 @@
         return score;
       }
 
+      function categoryLabelFromKey(category) {
+        const c = String(category ?? "").trim() || "ALL";
+        if (c === "ALL") return "الكل";
+        if (c === "FAVORITES") return "المفضلة";
+        if (c === "OUT_OF_STOCK") return "منتهي";
+        if (c === "WADFOW") return "WADFOW";
+        if (c === "TOTAL") return "TOTAL";
+        if (c === "UNAVAILABLE") return "الغير متوفر";
+        if (c === "UNCATEGORIZED") return "غير مصنف";
+        if (c === "DRILLS") return "مثاقب";
+        if (c === "GRINDING") return "جلخ";
+        if (c === "HAMMERS") return "كمبريسة";
+        if (c === "BATTERY") return "بطارية";
+        if (c === "WOOD") return "خشب";
+        if (c === "METAL") return "حديد";
+        if (c === "CERAMIC") return "سيراميك";
+        if (c === "GARDEN") return "زراعة وأشجار";
+        if (c === "PLUMBING") return "صحية";
+        if (c === "DISCS") return "ديسك";
+        if (c === "BITS") return "ريش";
+        if (c === "COMBO") return "كومبو";
+        if (c === "SETS") return "مجموعات";
+        if (c === "SAFETY") return "سلامة";
+        if (c === "AIR") return "هواء";
+        if (c === "MECHANIC") return "ميكانيك";
+        if (c === "HAND") return "يدوية";
+        if (c === "SINKS") return "مغاسل";
+        if (c === "ELECTRIC") return "كهرباء";
+        if (c === "PAINT") return "دهان";
+        if (c === "MEASURE") return "قياس وليزر";
+        if (c === "GENERATORS") return "مولدات";
+        if (c === "PUMPS") return "مضخات";
+        if (c === "VACUUMS") return "مكانس";
+        return "آخرى";
+      }
+
+      function updateCategoriesToggleLabel() {
+        const label = categoryLabelFromKey(state.category);
+        els.categoriesToggle.innerHTML = `التصنيفات: ${label} <span class="chev">▾</span>`;
+      }
+
       function applyFilters() {
         const qTrimmed = String(state.query ?? "").trim();
         const q = safeLower(qTrimmed);
@@ -2404,6 +2539,11 @@
         if (state.sortMode === "PRICE_ASC") list = [...list].sort((a, b) => (Number(a.priceAfter) || 0) - (Number(b.priceAfter) || 0));
         if (state.sortMode === "PRICE_DESC") list = [...list].sort((a, b) => (Number(b.priceAfter) || 0) - (Number(a.priceAfter) || 0));
 
+        if (qTrimmed.length > 0) {
+          const depr = (p) => (p.category === "UNAVAILABLE" || p.isOutOfStock || p.category === "UNCATEGORIZED" ? 1 : 0);
+          list = [...list].sort((a, b) => depr(a) - depr(b));
+        }
+
         state.filteredProducts = list;
         state.page = 1;
         render();
@@ -2429,70 +2569,7 @@
         els.rangeText.textContent = state.filteredProducts.length === 0 ? "0-0" : `${startIndex + 1}-${endIndex}`;
         els.totalText.textContent = String(state.filteredProducts.length);
 
-        const catLabel =
-          state.category === "ALL"
-            ? "الكل"
-            : state.category === "FAVORITES"
-            ? "المفضلة"
-            : state.category === "OUT_OF_STOCK"
-            ? "منتهي"
-            : state.category === "WADFOW"
-            ? "WADFOW"
-            : state.category === "TOTAL"
-            ? "TOTAL"
-            : state.category === "UNAVAILABLE"
-            ? "الغير متوفر"
-            : state.category === "UNCATEGORIZED"
-            ? "غير مصنف"
-            : state.category === "DRILLS"
-            ? "مثاقب"
-            : state.category === "GRINDING"
-            ? "جلخ"
-            : state.category === "HAMMERS"
-            ? "كمبريسة"
-            : state.category === "BATTERY"
-            ? "بطارية"
-            : state.category === "WOOD"
-            ? "خشب"
-            : state.category === "METAL"
-            ? "حديد"
-            : state.category === "CERAMIC"
-            ? "سيراميك"
-            : state.category === "GARDEN"
-            ? "زراعة وأشجار"
-            : state.category === "PLUMBING"
-            ? "صحية"
-            : state.category === "DISCS"
-            ? "ديسك"
-            : state.category === "BITS"
-            ? "ريش"
-            : state.category === "COMBO"
-            ? "كومبو"
-            : state.category === "SETS"
-            ? "مجموعات"
-            : state.category === "SAFETY"
-            ? "سلامة"
-            : state.category === "AIR"
-            ? "هواء"
-            : state.category === "MECHANIC"
-            ? "ميكانيك"
-            : state.category === "HAND"
-            ? "يدوية"
-            : state.category === "SINKS"
-            ? "مغاسل"
-            : state.category === "ELECTRIC"
-            ? "كهرباء"
-            : state.category === "PAINT"
-            ? "دهان"
-            : state.category === "MEASURE"
-            ? "قياس وليزر"
-            : state.category === "GENERATORS"
-            ? "مولدات"
-            : state.category === "PUMPS"
-            ? "مضخات"
-            : state.category === "VACUUMS"
-            ? "مكانس"
-            : "آخرى";
+        const catLabel = categoryLabelFromKey(state.category);
         const qTrimmed = state.query.trim();
         const qLabel = qTrimmed.length > 0 ? ` / بحث: ${qTrimmed}` : "";
         els.activeFilters.textContent = `${catLabel}${qLabel}`;
@@ -2531,12 +2608,10 @@
           const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           const isWadfow = p.category === "WADFOW";
-          const favMini = `<button class="btn btn-ghost btn-fav-mini" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
-            isFavorite(p.key) ? "true" : "false"
-          }" aria-label="المفضلة">${isFavorite(p.key) ? "♥" : "♡"}</button>`;
+          const favOn = isFavorite(p.key);
           const favBtn = `<button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
-            isFavorite(p.key) ? "true" : "false"
-          }" aria-label="المفضلة">♥</button>`;
+            favOn ? "true" : "false"
+          }" aria-label="المفضلة">${favOn ? "♥" : "♡"}</button>`;
           const addButton =
             p.isOutOfStock
               ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
@@ -2597,7 +2672,7 @@
                     <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                     ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
                   </div>
-                  <div class="actions" style="display:flex;gap:10px;align-items:center">${addButton}${favMini}</div>
+                  <div class="actions">${addButton}</div>
                 </div>
               </article>
             `;
@@ -2633,6 +2708,9 @@
         applyFilters();
         if (els.homeView.style.display !== "none") setHash("shop");
         updateFooterLinksVisibility();
+        els.categoriesPanel.setAttribute("hidden", "");
+        els.categoriesToggle.setAttribute("aria-expanded", "false");
+        updateCategoriesToggleLabel();
       }
 
       function cartCountTotal() {
@@ -2858,9 +2936,10 @@
         els.productMeta.textContent = p.code2 ? p.code2 : "—";
         const isWadfow = p.category === "WADFOW";
         const showOld = p.discountPercent > 0 && p.priceAfter < p.priceBefore;
+        const favOn = isFavorite(p.key);
         const favBtn = `<button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
-          isFavorite(p.key) ? "true" : "false"
-        }" aria-label="المفضلة">♥</button>`;
+          favOn ? "true" : "false"
+        }" aria-label="المفضلة">${favOn ? "♥" : "♡"}</button>`;
         const addButton =
           p.isOutOfStock
             ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
@@ -2947,6 +3026,49 @@
             "لا يتم ظهور هوية المرسل , يمكنك إرسال أي ملاحظات أو اقتراحات أو مشاكل وغيرها , نأسف في حال وجود أي تقصير منا , مع تحياتي , مدير مبيعات شركة توتال سوريا";
           els.complaintForm.style.display = "grid";
           els.complaintInput.value = "";
+          return;
+        }
+        if (state.currentInfoKey === "rating") {
+          els.complaintForm.style.display = "none";
+          els.infoTitle.textContent = "التقييم";
+          els.infoMeta.textContent = "نقدر رأيك";
+          const note =
+            "ارسل لنا تقييمك أو ملاحظاتك لتساعدنا على التحسين من خدماتنا , علماً هوية المرسل لاتظهر لنا حفاظاً على خصوصيتكم";
+          els.infoText.innerHTML = `
+            <div class="panel-sub" style="margin-bottom:10px">${escapeHtml(note)}</div>
+            <form id="ratingForm" style="display:grid;gap:10px;max-width:520px">
+              <div class="panel-sub" id="ratingLabel">التقييم: 0/5 — سيء جدا</div>
+              <div class="rating-stars" role="group" aria-label="التقييم بالنجوم">
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                  <input id="rate0" type="radio" name="rating" value="0" checked />
+                  <label for="rate0" aria-label="0">0</label>
+                  <input id="rate1" type="radio" name="rating" value="1" />
+                  <label for="rate1" aria-label="1 نجمة">★</label>
+                  <input id="rate2" type="radio" name="rating" value="2" />
+                  <label for="rate2" aria-label="2 نجوم">★★</label>
+                  <input id="rate3" type="radio" name="rating" value="3" />
+                  <label for="rate3" aria-label="3 نجوم">★★★</label>
+                  <input id="rate4" type="radio" name="rating" value="4" />
+                  <label for="rate4" aria-label="4 نجوم">★★★★</label>
+                  <input id="rate5" type="radio" name="rating" value="5" />
+                  <label for="rate5" aria-label="5 نجوم">★★★★★</label>
+                </div>
+              </div>
+              <select class="select" id="ratingRank" aria-label="ترتيب التقييم">
+                <option value="سيء جدا">سيء جدا</option>
+                <option value="ضعيف">ضعيف</option>
+                <option value="مقبول">مقبول</option>
+                <option value="جيد">جيد</option>
+                <option value="جيدا جدا">جيدا جدا</option>
+                <option value="ممتاز جدا">ممتاز جدا</option>
+              </select>
+              <textarea id="ratingMsg" required placeholder="اكتب ملاحظتك أو اقتراحك..." style="padding:12px;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:13px;min-height:120px;resize:vertical"></textarea>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" type="submit" style="flex:1">ترسل إلي إلى التيلغرام</button>
+              </div>
+              <div class="panel-sub" id="ratingDone" style="display:none">تم إرسال التقييم.</div>
+            </form>
+          `;
           return;
         }
         if (state.currentInfoKey === "favorites") {
@@ -3057,6 +3179,19 @@
             const ts = Number(o.createdAt) || 0;
             const date = ts ? new Date(ts).toLocaleString("ar-SY") : "—";
             const itemsCount = Array.isArray(o.items) ? o.items.reduce((a, it) => a + (Number(it.qty) || 0), 0) : 0;
+            const items = Array.isArray(o.items) ? o.items : [];
+            let itemsHtml = "";
+            for (const it of items) {
+              itemsHtml += `<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border:1px solid var(--border);border-radius:12px;padding:10px;background:rgba(255,255,255,0.7)">
+                <div style="min-width:0">
+                  <div style="font-weight:900">${escapeHtml(String(it.code1 || ""))} ${escapeHtml(String(it.code2 || ""))}</div>
+                  <div class="panel-sub" style="margin-top:4px">${escapeHtml(String(it.about || ""))}</div>
+                </div>
+                <div style="direction:ltr;unicode-bidi:plaintext;font-weight:900;color:var(--primary-3)">$${formatMoney(Number(it.priceAfter) || 0)} × ${escapeHtml(
+                  String(Number(it.qty) || 0)
+                )}</div>
+              </div>`;
+            }
             html += `
               <div class="card" style="min-height:unset">
                 <div class="card-body">
@@ -3070,14 +3205,18 @@
               String(itemsCount)
             )}</div>
                   <div class="panel-sub">المحافظة: ${escapeHtml(String(o.gov || "—"))}</div>
+                  <details style="margin-top:10px">
+                    <summary style="cursor:pointer;font-weight:900">تفاصيل الطلب</summary>
+                    <div style="display:grid;gap:10px;margin-top:10px">${itemsHtml || `<div class="panel-sub">لا توجد عناصر محفوظة.</div>`}</div>
+                    <div style="margin-top:10px;font-weight:900">الفاتورة</div>
+                    <pre style="white-space:pre-wrap;direction:ltr;unicode-bidi:plaintext;margin:8px 0 0;padding:10px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.7);overflow:auto;max-height:260px">${escapeHtml(
+                      String(o.invoice || "لا توجد فاتورة محفوظة")
+                    )}</pre>
+                  </details>
                   <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
                     <button class="btn btn-primary" type="button" data-order-reorder="${escapeHtmlAttr(String(o.id || ""))}" style="flex:1">إعادة الطلب</button>
-                    <button class="btn btn-ghost" type="button" data-order-details="${escapeHtmlAttr(String(o.id || ""))}" style="flex:1">إظهار الفاتورة</button>
                     <button class="btn btn-ghost" type="button" data-order-copy="${escapeHtmlAttr(String(o.id || ""))}" style="flex:1">نسخ الفاتورة</button>
                   </div>
-                  <pre data-order-invoice="${escapeHtmlAttr(String(o.id || ""))}" hidden style="white-space:pre-wrap;direction:ltr;unicode-bidi:plaintext;margin:10px 0 0;padding:10px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.7);overflow:auto;max-height:260px">${escapeHtml(
-                    String(o.invoice || "لا توجد فاتورة محفوظة")
-                  )}</pre>
                 </div>
               </div>
             `;
@@ -3590,22 +3729,6 @@
             }
             return;
           }
-          const orderDetailsEl = t.closest("[data-order-details]");
-          if (orderDetailsEl instanceof HTMLElement) {
-            const id = String(orderDetailsEl.getAttribute("data-order-details") ?? "").trim();
-            if (!id) return;
-            const block = els.infoText.querySelector(`[data-order-invoice="${CSS.escape(id)}"]`);
-            if (!(block instanceof HTMLElement)) return;
-            const isHidden = block.hasAttribute("hidden");
-            if (isHidden) {
-              block.removeAttribute("hidden");
-              orderDetailsEl.textContent = "إخفاء الفاتورة";
-            } else {
-              block.setAttribute("hidden", "");
-              orderDetailsEl.textContent = "إظهار الفاتورة";
-            }
-            return;
-          }
           const favEl = t.closest("[data-fav]");
           if (favEl instanceof HTMLElement) {
             const k = favEl.getAttribute("data-fav");
@@ -3662,6 +3785,68 @@
           }
         });
 
+        els.infoView.addEventListener("change", (e) => {
+          const t = e.target;
+          const labels = ["سيء جدا", "ضعيف", "مقبول", "جيد", "جيدا جدا", "ممتاز جدا"];
+          const form = t instanceof Element ? t.closest("form") : null;
+          if (!(form instanceof HTMLFormElement) || form.id !== "ratingForm") return;
+          const setRating = (v) => {
+            const value = Math.max(0, Math.min(5, Number(v) || 0));
+            const out = form.querySelector("#ratingLabel");
+            if (out instanceof HTMLElement) out.textContent = `التقييم: ${value}/5 — ${labels[value]}`;
+            const sel = form.querySelector("#ratingRank");
+            if (sel instanceof HTMLSelectElement) sel.value = labels[value];
+            const radio = form.querySelector(`#rate${value}`);
+            if (radio instanceof HTMLInputElement) radio.checked = true;
+          };
+          if (t instanceof HTMLInputElement && t.name === "rating") return setRating(t.value);
+          if (t instanceof HTMLSelectElement && t.id === "ratingRank") {
+            const idx = labels.indexOf(String(t.value ?? ""));
+            if (idx >= 0) return setRating(idx);
+          }
+        });
+
+        els.infoView.addEventListener("submit", async (e) => {
+          const form = e.target;
+          if (!(form instanceof HTMLFormElement) || form.id !== "ratingForm") return;
+          e.preventDefault();
+          const msgEl = form.querySelector("#ratingMsg");
+          const doneEl = form.querySelector("#ratingDone");
+          const ratingEl = form.querySelector('input[name="rating"]:checked');
+          const msg = msgEl instanceof HTMLTextAreaElement ? String(msgEl.value ?? "").trim() : "";
+          const rating = ratingEl instanceof HTMLInputElement ? Math.max(0, Math.min(5, Number(ratingEl.value) || 0)) : 0;
+          if (msg.length < 3) return setInfoStatus("يرجى كتابة ملاحظة.", true);
+          const labels = ["سيء جدا", "ضعيف", "مقبول", "جيد", "جيدا جدا", "ممتاز جدا"];
+          setInfoStatus("جارٍ إرسال التقييم...", false);
+          try {
+            await sendToTelegram(`تقييم جديد\nالتقييم: ${rating}/5 — ${labels[rating]}\n\n${msg}`);
+            setInfoStatus("تم إرسال التقييم.", false);
+            if (msgEl instanceof HTMLTextAreaElement) msgEl.value = "";
+            if (doneEl instanceof HTMLElement) doneEl.style.display = "";
+          } catch {
+            setInfoStatus("تعذر الإرسال. حاول لاحقاً.", true);
+          }
+        });
+
+        const draftInputs = [
+          els.fullNameInput,
+          els.govInput,
+          els.phoneInput,
+          els.homsAddressInput,
+          els.shipCenterInput,
+          els.orderNotesInput,
+          els.shipHomsRadio,
+          els.shipGovRadio,
+          els.shipUsdInput,
+          els.shipSypInput,
+          els.allowVodafoneSwitchInput,
+        ].filter(Boolean);
+        const saveDraftDebounced = debounce(() => saveCustomerDraft(), 250);
+        for (const el of draftInputs) {
+          el.addEventListener("input", saveDraftDebounced);
+          el.addEventListener("change", saveDraftDebounced);
+        }
+
         els.shipHomsRadio.addEventListener("change", () => {
           if (!els.shipHomsRadio.checked) return;
           els.shipHomsBlock.style.display = "grid";
@@ -3708,6 +3893,9 @@
           const shipCurrency = els.shipSypInput.checked ? "سوري" : "دولار";
           const notes = String(els.orderNotesInput.value ?? "").trim();
           const allowSwitch = Boolean(els.allowVodafoneSwitchInput.checked);
+          try {
+            saveCustomerDraft();
+          } catch {}
 
           const invoice = buildInvoiceText({ name, gov, phone, shipType, homsAddress, shipCenter, shipCurrency, notes, allowSwitch });
           addOrderToHistory({ name, gov, phone, shipType, shipCurrency, notes, allowSwitch, invoice });
@@ -3727,6 +3915,7 @@
           }
           await copyText(invoice);
           els.whatsappAfterOrder.style.display = "";
+          setHash(`info=${encodeURIComponent("rating")}`);
         });
 
         els.copyInvoiceBtn.addEventListener("click", async () => {
@@ -3885,12 +4074,10 @@
           const aboutLong = String(p.about ?? "").length > 120;
           const discountText = p.discountPercent > 0 ? `-${Math.round(p.discountPercent * 100)}%` : "";
           const isWadfow = p.category === "WADFOW";
-          const favMini = `<button class="btn btn-ghost btn-fav-mini" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
-            isFavorite(p.key) ? "true" : "false"
-          }" aria-label="المفضلة">${isFavorite(p.key) ? "♥" : "♡"}</button>`;
+          const favOn = isFavorite(p.key);
           const favBtn = `<button class="fav-btn" type="button" data-fav="${escapeHtmlAttr(p.key)}" aria-pressed="${
-            isFavorite(p.key) ? "true" : "false"
-          }" aria-label="المفضلة">♥</button>`;
+            favOn ? "true" : "false"
+          }" aria-label="المفضلة">${favOn ? "♥" : "♡"}</button>`;
           const addButton =
             p.isOutOfStock
               ? `<button class="btn btn-disabled" type="button" disabled>منتهي</button>`
@@ -3951,7 +4138,7 @@
                     <span class="price-now">$${formatMoney(p.priceAfter)}</span>
                     ${showOld ? `<span class="price-old">$${formatMoney(p.priceBefore)}</span>` : ""}
                   </div>
-                  <div class="actions" style="display:flex;gap:10px;align-items:center">${addButton}${favMini}</div>
+                  <div class="actions">${addButton}</div>
                 </div>
               </article>
             `;
@@ -3959,11 +4146,14 @@
         els.homeGrid.innerHTML = html;
       }
 
-      wireEvents();
       try {
         loadFavorites();
         loadOrders();
       } catch {}
+      try {
+        loadCustomerDraft();
+      } catch {}
+      wireEvents();
       try {
         const savedView = String(localStorage.getItem("hjy_view_mode_v1") ?? "").trim();
         if (savedView) state.viewMode = savedView;
@@ -3977,6 +4167,7 @@
       els.homeGrid.setAttribute("data-view", state.viewMode);
       els.viewSelect.value = state.viewMode;
       if (els.sortSelect) els.sortSelect.value = state.sortMode || "DEFAULT";
+      updateCategoriesToggleLabel();
       updateFooterLinksVisibility();
       window.addEventListener("hashchange", applyHashRoute);
       loadProducts().then(() => {
