@@ -1497,7 +1497,7 @@
   <body>
     <div class="app" id="appRoot" data-route="home">
       <div class="promo-bar" id="promoBar">
-        <div class="promo-bar-inner">خصومات حصرية: خصم 3% لـ TOTAL و خصم 5% لـ WADFOW</div>
+        <div class="promo-bar-inner">خصومات حصرية: خصم 8% لـ TOTAL و خصم 10% لـ WADFOW</div>
       </div>
       <header class="topbar">
         <div class="topbar-inner">
@@ -1551,6 +1551,7 @@
               <button class="pill" type="button" data-category="OUT_OF_STOCK" aria-pressed="false">منتهي</button>
               <button class="pill" type="button" data-category="WADFOW" aria-pressed="false">WADFOW</button>
               <button class="pill" type="button" data-category="TOTAL" aria-pressed="false">TOTAL</button>
+              <button class="pill" type="button" data-category="WADFOW_TOTAL" aria-pressed="false">WADFOW - TOTAL</button>
               <button class="pill" type="button" data-category="UNAVAILABLE" aria-pressed="false">الغير متوفر</button>
               <button class="pill" type="button" data-category="UNCATEGORIZED" aria-pressed="false">غير مصنف</button>
               <button class="pill" type="button" data-category="DRILLS" aria-pressed="false">مثاقب</button>
@@ -1598,6 +1599,7 @@
             </div>
           </div>
           <div class="status" id="homeStatus" aria-hidden="true"></div>
+          <div class="home-note" style="font-weight:900;color:var(--promo)">نحثكم على اختيار WADFOW لأسعار حصرية لفترة محدودة</div>
           <div class="grid" id="homeProductsGrid" data-view="compact" aria-live="polite"></div>
         </section>
 
@@ -1667,6 +1669,7 @@
                   <option value="طرطوس">طرطوس</option>
                   <option value="إدلب">إدلب</option>
                   <option value="درعا">درعا</option>
+                  <option value="السويداء">السويداء</option>
                   <option value="الحسكة">الحسكة</option>
                   <option value="دير الزور">دير الزور</option>
                   <option value="الرقة">الرقة</option>
@@ -1679,22 +1682,22 @@
               <div class="checkout-choices">
                 <div class="choice-row" role="group" aria-label="طريقة الاستلام">
                   <label class="choice-pill">
-                    <input id="shipHomsRadio" type="radio" name="shipType" value="HOMS" checked />
+                    <input id="shipHomsRadio" type="radio" name="shipType" value="HOMS" />
                     <span>استلام ضمن حمص</span>
                   </label>
                   <label class="choice-pill">
-                    <input id="shipGovRadio" type="radio" name="shipType" value="GOV" />
+                    <input id="shipGovRadio" type="radio" name="shipType" value="GOV" checked />
                     <span>شحن للمحافظات</span>
                   </label>
                 </div>
-                <div id="shipHomsBlock" style="display:grid;gap:8px">
+                <div id="shipHomsBlock" style="display:none;gap:8px">
                   <div class="mini-note">تصلك مجاناً إلى موقعك</div>
                   <label style="display:grid;gap:6px">
                     <span style="font-weight:800">عنوان ضمن حمص</span>
                     <input id="homsAddressInput" type="text" autocomplete="street-address" style="padding:12px;border:1px solid var(--border);border-radius:12px" />
                   </label>
                 </div>
-                <div id="shipGovBlock" style="display:none;gap:8px">
+                <div id="shipGovBlock" style="display:grid;gap:8px">
                   <div class="mini-note">شحن رخيص وسهل وخلال يومين</div>
                   <button class="footer-link" id="shipDetailsBtn" type="button">أنا أول مرة أشحن ماهي تفاصيل؟</button>
                   <label style="display:grid;gap:6px">
@@ -1819,11 +1822,14 @@
         CSV_URL: "products.csv",
         HOME_PRODUCTS_URLS: ["home.csv", "home"],
         ABOUT_URLS: ["about.csv", "about"],
-        OUT_OF_STOCK_URLS: ["TOTAL_out_of_stock.csv", "TOTAL_out_of_stock"],
+        OUT_OF_STOCK_URLS_BY_CATEGORY: {
+          TOTAL: ["TOTAL_out_of_stock.csv", "TOTAL_out_of_stock"],
+          WADFOW: ["WADFOW_out_of_stock.csv", "WADFOW_out_of_stock"],
+        },
         ITEMS_PER_PAGE: 20,
-        MARKUP_RATE: 0.1,
-        DISCOUNT_TOTAL: 0.03,
-        DISCOUNT_WADFOW: 0.05,
+        MARKUP_RATE: 0.15,
+        DISCOUNT_TOTAL: 0.08,
+        DISCOUNT_WADFOW: 0.1,
         SEARCH_MIN_CHARS: 3,
         MIN_ORDER_TOTAL: 25,
         TELEGRAM_BOT_TOKEN: "8539011678:AAEcx0KoMJPO_biAaKyPA8SgsQZAe0gC3S4",
@@ -1940,7 +1946,7 @@
         lastQueryTokens: [],
         lastInvoiceText: "",
         viewMode: "compact",
-        outOfStockSet: new Set(),
+        outOfStockSets: { TOTAL: new Set(), WADFOW: new Set() },
         infoPages: new Map(),
         currentInfoKey: "",
         lastMainRoute: "shop",
@@ -2100,16 +2106,32 @@
       }
 
       async function loadOutOfStockSet() {
-        state.outOfStockSet.clear();
-        const res = await fetchTextFirstAvailable(CONFIG.OUT_OF_STOCK_URLS);
-        if (!res) return;
-        const table = parseCsvText(res.text);
-        if (table.headers.length === 0) return;
-        const idx = table.headers.findIndex((h) => safeLower(h).includes("code1"));
-        if (idx === -1) return;
-        for (const r of table.rows) {
-          const code1 = String(r[idx] ?? "").trim();
-          if (code1) state.outOfStockSet.add(code1);
+        for (const k of Object.keys(state.outOfStockSets || {})) {
+          const set = state.outOfStockSets[k];
+          if (set instanceof Set) set.clear();
+        }
+
+        const defs = CONFIG.OUT_OF_STOCK_URLS_BY_CATEGORY || {};
+        for (const categoryKey of Object.keys(defs)) {
+          const urls = defs[categoryKey];
+          if (!Array.isArray(urls) || urls.length === 0) continue;
+          const res = await fetchTextFirstAvailable(urls);
+          if (!res) continue;
+          const table = parseCsvText(res.text);
+          if (table.headers.length === 0) continue;
+          const idx = table.headers.findIndex((h) => safeLower(h).includes("code1"));
+          if (idx === -1) continue;
+
+          let set = state.outOfStockSets?.[categoryKey];
+          if (!(set instanceof Set)) {
+            set = new Set();
+            if (state.outOfStockSets && typeof state.outOfStockSets === "object") state.outOfStockSets[categoryKey] = set;
+          }
+
+          for (const r of table.rows) {
+            const code1 = String(r[idx] ?? "").trim();
+            if (code1) set.add(code1);
+          }
         }
       }
 
@@ -2349,14 +2371,14 @@
         if (els.orderNotesInput && !String(els.orderNotesInput.value ?? "").trim() && notes) els.orderNotesInput.value = notes;
         if (els.allowVodafoneSwitchInput) els.allowVodafoneSwitchInput.checked = allowSwitch;
 
-        if (shipType === "GOV") {
-          if (els.shipGovRadio) els.shipGovRadio.checked = true;
-          if (els.shipGovBlock) els.shipGovBlock.style.display = "grid";
-          if (els.shipHomsBlock) els.shipHomsBlock.style.display = "none";
-        } else {
+        if (shipType === "HOMS") {
           if (els.shipHomsRadio) els.shipHomsRadio.checked = true;
           if (els.shipHomsBlock) els.shipHomsBlock.style.display = "grid";
           if (els.shipGovBlock) els.shipGovBlock.style.display = "none";
+        } else {
+          if (els.shipGovRadio) els.shipGovRadio.checked = true;
+          if (els.shipGovBlock) els.shipGovBlock.style.display = "grid";
+          if (els.shipHomsBlock) els.shipHomsBlock.style.display = "none";
         }
 
         if (els.shipSypInput && els.shipUsdInput) {
@@ -2448,6 +2470,7 @@
         if (c === "OUT_OF_STOCK") return "منتهي";
         if (c === "WADFOW") return "WADFOW";
         if (c === "TOTAL") return "TOTAL";
+        if (c === "WADFOW_TOTAL") return "WADFOW - TOTAL";
         if (c === "UNAVAILABLE") return "الغير متوفر";
         if (c === "UNCATEGORIZED") return "غير مصنف";
         if (c === "DRILLS") return "مثاقب";
@@ -2501,6 +2524,8 @@
           list = list.filter((p) => state.favorites.has(p.key));
         } else if (state.category === "OUT_OF_STOCK") {
           list = list.filter((p) => p.isOutOfStock);
+        } else if (state.category === "WADFOW_TOTAL") {
+          list = list.filter((p) => p.category === "WADFOW" || p.category === "TOTAL");
         } else if (
           state.category === "WADFOW" ||
           state.category === "TOTAL" ||
@@ -3967,7 +3992,8 @@
             const discountPercent = discountForCategory(category);
             const key = `${String(code1).trim()}::${String(code2).trim()}`;
             const search = safeLower(`${code1} ${code2} ${about}`);
-            const isOutOfStock = state.outOfStockSet.has(String(code1).trim());
+            const outSet = state.outOfStockSets?.[category];
+            const isOutOfStock = outSet instanceof Set ? outSet.has(String(code1).trim()) : false;
 
             products.push({
               key,
