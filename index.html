@@ -2007,10 +2007,10 @@
         }
       }
 
-      async function fetchTextFirstAvailable(urls) {
+      async function fetchTextFirstAvailable(urls, maxAgeMs = 6 * 60 * 60 * 1000) {
         for (const u of urls) {
           try {
-            const got = await fetchTextCached(String(u), 6 * 60 * 60 * 1000);
+            const got = await fetchTextCached(String(u), maxAgeMs);
             if (!got) continue;
             return { url: String(got.url), text: got.text };
           } catch {}
@@ -2115,7 +2115,7 @@
         for (const categoryKey of Object.keys(defs)) {
           const urls = defs[categoryKey];
           if (!Array.isArray(urls) || urls.length === 0) continue;
-          const res = await fetchTextFirstAvailable(urls);
+          const res = await fetchTextFirstAvailable(urls, 2 * 60 * 1000);
           if (!res) continue;
           const table = parseCsvText(res.text);
           if (table.headers.length === 0) continue;
@@ -3992,8 +3992,14 @@
             const discountPercent = discountForCategory(category);
             const key = `${String(code1).trim()}::${String(code2).trim()}`;
             const search = safeLower(`${code1} ${code2} ${about}`);
+            const code1Key = String(code1).trim();
             const outSet = state.outOfStockSets?.[category];
-            const isOutOfStock = outSet instanceof Set ? outSet.has(String(code1).trim()) : false;
+            const isOutOfStockByCategory = outSet instanceof Set ? outSet.has(code1Key) : false;
+            const isOutOfStockByAny =
+              state.outOfStockSets && typeof state.outOfStockSets === "object"
+                ? Object.values(state.outOfStockSets).some((s) => s instanceof Set && s.has(code1Key))
+                : false;
+            const isOutOfStock = isOutOfStockByCategory || isOutOfStockByAny;
 
             products.push({
               key,
